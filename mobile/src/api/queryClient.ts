@@ -17,7 +17,10 @@ export const queryClient = new QueryClient({
 /** Query keys in one place so invalidation stays consistent. */
 export const queryKeys = {
   shop: ['shop'] as const,
+  home: ['home'] as const,
   categories: ['categories'] as const,
+  suggest: (q: string) => ['suggest', q] as const,
+  search: (q: string, categoryId: string | undefined) => ['search', { q, categoryId }] as const,
   category: (slug: string) => ['categories', slug] as const,
   products: (categoryId: string | undefined, sort: string) =>
     ['products', { categoryId, sort }] as const,

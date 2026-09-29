@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 import { catalogApi, type ProductSort } from '@/api/catalog';
 import { queryKeys } from '@/api/queryClient';
@@ -28,4 +28,31 @@ export function useProducts(categoryId: string | undefined, sort: ProductSort) {
 
 export function useProduct(id: string) {
   return useQuery({ queryKey: queryKeys.product(id), queryFn: () => catalogApi.product(id) });
+}
+
+export function useHome() {
+  return useQuery({ queryKey: queryKeys.home, queryFn: catalogApi.home });
+}
+
+export function useSuggestions(q: string) {
+  return useQuery({
+    queryKey: queryKeys.suggest(q),
+    queryFn: () => catalogApi.suggest(q),
+    enabled: q.length > 0,
+    staleTime: 5 * 60_000,
+    // Keep the previous list visible while the next one loads, so typing feels instant.
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useSearchResults(q: string, categoryId: string | undefined) {
+  return useInfiniteQuery({
+    queryKey: queryKeys.search(q, categoryId),
+    queryFn: ({ pageParam }) => catalogApi.products({ q, categoryId, offset: pageParam }),
+    initialPageParam: 0,
+    getNextPageParam: (last) =>
+      last.offset + last.items.length < last.total ? last.offset + last.items.length : undefined,
+    enabled: q.length > 0,
+    placeholderData: keepPreviousData,
+  });
 }
