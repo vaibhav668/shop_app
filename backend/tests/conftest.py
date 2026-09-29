@@ -64,12 +64,13 @@ def db_session(db_engine: Engine) -> Iterator[Session]:
 
 
 @pytest.fixture
-def test_settings() -> Settings:
+def test_settings(tmp_path: Path) -> Settings:
     return Settings(
         app_env="test",
         dev_login_enabled=True,
         google_allowed_client_ids="test-web-client",
         access_token_ttl_minutes=15,
+        media_dir=tmp_path / "media",
     )
 
 

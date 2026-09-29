@@ -11,6 +11,7 @@ from app.repositories import users as repo
 from tests.helpers import sign_in
 
 STRONG_SECRET = "s" * 48
+CLOUD = {"storage_provider": "cloudinary", "cloudinary_url": "cloudinary://k:s@demo"}
 
 
 def test_production_requires_real_jwt_secret() -> None:
@@ -20,7 +21,7 @@ def test_production_requires_real_jwt_secret() -> None:
 
 def test_production_rejects_dev_login() -> None:
     with pytest.raises(ValidationError, match="DEV_LOGIN_ENABLED"):
-        Settings(app_env="production", jwt_secret=STRONG_SECRET, dev_login_enabled=True)
+        Settings(app_env="production", jwt_secret=STRONG_SECRET, dev_login_enabled=True, **CLOUD)
 
 
 def test_dev_login_route_absent_when_disabled() -> None:
@@ -30,7 +31,7 @@ def test_dev_login_route_absent_when_disabled() -> None:
 
 
 def test_production_hides_api_docs() -> None:
-    app = create_app(Settings(app_env="production", jwt_secret=STRONG_SECRET))
+    app = create_app(Settings(app_env="production", jwt_secret=STRONG_SECRET, **CLOUD))
     assert TestClient(app).get("/docs").status_code == 404
 
 
@@ -44,3 +45,8 @@ def test_make_admin_cli(client: TestClient, db_session: Session) -> None:
 def test_make_admin_requires_existing_user(db_session: Session) -> None:
     with pytest.raises(LookupError, match="must sign in once"):
         set_role(db_session, "nobody@example.com", UserRole.ADMIN)
+
+
+def test_production_rejects_local_image_storage() -> None:
+    with pytest.raises(ValidationError, match="cloud image storage"):
+        Settings(app_env="production", jwt_secret=STRONG_SECRET)

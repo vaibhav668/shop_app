@@ -1,8 +1,9 @@
 """Admin authorization is enforced by the backend, never only by the admin UI."""
 
+import re
+
 import pytest
 from fastapi import APIRouter, Depends
-from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
@@ -50,19 +51,28 @@ def test_anonymous_is_unauthenticated(probe_client: TestClient) -> None:
 
 
 def _admin_routes() -> list[tuple[str, str]]:
-    app = create_app(Settings(app_env="test"))
+    # Read from the OpenAPI spec: included routers are not flattened into app.routes.
+    spec = create_app(Settings(app_env="test")).openapi()
     return [
-        (method, route.path)
-        for route in app.routes
-        if isinstance(route, APIRoute) and route.path.startswith("/api/v1/admin")
-        for method in sorted(route.methods)
+        (method.upper(), path)
+        for path, operations in spec["paths"].items()
+        if path.startswith("/api/v1/admin")
+        for method in operations
     ]
 
 
-@pytest.mark.parametrize(("method", "path"), _admin_routes())
+ADMIN_ROUTES = _admin_routes()
+
+
+def test_admin_route_sweep_is_not_empty() -> None:
+    """If route discovery breaks, fail here instead of the sweep passing vacuously."""
+    assert len(ADMIN_ROUTES) >= 10
+
+
+@pytest.mark.parametrize(("method", "path"), ADMIN_ROUTES)
 def test_every_admin_route_rejects_customers(client: TestClient, method: str, path: str) -> None:
     """Grows automatically as admin routes are added in later phases."""
     token = sign_in(client, "asha@example.com")["access_token"]
-    concrete = path.replace("{", "").replace("}", "")
+    concrete = re.sub(r"\{[^}]+\}", "00000000-0000-0000-0000-000000000000", path)
     response = client.request(method, concrete, headers=bearer(token))
     assert response.status_code == 403, f"{method} {path} is not admin-protected"
