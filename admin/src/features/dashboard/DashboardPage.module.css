@@ -1,0 +1,140 @@
+.stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.statLink:hover {
+  border-color: var(--color-border-strong);
+}
+
+.statLink:focus-visible {
+  outline: 2px solid var(--color-brand);
+}
+
+/* New orders waiting: the one number that asks for action. */
+.attention {
+  background: var(--color-offer-tint);
+  border-color: var(--color-offer);
+}
+
+.statLabel {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.statValue {
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.panelTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.warnIcon {
+  color: var(--color-offer);
+}
+
+.more {
+  color: var(--color-action);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.more:hover {
+  text-decoration: underline;
+}
+
+.empty {
+  padding: var(--space-6) var(--space-4);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.stockList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.stockList li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 48px;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.stockList li:last-child {
+  border-bottom: none;
+}
+
+.stockName {
+  color: var(--color-text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.stockName:hover {
+  text-decoration: underline;
+}
+
+.stockCount {
+  color: var(--color-offer-text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.zero {
+  color: var(--color-danger);
+}
+
+@media (max-width: 1299px) {
+  .stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1099px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}

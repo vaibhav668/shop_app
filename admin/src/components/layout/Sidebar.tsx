@@ -6,7 +6,8 @@ import { NAV_ITEMS } from '@/navigation';
 
 import styles from './Sidebar.module.css';
 
-export function Sidebar() {
+/** `badges` maps a nav path to a count shown beside it (e.g. new orders). */
+export function Sidebar({ badges = {} }: { badges?: Record<string, number> }) {
   const { user, signOut } = useAuth();
   return (
     <aside className={styles.sidebar}>
@@ -34,6 +35,11 @@ export function Sidebar() {
               >
                 <Icon size={18} strokeWidth={1.75} aria-hidden />
                 <span className={styles.label}>{label}</span>
+                {badges[path] ? (
+                  <span className={styles.count} aria-label={`${badges[path]} waiting`}>
+                    {badges[path]}
+                  </span>
+                ) : null}
               </NavLink>
             </li>
           ))}

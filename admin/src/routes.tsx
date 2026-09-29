@@ -6,13 +6,15 @@ import { BannersPage } from '@/features/catalog/BannersPage';
 import { CategoriesPage } from '@/features/catalog/CategoriesPage';
 import { ProductFormPage } from '@/features/catalog/ProductFormPage';
 import { ProductsPage } from '@/features/catalog/ProductsPage';
+import { DashboardPage } from '@/features/dashboard/DashboardPage';
+import { OrdersPage } from '@/features/orders/OrdersPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { NAV_ITEMS } from '@/navigation';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { SectionPlaceholder } from '@/pages/SectionPlaceholder';
 import { SignInPage } from '@/pages/SignInPage';
 
-const BUILT = new Set(['/categories', '/products', '/banners', '/settings']);
+const BUILT = new Set(['/', '/orders', '/categories', '/products', '/banners', '/settings']);
 
 export const routes: RouteObject[] = [
   { path: '/sign-in', element: <SignInPage /> },
@@ -23,6 +25,8 @@ export const routes: RouteObject[] = [
       </RequireAuth>
     ),
     children: [
+      { path: '/', element: <DashboardPage /> },
+      { path: '/orders', element: <OrdersPage /> },
       { path: '/categories', element: <CategoriesPage /> },
       { path: '/banners', element: <BannersPage /> },
       { path: '/products', element: <ProductsPage /> },

@@ -1,0 +1,131 @@
+.muted {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.strong {
+  font-weight: 600;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.heading {
+  margin-bottom: var(--space-1);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  color: var(--color-action);
+  font-weight: 600;
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.phone:hover {
+  text-decoration: underline;
+}
+
+.note {
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-offer-tint);
+  color: var(--color-offer-text);
+}
+
+.items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.qty {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.itemName {
+  min-width: 0;
+}
+
+.bill {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: 4px;
+  margin: var(--space-2) 0 0;
+}
+
+.bill dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-left: var(--space-4);
+  margin: 0;
+}
+
+.footerError {
+  margin-right: auto;
+  align-self: center;
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+.reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.reasonChip {
+  height: 32px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.reasonChip:hover {
+  background: var(--color-surface-muted);
+}
+
+.reasonChip:focus-visible {
+  outline: 2px solid var(--color-brand);
+}

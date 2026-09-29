@@ -74,6 +74,26 @@
   color: var(--color-text);
 }
 
+.link {
+  position: relative;
+}
+
+/* Waiting-orders count: amber fill with dark text (never white on orange). */
+.count {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--color-offer);
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
 .active,
 .active:hover {
   background: var(--color-brand-tint);
@@ -166,5 +186,15 @@
   .link {
     justify-content: center;
     padding: 0;
+  }
+
+  .count {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 10px;
   }
 }
