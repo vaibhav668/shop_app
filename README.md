@@ -8,9 +8,9 @@ Start with [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md).
 
 | Folder | What | Status |
 |---|---|---|
-| `backend/` | FastAPI, SQLAlchemy, Alembic | Phase 5 — cart, pricing, favourites |
-| `mobile/` | Expo SDK 57 + React Native customer app | Phase 5 — cart, cart bar, favourites |
-| `admin/` | Vite + React admin dashboard | Phase 4 — catalog management, banners |
+| `backend/` | FastAPI, SQLAlchemy, Alembic | Phase 6 — addresses, checkout quote, shop settings |
+| `mobile/` | Expo SDK 57 + React Native customer app | Phase 6 — saved addresses, checkout screen |
+| `admin/` | Vite + React admin dashboard | Phase 6 — catalog, banners, shop settings |
 | `docs/` | Plan, architecture, schema, API, UI system | — |
 | `scripts/` | Repo-wide checks (palette guard) | — |
 
