@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
+    "@react-native-google-signin/google-signin": "^16.1.5",
     "expo": "~57.0.26",
     "expo-constants": "~57.0.20",
     "expo-dev-client": "~57.0.19",
@@ -11,6 +12,7 @@
     "expo-image": "~57.0.5",
     "expo-linking": "~57.0.11",
     "expo-router": "~57.0.24",
+    "expo-secure-store": "~57.0.4",
     "expo-splash-screen": "~57.0.9",
     "expo-status-bar": "~57.0.1",
     "expo-system-ui": "~57.0.4",
@@ -46,7 +48,8 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "gen:api": "npx --yes openapi-typescript@7.13.0 ../backend/openapi.json -o src/api/schema.ts && prettier --write src/api/schema.ts"
   },
   "private": true,
   "jest": {
