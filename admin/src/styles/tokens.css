@@ -1,0 +1,51 @@
+/*
+ * "Fresh Market" tokens. The ONLY file in admin/src allowed to contain hex colours
+ * (enforced by scripts/check-palette.mjs). Spec: docs/UI_SYSTEM.md.
+ */
+:root {
+  --color-brand: #16a34a;
+  --color-action: #15803d;
+  --color-action-pressed: #166534;
+  --color-brand-tint: #dcfce7;
+
+  --color-bg: #fafaf7;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f5f5f4;
+
+  --color-text: #171717;
+  --color-text-secondary: #737373;
+  --color-text-tertiary: #a3a3a3;
+  --color-on-action: #ffffff;
+
+  --color-border: #e7e5e4;
+  --color-border-strong: #d6d3d1;
+
+  --color-offer: #f59e0b;
+  --color-offer-tint: #fef3c7;
+  --color-offer-text: #92400e;
+
+  --color-danger: #dc2626;
+  --color-danger-tint: #fee2e2;
+
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
+
+  --shadow-float: 0 4px 12px rgb(23 23 23 / 0.08);
+
+  --sidebar-width: 232px;
+  --sidebar-width-collapsed: 68px;
+}

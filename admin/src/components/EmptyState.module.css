@@ -1,0 +1,33 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-10) var(--space-8);
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.icon {
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-1);
+}
+
+.title {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.message {
+  max-width: 420px;
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.action {
+  margin-top: var(--space-2);
+}
