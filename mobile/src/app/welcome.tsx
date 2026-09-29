@@ -40,7 +40,7 @@ export default function WelcomeScreen() {
             Groceries from your neighbourhood shop
           </Text>
           <Text variant="body" color="textSecondary">
-            Fresh stock from Daily Basket, packed and delivered by the shop itself.
+            Fresh stock from Bada Bazar, packed and delivered by the shop itself.
           </Text>
         </View>
 

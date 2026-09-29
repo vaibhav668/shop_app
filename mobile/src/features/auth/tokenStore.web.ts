@@ -1,6 +1,6 @@
 // Web preview only (`expo start --web`), used for local UI review. The Android app uses the
 // secure-store implementation in tokenStore.ts.
-const REFRESH_KEY = 'daily-basket.refresh-token';
+const REFRESH_KEY = 'bada-bazar.refresh-token';
 
 export const tokenStore = {
   getRefreshToken: async () => localStorage.getItem(REFRESH_KEY),

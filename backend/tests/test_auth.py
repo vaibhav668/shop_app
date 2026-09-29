@@ -64,7 +64,7 @@ class TestAdminSignIn:
         assert response.status_code == 200
         assert "refresh_token" not in response.json()
         cookie = response.headers["set-cookie"]
-        assert "db_refresh=" in cookie
+        assert "bb_refresh=" in cookie
         assert "HttpOnly" in cookie
         assert "Path=/api/v1/auth" in cookie
         assert "SameSite=strict" in cookie

@@ -57,7 +57,7 @@ export function SignInPage() {
         <span className={styles.mark} aria-hidden>
           <ShoppingBasket size={24} strokeWidth={2} />
         </span>
-        <h1 className={styles.title}>Daily Basket admin</h1>
+        <h1 className={styles.title}>Bada Bazar admin</h1>
         <p className={styles.subtitle}>Sign in with the Google account the shop owner added.</p>
 
         {error ? (

@@ -15,7 +15,7 @@ export function Sidebar() {
           <ShoppingBasket size={18} strokeWidth={2} />
         </span>
         <span className={styles.brandText}>
-          <span className={styles.shopName}>Daily Basket</span>
+          <span className={styles.shopName}>Bada Bazar</span>
           <span className={styles.caption}>Shop admin</span>
         </span>
       </div>

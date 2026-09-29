@@ -17,7 +17,7 @@ from app.schemas.auth import (
 )
 from app.services.auth import AuthResult, AuthService
 
-REFRESH_COOKIE = "db_refresh"
+REFRESH_COOKIE = "bb_refresh"
 REFRESH_COOKIE_PATH = "/api/v1/auth"
 
 router = APIRouter(prefix="/auth", tags=["auth"])

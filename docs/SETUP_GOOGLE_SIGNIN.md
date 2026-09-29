@@ -12,16 +12,16 @@ You'll create **one project** with **two OAuth clients**:
 The mobile app asks Google for an ID token *for the web client*. That's why the backend only needs the web client ID.
 
 ## 1. Project and consent screen
-1. Go to <https://console.cloud.google.com/> and create a project named **Daily Basket**.
+1. Go to <https://console.cloud.google.com/> and create a project named **Bada Bazar**.
 2. Open **APIs & Services → OAuth consent screen** (called "Google Auth Platform" in newer consoles).
    - User type: **External**.
-   - App name: *Daily Basket*. Support email: your email.
+   - App name: *Bada Bazar*. Support email: your email.
    - Scopes: the defaults (`openid`, `email`, `profile`) are enough.
    - While the app is in **Testing**, add your own Google account(s) under **Test users**.
 
 ## 2. Web client
 1. **Credentials → Create credentials → OAuth client ID → Web application**.
-2. Name: `Daily Basket web`.
+2. Name: `Bada Bazar web`.
 3. **Authorised JavaScript origins**: `http://localhost:5173` (later also add `https://admin.<your-domain>`).
 4. No redirect URIs are needed.
 5. Copy the **Client ID** (it ends in `.apps.googleusercontent.com`).
@@ -31,7 +31,7 @@ The mobile app asks Google for an ID token *for the web client*. That's why the 
    - **EAS development build**: run `npx eas-cli@latest credentials -p android` in `mobile/`, choose the *development* profile, and copy the **SHA1 Fingerprint**. You can also create the first build with step 5 below, then read the fingerprint from the same menu.
    - **Play Store builds (later)**: also add the **App signing key** SHA-1 from Play Console → Setup → App integrity. If this is missing, sign-in fails only in Play builds.
 2. **Create credentials → OAuth client ID → Android**.
-3. Package name: `com.placeholder.dailybasket` (update this when the real package name is chosen).
+3. Package name: `com.placeholder.badabazar` (update this when the real package name is chosen).
 4. Paste the SHA-1 and create the client.
 
 ## 4. Put the IDs in place

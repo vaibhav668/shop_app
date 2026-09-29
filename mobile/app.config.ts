@@ -2,12 +2,12 @@ import type { ExpoConfig } from 'expo/config';
 
 // Placeholder until the real package name is decided. It becomes permanent after the
 // first Play Store upload, so it is overridable via env for release builds.
-const ANDROID_PACKAGE = process.env.APP_ANDROID_PACKAGE ?? 'com.placeholder.dailybasket';
+const ANDROID_PACKAGE = process.env.APP_ANDROID_PACKAGE ?? 'com.placeholder.badabazar';
 
 const config: ExpoConfig = {
-  name: 'Daily Basket',
-  slug: 'daily-basket',
-  scheme: 'dailybasket',
+  name: 'Bada Bazar',
+  slug: 'bada-bazar',
+  scheme: 'badabazar',
   version: '0.1.0',
   orientation: 'portrait',
   icon: './assets/images/icon.png',

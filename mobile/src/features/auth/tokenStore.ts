@@ -2,7 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 
 // The refresh token lives in the Android Keystore-backed secure store; the access token is
 // memory-only and re-issued from it on launch.
-const REFRESH_KEY = 'daily-basket.refresh-token';
+const REFRESH_KEY = 'bada-bazar.refresh-token';
 
 export const tokenStore = {
   getRefreshToken: () => SecureStore.getItemAsync(REFRESH_KEY),

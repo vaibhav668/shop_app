@@ -13,7 +13,7 @@ describe('admin sign-in', () => {
   it('sends signed-out visitors to the sign-in page', async () => {
     mockApi({ '/auth/refresh': expired });
     const router = renderApp('/orders');
-    expect(await screen.findByRole('heading', { name: 'Daily Basket admin' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Bada Bazar admin' })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/sign-in');
   });
 
@@ -50,7 +50,7 @@ describe('admin sign-in', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: 'Sign out' }));
 
-    expect(await screen.findByRole('heading', { name: 'Daily Basket admin' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Bada Bazar admin' })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/sign-in');
     const logout = fetchMock.mock.calls.find(([url]) => String(url).endsWith('/auth/logout'));
     expect(logout?.[1]).toMatchObject({ credentials: 'include' });

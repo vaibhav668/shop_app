@@ -14,7 +14,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     configure_logging(settings.log_level)
 
     app = FastAPI(
-        title="Daily Basket API",
+        title="Bada Bazar API",
         version="0.1.0",
         openapi_url=f"{API_PREFIX}/openapi.json",
         docs_url=None if settings.is_production else "/docs",

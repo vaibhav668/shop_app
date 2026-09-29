@@ -1,8 +1,8 @@
-# Daily Basket
+# Bada Bazar
 
 A grocery ordering platform for a single local shop. It has three parts: an Android customer app (Expo), a web admin dashboard for the shopkeeper (React), and a FastAPI + PostgreSQL backend.
 
-"Daily Basket" and the Android package name `com.placeholder.dailybasket` are placeholders until the real brand is chosen.
+The Android package name `com.placeholder.badabazar` is a placeholder until the final package name is chosen before the first Play Store build.
 
 Start with [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md).
 

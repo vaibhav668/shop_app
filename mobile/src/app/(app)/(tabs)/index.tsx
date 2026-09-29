@@ -17,7 +17,7 @@ export default function HomeScreen() {
           {firstName ? `, ${firstName}` : ''}
         </Text>
         <Text variant="body" color="textSecondary">
-          Fresh groceries from Daily Basket
+          Fresh groceries from Bada Bazar
         </Text>
       </View>
       <EmptyState

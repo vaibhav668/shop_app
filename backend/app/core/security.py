@@ -12,7 +12,7 @@ from app.core.config import Settings
 from app.core.errors import AppError
 
 _ALGORITHM = "HS256"
-_ISSUER = "daily-basket-api"
+_ISSUER = "bada-bazar-api"
 
 
 @dataclass(frozen=True)
