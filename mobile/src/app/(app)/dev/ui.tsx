@@ -30,38 +30,50 @@ const SAMPLE_PRODUCTS: ProductCardData[] = [
   {
     id: 'milk',
     name: 'Toned Milk',
-    unitLabel: '500 ml',
-    pricePaise: 2800,
-    mrpPaise: 2800,
-    imageUrl: null,
-    stockHint: 'IN_STOCK',
+    unit_label: '500 ml',
+    price_paise: 2800,
+    mrp_paise: 2800,
+    discount_percent: 0,
+    image_url: null,
+    is_available: true,
+    stock_hint: 'IN_STOCK',
+    max_per_order: 5,
   },
   {
     id: 'bread',
     name: 'Whole Wheat Bread, Freshly Baked',
-    unitLabel: '400 g',
-    pricePaise: 4500,
-    mrpPaise: 5000,
-    imageUrl: null,
-    stockHint: 'LOW',
+    unit_label: '400 g',
+    price_paise: 4500,
+    mrp_paise: 5000,
+    discount_percent: 10,
+    image_url: null,
+    is_available: true,
+    stock_hint: 'LOW',
+    max_per_order: 5,
   },
   {
     id: 'eggs',
     name: 'Farm Eggs',
-    unitLabel: '6 pcs',
-    pricePaise: 5450,
-    mrpPaise: 6000,
-    imageUrl: null,
-    stockHint: 'IN_STOCK',
+    unit_label: '6 pcs',
+    price_paise: 5450,
+    mrp_paise: 6000,
+    discount_percent: 9,
+    image_url: null,
+    is_available: true,
+    stock_hint: 'IN_STOCK',
+    max_per_order: 5,
   },
   {
     id: 'paneer',
     name: 'Fresh Paneer',
-    unitLabel: '200 g',
-    pricePaise: 9000,
-    mrpPaise: 9500,
-    imageUrl: null,
-    stockHint: 'OUT',
+    unit_label: '200 g',
+    price_paise: 9000,
+    mrp_paise: 9500,
+    discount_percent: 5,
+    image_url: null,
+    is_available: false,
+    stock_hint: 'OUT',
+    max_per_order: 5,
   },
 ];
 
@@ -183,11 +195,12 @@ export default function UiKitScreen() {
               <View key={p.id} style={styles.gridItem}>
                 <ProductCard
                   product={p}
-                  quantity={qty[p.id] ?? 0}
-                  maxQuantity={5}
-                  onAdd={() => change(p.id, 1)}
-                  onIncrement={() => change(p.id, 1)}
-                  onDecrement={() => change(p.id, -1)}
+                  cart={{
+                    quantity: qty[p.id] ?? 0,
+                    onAdd: () => change(p.id, 1),
+                    onIncrement: () => change(p.id, 1),
+                    onDecrement: () => change(p.id, -1),
+                  }}
                 />
               </View>
             ))}

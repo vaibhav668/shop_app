@@ -1,69 +1,44 @@
-import { Image } from 'expo-image';
-import { ShoppingBasket } from 'lucide-react-native';
 import { memo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
+import type { ProductCard as ProductCardData } from '@/api/catalog';
+import { ProductImage } from '@/components/product/ProductImage';
 import { Badge, Money, QuantityStepper, Text } from '@/components/ui';
-import { discountPercent, formatPaise } from '@/lib/money';
+import { formatPaise } from '@/lib/money';
 import { colors, motion, radius, spacing } from '@/theme/tokens';
 
-export type StockHint = 'IN_STOCK' | 'LOW' | 'OUT';
+export type { ProductCardData };
 
-/** Mirrors the API's ProductCard DTO (docs/API_SPEC.md), in camelCase. */
-export type ProductCardData = {
-  id: string;
-  name: string;
-  unitLabel: string;
-  pricePaise: number;
-  mrpPaise: number;
-  imageUrl: string | null;
-  stockHint: StockHint;
-};
-
-export type ProductCardProps = {
-  product: ProductCardData;
+/** Cart controls arrive in Phase 5; until a screen passes them, the card is browse-only. */
+export type CartControls = {
   quantity: number;
-  maxQuantity?: number;
-  onPress?: () => void;
   onAdd: () => void;
   onIncrement: () => void;
   onDecrement: () => void;
 };
 
-function ProductCardBase({
-  product,
-  quantity,
-  maxQuantity,
-  onPress,
-  onAdd,
-  onIncrement,
-  onDecrement,
-}: ProductCardProps) {
-  const outOfStock = product.stockHint === 'OUT';
-  const discount = discountPercent(product.pricePaise, product.mrpPaise);
+export type ProductCardProps = {
+  product: ProductCardData;
+  onPress?: () => void;
+  cart?: CartControls;
+};
+
+function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
+  const outOfStock = !product.is_available;
+  const discount = product.discount_percent;
 
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${product.name}, ${product.unitLabel}, ${formatPaise(product.pricePaise)}${
+      accessibilityLabel={`${product.name}, ${product.unit_label}, ${formatPaise(product.price_paise)}${
         outOfStock ? ', out of stock' : ''
       }`}
-      style={styles.card}
+      style={({ pressed }) => [styles.card, pressed && onPress && styles.pressed]}
     >
       <View style={styles.imageWell}>
-        {product.imageUrl ? (
-          <Image
-            source={product.imageUrl}
-            style={[styles.image, outOfStock && styles.faded]}
-            contentFit="contain"
-            transition={motion.base}
-            accessibilityIgnoresInvertColors
-          />
-        ) : (
-          <ShoppingBasket size={40} strokeWidth={1.5} color={colors.textTertiary} />
-        )}
+        <ProductImage uri={product.image_url} faded={outOfStock} iconSize={40} />
         {discount > 0 && !outOfStock ? (
           <View style={styles.tag}>
             <Badge label={`${discount}% OFF`} tone="offer" />
@@ -76,9 +51,9 @@ function ProductCardBase({
           {product.name}
         </Text>
         <Text variant="caption" color="textSecondary">
-          {product.unitLabel}
+          {product.unit_label}
         </Text>
-        {product.stockHint === 'LOW' ? (
+        {product.stock_hint === 'LOW' ? (
           <Text variant="micro" color="offerText">
             Only a few left
           </Text>
@@ -86,9 +61,9 @@ function ProductCardBase({
 
         <View style={styles.footer}>
           <View>
-            <Money paise={product.pricePaise} variant="bodyStrong" />
+            <Money paise={product.price_paise} variant="bodyStrong" />
             {discount > 0 ? (
-              <Money paise={product.mrpPaise} variant="caption" color="textTertiary" strike />
+              <Money paise={product.mrp_paise} variant="caption" color="textTertiary" strike />
             ) : null}
           </View>
 
@@ -96,30 +71,32 @@ function ProductCardBase({
             <Text variant="micro" color="danger">
               Out of stock
             </Text>
-          ) : quantity > 0 ? (
-            <Animated.View key="stepper" entering={FadeIn.duration(motion.base)}>
-              <QuantityStepper
-                value={quantity}
-                max={maxQuantity}
-                onIncrement={onIncrement}
-                onDecrement={onDecrement}
-                itemName={product.name}
-              />
-            </Animated.View>
-          ) : (
-            <Animated.View key="add" entering={FadeIn.duration(motion.base)}>
-              <Pressable
-                onPress={onAdd}
-                accessibilityRole="button"
-                accessibilityLabel={`Add ${product.name} to cart`}
-                style={({ pressed }) => [styles.add, pressed && styles.addPressed]}
-              >
-                <Text variant="micro" color="action" style={styles.addLabel}>
-                  ADD
-                </Text>
-              </Pressable>
-            </Animated.View>
-          )}
+          ) : cart ? (
+            cart.quantity > 0 ? (
+              <Animated.View key="stepper" entering={FadeIn.duration(motion.base)}>
+                <QuantityStepper
+                  value={cart.quantity}
+                  max={product.max_per_order ?? undefined}
+                  onIncrement={cart.onIncrement}
+                  onDecrement={cart.onDecrement}
+                  itemName={product.name}
+                />
+              </Animated.View>
+            ) : (
+              <Animated.View key="add" entering={FadeIn.duration(motion.base)}>
+                <Pressable
+                  onPress={cart.onAdd}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Add ${product.name} to cart`}
+                  style={({ pressed }) => [styles.add, pressed && styles.addPressed]}
+                >
+                  <Text variant="micro" color="action" style={styles.addLabel}>
+                    ADD
+                  </Text>
+                </Pressable>
+              </Animated.View>
+            )
+          ) : null}
         </View>
       </View>
     </Pressable>
@@ -137,22 +114,20 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     padding: spacing.xs,
   },
+  pressed: { borderColor: colors.borderStrong },
   imageWell: {
     aspectRatio: 1,
     borderRadius: radius.sm,
     backgroundColor: colors.surfaceMuted,
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: spacing.xs,
   },
-  image: { width: '100%', height: '100%' },
-  faded: { opacity: 0.5 },
   tag: { position: 'absolute', top: 6, left: 6 },
   body: { paddingTop: spacing.xs, paddingHorizontal: 2, gap: 2, flex: 1 },
   name: { minHeight: 40 },
   footer: {
     marginTop: 'auto',
     paddingTop: spacing.xs,
+    minHeight: 40,
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',

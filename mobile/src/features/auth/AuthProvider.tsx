@@ -11,6 +11,7 @@ import {
 
 import { type AuthResponse, authApi, type User } from '@/api/auth';
 import { ApiError, configureApiSession } from '@/api/client';
+import { queryClient } from '@/api/queryClient';
 import { getGoogleIdToken, signOutOfGoogle } from '@/features/auth/googleSignIn';
 import { tokenStore } from '@/features/auth/tokenStore';
 
@@ -40,6 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const endSession = useCallback(async () => {
     accessToken.current = null;
     await tokenStore.clear();
+    // The next person on this phone must not see the previous person's cached data.
+    queryClient.clear();
     setUser(null);
     setStatus('signedOut');
   }, []);

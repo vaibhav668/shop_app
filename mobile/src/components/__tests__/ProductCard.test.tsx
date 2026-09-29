@@ -5,19 +5,27 @@ import { ProductCard, type ProductCardData } from '@/components/product/ProductC
 const bread: ProductCardData = {
   id: 'bread',
   name: 'Whole Wheat Bread',
-  unitLabel: '400 g',
-  pricePaise: 4500,
-  mrpPaise: 5000,
-  imageUrl: null,
-  stockHint: 'IN_STOCK',
+  unit_label: '400 g',
+  price_paise: 4500,
+  mrp_paise: 5000,
+  discount_percent: 10,
+  image_url: null,
+  is_available: true,
+  stock_hint: 'IN_STOCK',
+  max_per_order: null,
 };
 
-async function setup(overrides: Partial<ProductCardData> = {}, quantity = 0) {
-  const handlers = { onAdd: jest.fn(), onIncrement: jest.fn(), onDecrement: jest.fn() };
-  const view = await render(
-    <ProductCard product={{ ...bread, ...overrides }} quantity={quantity} {...handlers} />,
+async function setup(overrides: Partial<ProductCardData> = {}, quantity?: number) {
+  const cart = { onAdd: jest.fn(), onIncrement: jest.fn(), onDecrement: jest.fn() };
+  const onPress = jest.fn();
+  await render(
+    <ProductCard
+      product={{ ...bread, ...overrides }}
+      onPress={onPress}
+      cart={quantity === undefined ? undefined : { quantity, ...cart }}
+    />,
   );
-  return { ...handlers, view };
+  return { ...cart, onPress };
 }
 
 describe('<ProductCard />', () => {
@@ -28,8 +36,19 @@ describe('<ProductCard />', () => {
     expect(screen.getByText('10% OFF')).toBeOnTheScreen();
   });
 
-  it('shows ADD when not in the cart, and calls onAdd', async () => {
-    const { onAdd } = await setup();
+  it('opens the product when tapped', async () => {
+    const { onPress } = await setup();
+    await fireEvent.press(await screen.findByRole('button', { name: /Whole Wheat Bread/ }));
+    expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it('is browse-only without cart controls', async () => {
+    await setup();
+    expect(screen.queryByLabelText('Add Whole Wheat Bread to cart')).toBeNull();
+  });
+
+  it('shows ADD with cart controls, and calls onAdd', async () => {
+    const { onAdd } = await setup({}, 0);
     await fireEvent.press(await screen.findByLabelText('Add Whole Wheat Bread to cart'));
     expect(onAdd).toHaveBeenCalledTimes(1);
   });
@@ -44,14 +63,14 @@ describe('<ProductCard />', () => {
   });
 
   it('cannot be added when out of stock', async () => {
-    await setup({ stockHint: 'OUT' });
+    await setup({ is_available: false, stock_hint: 'OUT' }, 0);
     expect(await screen.findByText('Out of stock')).toBeOnTheScreen();
     expect(screen.queryByLabelText('Add Whole Wheat Bread to cart')).toBeNull();
     expect(screen.queryByText('10% OFF')).toBeNull();
   });
 
   it('warns when stock is low', async () => {
-    await setup({ stockHint: 'LOW' });
+    await setup({ stock_hint: 'LOW' });
     expect(await screen.findByText('Only a few left')).toBeOnTheScreen();
   });
 });
