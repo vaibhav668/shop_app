@@ -8,8 +8,8 @@ Start with [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md).
 
 | Folder | What | Status |
 |---|---|---|
-| `backend/` | FastAPI, SQLAlchemy, Alembic | Phase 9 — orders, inventory (bulk stock, history), customers |
-| `mobile/` | Expo SDK 57 + React Native customer app | Phase 7 — place orders, orders tab, order tracking |
+| `backend/` | FastAPI, SQLAlchemy, Alembic | Phase 10 — orders, inventory, customers, notifications (FCM) |
+| `mobile/` | Expo SDK 57 + React Native customer app | Phase 10 — ordering, tracking, notifications & push |
 | `admin/` | Vite + React admin dashboard | Phase 9 — orders, inventory, Quick Stock, customers, dashboard |
 | `docs/` | Plan, architecture, schema, API, UI system | — |
 | `scripts/` | Repo-wide checks (palette guard) | — |
