@@ -4,6 +4,7 @@ payment events all come through here, so every change is checked, logged and has
 import enum
 import uuid
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Session
 
@@ -17,6 +18,9 @@ from app.models import (
     PaymentStatus,
 )
 from app.services.inventory import InventoryService
+
+if TYPE_CHECKING:
+    from app.services.notifications import Notifier
 
 S = OrderStatus
 
@@ -60,8 +64,9 @@ def allowed_for(actor: ActorKind, current: OrderStatus) -> frozenset[OrderStatus
 
 
 class OrderStateMachine:
-    def __init__(self, db: Session) -> None:
+    def __init__(self, db: Session, notifier: "Notifier | None" = None) -> None:
         self.db = db
+        self.notifier = notifier
 
     def transition(
         self, order: Order, to: OrderStatus, actor: Actor, note: str | None = None
@@ -97,6 +102,9 @@ class OrderStateMachine:
                 note=note,
             )
         )
+        # Tell the customer, unless they made this change themselves (they just saw it).
+        if self.notifier is not None and actor.kind is not ActorKind.CUSTOMER:
+            self.notifier.order_status(order, to)
 
     def _on_cancel(self, order: Order, actor: Actor, note: str | None) -> None:
         order.cancel_reason = note

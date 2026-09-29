@@ -95,7 +95,8 @@ The first address becomes the default automatically (`is_default: true` on creat
 | POST | `/payments/webhook/razorpay` **public** | raw provider body | Verified with `X-Razorpay-Signature` against the webhook secret. Always returns 200 once the signature is valid (idempotent). |
 
 ### Notifications
-`GET /notifications?limit&offset` · `POST /notifications/read-all` · `GET /notifications/unread-count`
+`GET /notifications?limit&offset` → newest first, `{id, type, title, body, data: {order_id, status, route}, read_at, created_at}` · `POST /notifications/read-all` → 204 · `GET /notifications/unread-count` → `{count}`
+One notification per order step the customer didn't take themselves (placed, confirmed, packing, out for delivery, delivered, cancelled by the shop). The row is written in the same transaction as the order change; the push is sent after the response and only if that row exists. Dead device tokens reported by FCM are deleted. `POST /auth/logout {device_token}` stops pushes to that phone.
 
 ## Admin endpoints (`/admin/*`, role ADMIN, enforced at router level)
 

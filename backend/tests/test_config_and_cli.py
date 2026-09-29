@@ -11,7 +11,12 @@ from app.repositories import users as repo
 from tests.helpers import sign_in
 
 STRONG_SECRET = "s" * 48
-CLOUD = {"storage_provider": "cloudinary", "cloudinary_url": "cloudinary://k:s@demo"}
+CLOUD = {
+    "storage_provider": "cloudinary",
+    "cloudinary_url": "cloudinary://k:s@demo",
+    "push_provider": "fcm",
+    "firebase_credentials_file": "firebase-service-account.json",
+}
 
 
 def test_production_requires_real_jwt_secret() -> None:
@@ -50,3 +55,14 @@ def test_make_admin_requires_existing_user(db_session: Session) -> None:
 def test_production_rejects_local_image_storage() -> None:
     with pytest.raises(ValidationError, match="cloud image storage"):
         Settings(app_env="production", jwt_secret=STRONG_SECRET)
+
+
+def test_production_rejects_fake_push() -> None:
+    cloud_storage = {k: v for k, v in CLOUD.items() if not k.startswith(("push", "firebase"))}
+    with pytest.raises(ValidationError, match="PUSH_PROVIDER=fcm"):
+        Settings(app_env="production", jwt_secret=STRONG_SECRET, **cloud_storage)
+
+
+def test_fcm_needs_a_credentials_file() -> None:
+    with pytest.raises(ValidationError, match="FIREBASE_CREDENTIALS_FILE"):
+        Settings(app_env="local", push_provider="fcm")

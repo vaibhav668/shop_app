@@ -27,16 +27,24 @@ from app.schemas.order import (
     LowStockItem,
     OrdersSummaryOut,
 )
+from app.services.notifications import Notifier
 from app.services.order_state import Actor, ActorKind, OrderStateMachine, allowed_for
 from app.services.orders import OrderViews, with_details
 from app.services.shop import get_shop_settings
 
 
 class AdminOrderService:
-    def __init__(self, db: Session, views: OrderViews, shop_timezone: str) -> None:
+    def __init__(
+        self,
+        db: Session,
+        views: OrderViews,
+        shop_timezone: str,
+        notifier: Notifier | None = None,
+    ) -> None:
         self.db = db
         self.views = views
         self.tz = ZoneInfo(shop_timezone)
+        self.notifier = notifier
 
     # --- list -------------------------------------------------------------------------------
 
@@ -136,7 +144,9 @@ class AdminOrderService:
         self, order_id: uuid.UUID, to: OrderStatus, admin: User, note: str | None
     ) -> Order:
         order = self.get(order_id, lock=True)
-        OrderStateMachine(self.db).transition(order, to, Actor(ActorKind.ADMIN, admin.id), note)
+        OrderStateMachine(self.db, self.notifier).transition(
+            order, to, Actor(ActorKind.ADMIN, admin.id), note
+        )
         self.db.commit()
         return self.get(order_id)
 

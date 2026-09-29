@@ -8,6 +8,7 @@ from app.core.config import Settings, get_settings
 from app.core.security import utcnow
 from app.dependencies.auth import require_admin
 from app.dependencies.db import get_db
+from app.dependencies.notifications import get_notifier
 from app.dependencies.storage import get_storage
 from app.integrations.storage import StorageProvider
 from app.models import OrderStatus, PaymentStatus, User
@@ -20,6 +21,7 @@ from app.schemas.order import (
     StatusChangeRequest,
 )
 from app.services.admin_orders import AdminOrderService
+from app.services.notifications import Notifier
 from app.services.orders import OrderViews
 
 router = APIRouter()
@@ -29,8 +31,9 @@ def get_service(
     db: Session = Depends(get_db),
     storage: StorageProvider = Depends(get_storage),
     settings: Settings = Depends(get_settings),
+    notifier: Notifier = Depends(get_notifier),
 ) -> AdminOrderService:
-    return AdminOrderService(db, OrderViews(storage), settings.shop_timezone)
+    return AdminOrderService(db, OrderViews(storage), settings.shop_timezone, notifier)
 
 
 @router.get("/orders", response_model=Page[AdminOrderRow])

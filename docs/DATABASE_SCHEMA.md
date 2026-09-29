@@ -208,7 +208,7 @@ One row per payment attempt, so an order can have several.
 `id`, `product_id` FK, `delta` int, `resulting_stock` int, `reason` inventory_reason, `order_id` FK nullable, `actor_user_id` FK nullable, `note`, `created_at` (default `clock_timestamp()`, so rows written in one transaction keep their real order). Index on `(product_id, created_at DESC)`.
 
 ### notifications
-`id`, `user_id` FK, `type` text (e.g. `ORDER_STATUS`), `title`, `body`, `data` jsonb (`{order_id, route}`), `read_at`, `created_at`. Index on `(user_id, created_at DESC)`.
+`id`, `user_id` FK, `type` text (e.g. `ORDER_STATUS`), `title`, `body`, `data` jsonb (`{order_id, route}`), `read_at`, `created_at` (default `clock_timestamp()`). Index on `(user_id, created_at DESC)`. Deleted with the account.
 
 ### banners
 `id`, `title`, `subtitle`, `image_key`, `target_type` banner_target, `target_id` uuid, `sort_order`, `is_active`, `starts_at`, `ends_at`.

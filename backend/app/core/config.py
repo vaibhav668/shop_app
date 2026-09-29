@@ -42,6 +42,11 @@ class Settings(BaseSettings):
     media_dir: Path = BACKEND_DIR / "media"
     cloudinary_url: str = ""
 
+    # "fake" logs pushes instead of sending them (local/test). "fcm" sends through Firebase
+    # Cloud Messaging with a service-account key file (never committed; see docs).
+    push_provider: Literal["fake", "fcm"] = "fake"
+    firebase_credentials_file: Path | None = None
+
     @model_validator(mode="after")
     def _guard_deployed_environments(self) -> "Settings":
         if self.app_env in ("staging", "production"):
@@ -51,8 +56,12 @@ class Settings(BaseSettings):
                 raise ValueError("DEV_LOGIN_ENABLED is only allowed in local/test.")
             if self.storage_provider == "local":
                 raise ValueError("Use cloud image storage (STORAGE_PROVIDER) outside local/test.")
+            if self.push_provider == "fake":
+                raise ValueError("Use PUSH_PROVIDER=fcm outside local/test.")
         if self.storage_provider == "cloudinary" and not self.cloudinary_url:
             raise ValueError("STORAGE_PROVIDER=cloudinary needs CLOUDINARY_URL.")
+        if self.push_provider == "fcm" and not self.firebase_credentials_file:
+            raise ValueError("PUSH_PROVIDER=fcm needs FIREBASE_CREDENTIALS_FILE.")
         return self
 
     @property

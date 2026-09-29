@@ -34,6 +34,7 @@ from app.schemas.order import (
 from app.services.addresses import AddressService
 from app.services.checkout import enabled_payment_methods
 from app.services.inventory import InventoryService
+from app.services.notifications import Notifier
 from app.services.order_state import (
     CUSTOMER_CANCELLABLE,
     Actor,
@@ -119,9 +120,12 @@ class OrderViews:
 
 
 class OrderService:
-    def __init__(self, db: Session, addresses: AddressService) -> None:
+    def __init__(
+        self, db: Session, addresses: AddressService, notifier: Notifier | None = None
+    ) -> None:
         self.db = db
         self.addresses = addresses
+        self.notifier = notifier
 
     # --- placing ----------------------------------------------------------------------------
 
@@ -255,6 +259,8 @@ class OrderService:
             )
         )
         address.last_used_at = now
+        if self.notifier is not None:
+            self.notifier.order_status(order, OrderStatus.PENDING)
         self.db.commit()
         return order
 
@@ -302,7 +308,7 @@ class OrderService:
         )
         if order is None:
             raise AppError("NOT_FOUND", "Order not found.", 404)
-        OrderStateMachine(self.db).transition(
+        OrderStateMachine(self.db, self.notifier).transition(
             order, OrderStatus.CANCELLED, Actor(ActorKind.CUSTOMER, user.id), reason
         )
         self.db.commit()

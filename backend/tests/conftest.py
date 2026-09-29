@@ -3,6 +3,7 @@ import os
 os.environ["APP_ENV"] = "test"
 
 from collections.abc import Iterator
+from contextlib import nullcontext
 from pathlib import Path
 
 import pytest
@@ -16,6 +17,8 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings, get_settings
 from app.dependencies.auth import get_google_verifier
 from app.dependencies.db import get_db
+from app.dependencies.notifications import get_push_provider, get_session_factory
+from app.integrations.push import FakePushProvider
 from app.main import create_app
 from tests.fakes import FakeGoogleVerifier
 
@@ -75,9 +78,21 @@ def test_settings(tmp_path: Path) -> Settings:
 
 
 @pytest.fixture
-def client(db_session: Session, test_settings: Settings) -> Iterator[TestClient]:
+def push() -> FakePushProvider:
+    """Records every push the app sends during a test."""
+    return FakePushProvider()
+
+
+@pytest.fixture
+def client(
+    db_session: Session, test_settings: Settings, push: FakePushProvider
+) -> Iterator[TestClient]:
     app = create_app(test_settings)
     app.dependency_overrides[get_db] = lambda: db_session
     app.dependency_overrides[get_google_verifier] = lambda: FakeGoogleVerifier()
+    app.dependency_overrides[get_push_provider] = lambda: push
+    # Pushes run after the response in "their own" session; in tests that is the test session
+    # (not closed afterwards), so they see the test's data and roll back with it.
+    app.dependency_overrides[get_session_factory] = lambda: lambda: nullcontext(db_session)
     with TestClient(app) as test_client:
         yield test_client

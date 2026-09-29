@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import AppError
 from app.core.security import utcnow
-from app.models import TERMINAL_STATUSES, Address, DeviceToken, Order, User
+from app.models import TERMINAL_STATUSES, Address, DeviceToken, Notification, Order, User
 from app.repositories import users as repo
 
 
@@ -68,4 +68,5 @@ class UserService:
         repo.delete_all_device_tokens(self.db, user.id)
         # Saved addresses are personal data; past orders keep their own copy.
         self.db.execute(delete(Address).where(Address.user_id == user.id))
+        self.db.execute(delete(Notification).where(Notification.user_id == user.id))
         self.db.commit()

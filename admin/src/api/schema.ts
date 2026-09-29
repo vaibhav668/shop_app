@@ -796,6 +796,60 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/notifications': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Notifications
+     * @description Newest first.
+     */
+    get: operations['list_notifications_api_v1_notifications_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/notifications/read-all': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Read All */
+    post: operations['read_all_api_v1_notifications_read_all_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/notifications/unread-count': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Unread Count */
+    get: operations['get_unread_count_api_v1_notifications_unread_count_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/orders': {
     parameters: {
       query?: never;
@@ -1789,6 +1843,31 @@ export interface components {
       /** Resulting Stock */
       resulting_stock: number;
     };
+    /** NotificationOut */
+    NotificationOut: {
+      /** Body */
+      body: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Data */
+      data: {
+        [key: string]: unknown;
+      };
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Read At */
+      read_at: string | null;
+      /** Title */
+      title: string;
+      /** Type */
+      type: string;
+    };
     /** OrderDetailOut */
     OrderDetailOut: {
       /** Can Cancel */
@@ -1935,6 +2014,17 @@ export interface components {
     Page_MovementOut_: {
       /** Items */
       items: components['schemas']['MovementOut'][];
+      /** Limit */
+      limit: number;
+      /** Offset */
+      offset: number;
+      /** Total */
+      total: number;
+    };
+    /** Page[NotificationOut] */
+    Page_NotificationOut_: {
+      /** Items */
+      items: components['schemas']['NotificationOut'][];
       /** Limit */
       limit: number;
       /** Offset */
@@ -2247,6 +2337,11 @@ export interface components {
        */
       at: string;
       status: components['schemas']['OrderStatus'];
+    };
+    /** UnreadCountOut */
+    UnreadCountOut: {
+      /** Count */
+      count: number;
     };
     /** UpdateMeRequest */
     UpdateMeRequest: {
@@ -3995,6 +4090,76 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  list_notifications_api_v1_notifications_get: {
+    parameters: {
+      query?: {
+        limit?: number;
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Page_NotificationOut_'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  read_all_api_v1_notifications_read_all_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  get_unread_count_api_v1_notifications_unread_count_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UnreadCountOut'];
         };
       };
     };

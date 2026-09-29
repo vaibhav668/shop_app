@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.dependencies.auth import get_current_user
 from app.dependencies.db import get_db
+from app.dependencies.notifications import get_notifier
 from app.dependencies.shop import get_delivery_area
 from app.dependencies.storage import get_storage
 from app.integrations.storage import StorageProvider
@@ -20,15 +21,18 @@ from app.schemas.order import (
 )
 from app.services.addresses import AddressService
 from app.services.delivery import DeliveryArea
+from app.services.notifications import Notifier
 from app.services.orders import OrderService, OrderViews
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 
 def get_service(
-    db: Session = Depends(get_db), area: DeliveryArea = Depends(get_delivery_area)
+    db: Session = Depends(get_db),
+    area: DeliveryArea = Depends(get_delivery_area),
+    notifier: Notifier = Depends(get_notifier),
 ) -> OrderService:
-    return OrderService(db, AddressService(db, area))
+    return OrderService(db, AddressService(db, area), notifier)
 
 
 def get_views(storage: StorageProvider = Depends(get_storage)) -> OrderViews:
