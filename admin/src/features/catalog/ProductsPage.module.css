@@ -21,3 +21,9 @@
   height: 16px;
   accent-color: var(--color-brand);
 }
+
+@media (max-width: 767px) {
+  .filters {
+    grid-template-columns: 1fr;
+  }
+}

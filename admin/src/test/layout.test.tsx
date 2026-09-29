@@ -45,6 +45,20 @@ describe('admin shell (signed in)', () => {
     expect(screen.getByText('owner@example.com')).toBeInTheDocument();
   });
 
+  it('opens the phone menu from the top bar and closes it after choosing a section', async () => {
+    renderApp('/');
+    const menuButton = await screen.findByRole('button', { name: 'Open menu' });
+    expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+
+    await userEvent.click(menuButton);
+    expect(menuButton).toHaveAttribute('aria-expanded', 'true');
+
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    await userEvent.click(within(nav).getByRole('link', { name: 'Orders' }));
+    expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('heading', { level: 1, name: 'Orders' })).toBeInTheDocument();
+  });
+
   it('shows a friendly page for unknown URLs', async () => {
     renderApp('/nope');
     expect(await screen.findByText("This page doesn't exist.")).toBeInTheDocument();

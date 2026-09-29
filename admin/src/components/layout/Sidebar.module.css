@@ -198,3 +198,62 @@
     font-size: 10px;
   }
 }
+
+/* Phones: a full slide-in menu (opened from the top bar), with labels again. */
+@media (max-width: 767px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 60;
+    width: min(280px, 85vw);
+    height: 100dvh;
+    padding-inline: var(--space-3);
+    box-shadow: var(--shadow-float);
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition:
+      transform 200ms ease-out,
+      visibility 200ms;
+  }
+
+  .open {
+    transform: none;
+    visibility: visible;
+  }
+
+  .brandText,
+  .label,
+  .accountText,
+  .avatar {
+    display: flex;
+  }
+
+  .label {
+    display: inline;
+  }
+
+  .account {
+    justify-content: flex-start;
+    padding-inline: var(--space-2);
+  }
+
+  .brand {
+    justify-content: flex-start;
+    padding: 0 var(--space-2);
+  }
+
+  .link {
+    justify-content: flex-start;
+    height: 44px; /* comfortable touch target */
+    padding: 0 var(--space-3);
+  }
+
+  .count {
+    position: static;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    font-size: 12px;
+  }
+}

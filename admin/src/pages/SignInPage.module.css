@@ -6,7 +6,7 @@
 }
 
 .card {
-  width: 400px;
+  width: min(400px, 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -80,4 +80,16 @@
 .secondaryAction:hover {
   color: var(--color-text);
   text-decoration: underline;
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding: var(--space-4);
+    align-items: start;
+    padding-top: var(--space-10);
+  }
+
+  .card {
+    padding: var(--space-8) var(--space-5);
+  }
 }

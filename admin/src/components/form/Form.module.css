@@ -124,3 +124,9 @@ textarea.control {
   grid-template-columns: 1fr 1fr;
   gap: var(--space-4);
 }
+
+@media (max-width: 767px) {
+  .twoCol {
+    grid-template-columns: 1fr;
+  }
+}

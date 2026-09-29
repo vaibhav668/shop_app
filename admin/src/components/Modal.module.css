@@ -61,3 +61,15 @@
   gap: var(--space-2);
   padding: var(--space-4) var(--space-6) var(--space-5);
 }
+
+@media (max-width: 767px) {
+  .backdrop {
+    padding: var(--space-4);
+  }
+
+  .header,
+  .body,
+  .footer {
+    padding-inline: var(--space-4);
+  }
+}

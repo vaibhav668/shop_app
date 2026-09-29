@@ -158,3 +158,20 @@
 .error {
   color: var(--color-danger);
 }
+
+@media (max-width: 767px) {
+  .filters {
+    width: 100%;
+  }
+
+  /* Sit just under the phone top bar. */
+  .bar {
+    top: 56px;
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr) 52px 80px;
+    gap: var(--space-2);
+    padding-inline: var(--space-3);
+  }
+}

@@ -68,3 +68,19 @@
   padding: var(--space-4) var(--space-6);
   border-top: 1px solid var(--color-border);
 }
+
+@media (max-width: 767px) {
+  .header,
+  .body,
+  .footer {
+    padding-inline: var(--space-4);
+  }
+
+  .footer {
+    flex-wrap: wrap;
+  }
+
+  .footer > * {
+    flex: 1 1 auto;
+  }
+}

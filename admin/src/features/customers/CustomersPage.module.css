@@ -102,3 +102,16 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
+
+@media (max-width: 767px) {
+  .search {
+    width: 100%;
+  }
+
+  /* Order number and date on one line, amount and status on the next. */
+  .orders li {
+    grid-template-columns: auto 1fr;
+    row-gap: var(--space-1);
+    padding: var(--space-2) 0;
+  }
+}

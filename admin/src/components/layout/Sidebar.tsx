@@ -6,11 +6,22 @@ import { NAV_ITEMS } from '@/navigation';
 
 import styles from './Sidebar.module.css';
 
-/** `badges` maps a nav path to a count shown beside it (e.g. new orders). */
-export function Sidebar({ badges = {} }: { badges?: Record<string, number> }) {
+/**
+ * `badges` maps a nav path to a count shown beside it (e.g. new orders).
+ * On phones the sidebar is a slide-in menu: `open` shows it, `onNavigate` closes it.
+ */
+export function Sidebar({
+  badges = {},
+  open = false,
+  onNavigate,
+}: {
+  badges?: Record<string, number>;
+  open?: boolean;
+  onNavigate?: () => void;
+}) {
   const { user, signOut } = useAuth();
   return (
-    <aside className={styles.sidebar}>
+    <aside id="main-menu" className={`${styles.sidebar} ${open ? styles.open : ''}`}>
       <div className={styles.brand}>
         <span className={styles.mark} aria-hidden>
           <ShoppingBasket size={18} strokeWidth={2} />
@@ -29,6 +40,7 @@ export function Sidebar({ badges = {} }: { badges?: Record<string, number> }) {
                 to={path}
                 end={path === '/'}
                 title={label}
+                onClick={onNavigate}
                 className={({ isActive }) =>
                   isActive ? `${styles.link} ${styles.active}` : styles.link
                 }

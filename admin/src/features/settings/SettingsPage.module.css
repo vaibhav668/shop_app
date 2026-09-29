@@ -111,3 +111,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 767px) {
+  .card {
+    padding: var(--space-4);
+  }
+
+  .grid {
+    gap: var(--space-4);
+  }
+}
