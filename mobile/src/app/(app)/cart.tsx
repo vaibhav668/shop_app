@@ -72,12 +72,13 @@ function CartContents({ cart }: { cart: Cart }) {
             Minimum order is {formatPaise(cart.rules.min_order_paise)}. Add{' '}
             {formatPaise(cart.min_order_remaining_paise)} more.
           </Text>
-        ) : (
-          <Text variant="caption" color="textSecondary">
-            Checkout opens in the next update of the app.
-          </Text>
-        )}
-        <Button title={`Checkout · ${formatPaise(cart.total_paise)}`} fullWidth disabled />
+        ) : null}
+        <Button
+          title={`Checkout · ${formatPaise(cart.total_paise)}`}
+          fullWidth
+          disabled={cart.has_issues || belowMinimum}
+          onPress={() => router.push('/checkout')}
+        />
       </View>
     </View>
   );

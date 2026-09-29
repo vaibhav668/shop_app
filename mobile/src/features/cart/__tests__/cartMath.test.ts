@@ -2,6 +2,7 @@ import type { DeliveryRules } from '@/api/cart';
 import type { ProductCard } from '@/api/catalog';
 import {
   applyQuantity,
+  checkoutItems,
   emptyCart,
   maxQuantityFor,
   quantityOf,
@@ -77,6 +78,17 @@ describe('estimated totals match the server formula', () => {
 
   it('an empty cart owes nothing', () => {
     expect(withTotals([], rules)).toMatchObject({ total_paise: 0, delivery_fee_paise: 0 });
+  });
+});
+
+describe('checkoutItems', () => {
+  it('sends product ids and asked quantities only, never prices', () => {
+    const cart = applyQuantity(applyQuantity(emptyCart(rules), milk, 2), atta, 1);
+    expect(checkoutItems(cart)).toEqual([
+      { product_id: 'milk', quantity: 2 },
+      { product_id: 'atta', quantity: 1 },
+    ]);
+    expect(checkoutItems(undefined)).toEqual([]);
   });
 });
 

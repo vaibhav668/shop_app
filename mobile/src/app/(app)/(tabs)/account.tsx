@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { ChevronRight, Heart, LogOut, Palette } from 'lucide-react-native';
+import { ChevronRight, Heart, LogOut, MapPin, Palette } from 'lucide-react-native';
 import { useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
@@ -70,6 +70,18 @@ export default function AccountScreen() {
           </Text>
           <ChevronRight size={18} color={colors.textTertiary} />
         </Pressable>
+        <View style={styles.menuDivider} />
+        <Pressable
+          onPress={() => router.push('/addresses')}
+          accessibilityRole="button"
+          style={({ pressed }) => [styles.menuRow, pressed && styles.menuPressed]}
+        >
+          <MapPin size={20} strokeWidth={1.75} color={colors.text} />
+          <Text variant="body" style={styles.menuLabel}>
+            Saved addresses
+          </Text>
+          <ChevronRight size={18} color={colors.textTertiary} />
+        </Pressable>
       </View>
 
       <View style={styles.actions}>
@@ -131,6 +143,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   menuPressed: { backgroundColor: colors.surfaceMuted },
+  menuDivider: { height: 1, marginLeft: spacing.md, backgroundColor: colors.border },
   menuLabel: { flex: 1 },
   actions: { gap: spacing.xs, marginTop: spacing.xl },
 });

@@ -20,6 +20,11 @@ export function quantityOf(cart: Cart | undefined, productId: string): number {
   return cart?.lines.find((l) => l.product.id === productId)?.quantity ?? 0;
 }
 
+/** What checkout asks the server to price: the cart as shown, quantities as asked. */
+export function checkoutItems(cart: Cart | undefined): { product_id: string; quantity: number }[] {
+  return (cart?.lines ?? []).map((l) => ({ product_id: l.product.id, quantity: l.quantity }));
+}
+
 export function applyQuantity(cart: Cart, product: ProductCard, quantity: number): Cart {
   const existing = cart.lines.find((l) => l.product.id === product.id);
   let lines: CartLine[];

@@ -17,6 +17,20 @@ export default function AppLayout() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="search" options={{ headerShown: false, animation: 'fade' }} />
       <Stack.Screen name="cart" options={{ title: 'Your cart' }} />
+      <Stack.Screen name="checkout" options={{ title: 'Checkout' }} />
+      <Stack.Screen name="addresses/index" options={{ title: 'Saved addresses' }} />
+      <Stack.Screen name="addresses/form" options={{ title: 'Add address' }} />
+      <Stack.Screen
+        name="addresses/pick"
+        options={{
+          presentation: 'formSheet',
+          headerShown: false,
+          sheetAllowedDetents: [0.6, 0.95],
+          sheetGrabberVisible: true,
+          sheetCornerRadius: 16,
+          contentStyle: { backgroundColor: colors.surface },
+        }}
+      />
       <Stack.Screen name="favourites" options={{ title: 'Favourites' }} />
       <Stack.Screen name="category/[slug]" options={{ title: '' }} />
       <Stack.Screen name="product/[id]" options={{ title: '' }} />
