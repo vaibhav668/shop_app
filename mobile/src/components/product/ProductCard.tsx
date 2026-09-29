@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
@@ -24,20 +24,34 @@ export type ProductCardProps = {
   cart?: CartControls;
 };
 
+/**
+ * The "open product" button is a full-card layer *behind* the content, not a wrapper around it:
+ * the ADD button and stepper must not sit inside another button (invalid <button> nesting on
+ * web, and screen readers would merge them). The visible content ignores touches, so a tap
+ * anywhere except the cart controls falls through to the open layer.
+ */
 function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
+  const [pressed, setPressed] = useState(false);
   const outOfStock = !product.is_available;
   const discount = product.discount_percent;
 
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`${product.name}, ${product.unit_label}, ${formatPaise(product.price_paise)}${
-        outOfStock ? ', out of stock' : ''
-      }`}
-      style={({ pressed }) => [styles.card, pressed && onPress && styles.pressed]}
-    >
-      <View style={styles.imageWell}>
+    <View style={[styles.card, pressed && styles.pressed]}>
+      {onPress ? (
+        <Pressable
+          onPress={onPress}
+          onPressIn={() => setPressed(true)}
+          onPressOut={() => setPressed(false)}
+          accessibilityRole="button"
+          accessibilityLabel={`${product.name}, ${product.unit_label}, ${formatPaise(product.price_paise)}${
+            outOfStock ? ', out of stock' : ''
+          }`}
+          style={styles.openLayer}
+        />
+      ) : null}
+
+      {/* Decorative for assistive tech: the open button above already announces all of this. */}
+      <View style={[styles.imageWell, styles.passThrough]} aria-hidden>
         <ProductImage uri={product.image_url} faded={outOfStock} iconSize={40} />
         {discount > 0 && !outOfStock ? (
           <View style={styles.tag}>
@@ -46,21 +60,23 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
         ) : null}
       </View>
 
-      <View style={styles.body}>
-        <Text variant="label" numberOfLines={2} style={styles.name}>
-          {product.name}
-        </Text>
-        <Text variant="caption" color="textSecondary">
-          {product.unit_label}
-        </Text>
-        {product.stock_hint === 'LOW' ? (
-          <Text variant="micro" color="offerText">
-            Only a few left
+      <View style={[styles.body, styles.passChildren]}>
+        <View style={[styles.text, styles.passThrough]} aria-hidden>
+          <Text variant="label" numberOfLines={2} style={styles.name}>
+            {product.name}
           </Text>
-        ) : null}
+          <Text variant="caption" color="textSecondary">
+            {product.unit_label}
+          </Text>
+          {product.stock_hint === 'LOW' ? (
+            <Text variant="micro" color="offerText">
+              Only a few left
+            </Text>
+          ) : null}
+        </View>
 
-        <View style={styles.footer}>
-          <View>
+        <View style={[styles.footer, styles.passChildren]}>
+          <View style={styles.passThrough} aria-hidden>
             <Money paise={product.price_paise} variant="bodyStrong" />
             {discount > 0 ? (
               <Money paise={product.mrp_paise} variant="caption" color="textTertiary" strike />
@@ -99,7 +115,7 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
           ) : null}
         </View>
       </View>
-    </Pressable>
+    </View>
   );
 }
 
@@ -115,6 +131,19 @@ const styles = StyleSheet.create({
     padding: spacing.xs,
   },
   pressed: { borderColor: colors.borderStrong },
+  openLayer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    borderRadius: radius.lg,
+  },
+  // Content that lets taps fall through to the open layer...
+  passThrough: { pointerEvents: 'none' },
+  // ...and containers whose children (the cart controls) still take taps.
+  passChildren: { pointerEvents: 'box-none' },
+  text: { gap: 2 },
   imageWell: {
     aspectRatio: 1,
     borderRadius: radius.sm,
