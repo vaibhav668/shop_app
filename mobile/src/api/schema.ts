@@ -504,7 +504,7 @@ export interface components {
        * @default bearer
        * @constant
        */
-      token_type: 'bearer';
+      token_type?: 'bearer';
       user: components['schemas']['UserOut'];
     };
     /** Body_upload_image_api_v1_admin_uploads_images_post */
@@ -520,7 +520,7 @@ export interface components {
        * Is Active
        * @default true
        */
-      is_active: boolean;
+      is_active?: boolean;
       /** Name */
       name: string;
     };
@@ -562,12 +562,12 @@ export interface components {
        * Remove Image
        * @default false
        */
-      remove_image: boolean;
+      remove_image?: boolean;
     };
     /** DevSignInRequest */
     DevSignInRequest: {
       /** @default mobile */
-      client: components['schemas']['SessionClient'];
+      client?: components['schemas']['SessionClient'];
       /**
        * Email
        * Format: email
@@ -583,14 +583,14 @@ export interface components {
        * @default android
        * @constant
        */
-      platform: 'android';
+      platform?: 'android';
       /** Token */
       token: string;
     };
     /** GoogleSignInRequest */
     GoogleSignInRequest: {
       /** @default mobile */
-      client: components['schemas']['SessionClient'];
+      client?: components['schemas']['SessionClient'];
       /** Id Token */
       id_token: string;
     };
@@ -606,7 +606,7 @@ export interface components {
        * @default ok
        * @constant
        */
-      status: 'ok';
+      status?: 'ok';
     };
     /** LogoutRequest */
     LogoutRequest: {
@@ -679,12 +679,12 @@ export interface components {
        * Is Active
        * @default true
        */
-      is_active: boolean;
+      is_active?: boolean;
       /**
        * Is Featured
        * @default false
        */
-      is_featured: boolean;
+      is_featured?: boolean;
       /** Low Stock Threshold */
       low_stock_threshold?: number | null;
       /** Max Per Order */
@@ -701,7 +701,7 @@ export interface components {
        * Stock Quantity
        * @default 0
        */
-      stock_quantity: number;
+      stock_quantity?: number;
       /** Unit Label */
       unit_label: string;
     };
@@ -768,7 +768,7 @@ export interface components {
        * Remove Image
        * @default false
        */
-      remove_image: boolean;
+      remove_image?: boolean;
       /** Search Keywords */
       search_keywords?: string | null;
       /** Unit Label */

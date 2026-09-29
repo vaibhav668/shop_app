@@ -102,7 +102,7 @@ Index: `UNIQUE (user_id) WHERE is_default` enforces one default address per user
 | id | uuid PK | |
 | name | text NOT NULL | |
 | slug | text UNIQUE NOT NULL | |
-| image_url, image_key | text | |
+| image_key | text | Storage key only. The API derives the URL (and thumbnail size) from the configured storage provider at response time. |
 | sort_order | int NOT NULL DEFAULT 0 | |
 | is_active | bool NOT NULL DEFAULT true | |
 
@@ -122,7 +122,7 @@ Index: `UNIQUE (user_id) WHERE is_default` enforces one default address per user
 | max_per_order | int | NULL means no limit beyond the API's hard cap of 50 |
 | is_active | bool NOT NULL DEFAULT true | Admin enable/disable |
 | is_featured | bool NOT NULL DEFAULT false | Shown in the home "Fresh picks" section |
-| image_url, image_key | text | |
+| image_key | text | Storage key only. The API derives the URL (and thumbnail size) from the configured storage provider at response time. |
 | search_keywords | text | Synonyms, e.g. `doodh` for milk |
 | sort_order | int NOT NULL DEFAULT 0 | |
 | archived_at | timestamptz | Soft delete |
@@ -208,7 +208,7 @@ One row per payment attempt, so an order can have several.
 `id`, `user_id` FK, `type` text (e.g. `ORDER_STATUS`), `title`, `body`, `data` jsonb (`{order_id, route}`), `read_at`, `created_at`. Index on `(user_id, created_at DESC)`.
 
 ### banners
-`id`, `title`, `subtitle`, `image_url`, `image_key`, `target_type` banner_target, `target_id` uuid, `sort_order`, `is_active`, `starts_at`, `ends_at`.
+`id`, `title`, `subtitle`, `image_key`, `target_type` banner_target, `target_id` uuid, `sort_order`, `is_active`, `starts_at`, `ends_at`.
 
 ### shop_settings (single row)
 | Column | Type | Default |

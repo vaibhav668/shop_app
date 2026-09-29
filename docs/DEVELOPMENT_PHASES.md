@@ -43,17 +43,17 @@ Commits: `feat(mobile): initialize expo app with router and typescript` · `feat
 Commits: `feat(backend): add users and sessions models` · `feat(backend): add google token verification and jwt sessions` · `feat(mobile): add google sign-in flow and onboarding` · `feat(admin): add admin sign-in and route guard` · `test(backend): cover auth and admin authorization`
 
 ## Phase 3 — Catalog + product admin
-- Models + migration: `categories`, `products`, `inventory_movements`, `banners`, `shop_settings` (seed row)
+- Models + migration: `categories`, `products`, `inventory_movements`, `shop_settings` (seed row). *(`banners` moved to Phase 4 with the Home screen.)*
 - `StorageProvider` (local + Cloudinary), `/admin/uploads/images`
-- Admin API: categories CRUD/reorder, products CRUD/archive/restore
+- Admin API: categories CRUD/reorder, products CRUD/archive/restore, stock set (with `expected_stock` conflict check) and +/− adjust via `InventoryService`
 - Public API: `/categories`, `/products`, `/products/{id}`, `/shop`
 - Admin UI: Categories page, Products list + form (image upload, price/MRP validation, category select, unit, description, featured, active)
 - Mobile: Categories tab, category product list (infinite), product detail (all states including "Out of stock"), image caching
-- `seed-dev` CLI (sample data for local/staging only)
+- `seed-dev` CLI (sample data, refuses to run unless `APP_ENV=local`)
 - Tests: price/MRP validation, archived and inactive products hidden from customers, pagination, admin-only writes
 
 ## Phase 4 — Search & home
-- Trigram index migration; `SearchService`; `/products?q=`, `/products/suggest`
+- `banners` table + admin Banners page; trigram index migration; `SearchService`; `/products?q=`, `/products/suggest`
 - `/home` composition (banners, categories, featured, popular, buy_again returns empty until orders exist)
 - Mobile: Home (greeting, address chip placeholder, search entry, categories, banners, sections), Search screen (debounced suggestions, recent searches in AsyncStorage, category chips, results, no-results)
 - Tests: search relevance basics (prefix, typo tolerance, keywords like "doodh"), suggestion limit

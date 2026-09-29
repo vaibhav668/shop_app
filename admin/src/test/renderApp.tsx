@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { vi } from 'vitest';
 
@@ -37,12 +38,20 @@ export function authOk(user = OWNER) {
   };
 }
 
-/** Mocks fetch by path suffix. Unmatched requests fail loudly. */
+/**
+ * Mocks fetch. Keys are "/path" (any method) or "METHOD /path"; the path is matched against the
+ * end of the URL's pathname, so query strings don't matter. Unmatched requests fail loudly.
+ */
 export function mockApi(handlers: Record<string, Handler | ReturnType<Handler>>) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init: RequestInit = {}) => {
     const url = String(input);
-    const key = Object.keys(handlers).find((suffix) => url.endsWith(suffix));
-    if (!key) throw new Error(`Unexpected request: ${url}`);
+    const pathname = new URL(url).pathname;
+    const method = (init.method ?? 'GET').toUpperCase();
+    const key =
+      Object.keys(handlers).find(
+        (k) => k === `${method} ${k.split(' ')[1]}` && pathname.endsWith(k.split(' ')[1]),
+      ) ?? Object.keys(handlers).find((k) => !k.includes(' ') && pathname.endsWith(k));
+    if (!key) throw new Error(`Unexpected request: ${method} ${url}`);
     const h = handlers[key];
     const { status, body } = typeof h === 'function' ? h(url, init) : h;
     return jsonResponse(status, body);
@@ -52,11 +61,15 @@ export function mockApi(handlers: Record<string, Handler | ReturnType<Handler>>)
 }
 
 export function renderApp(path: string) {
+  // A fresh cache per test so one test's data never leaks into the next.
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const router = createMemoryRouter(routes, { initialEntries: [path] });
   render(
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>,
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </QueryClientProvider>,
   );
   return router;
 }

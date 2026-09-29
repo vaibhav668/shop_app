@@ -1,0 +1,120 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.optional {
+  color: var(--color-text-tertiary);
+  font-weight: 400;
+}
+
+.control {
+  height: 40px;
+  width: 100%;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+textarea.control {
+  height: auto;
+  min-height: 96px;
+  padding: var(--space-2) var(--space-3);
+  resize: vertical;
+}
+
+.control:hover {
+  border-color: var(--color-border-strong);
+}
+
+.control:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 0;
+  border-color: var(--color-brand);
+}
+
+.control[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.prefixed {
+  position: relative;
+}
+
+.prefix {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+.prefixed .control {
+  padding-left: 28px;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.error {
+  font-size: 13px;
+  color: var(--color-danger);
+}
+
+.toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.toggle input {
+  appearance: none;
+  flex-shrink: 0;
+  width: 36px;
+  height: 20px;
+  margin: 2px 0 0;
+  border-radius: var(--radius-full);
+  background: var(--color-border-strong);
+  position: relative;
+  cursor: pointer;
+  transition: background-color 120ms ease-out;
+}
+
+.toggle input::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  transition: transform 120ms ease-out;
+}
+
+.toggle input:checked {
+  background: var(--color-brand);
+}
+
+.toggle input:checked::after {
+  transform: translateX(16px);
+}
+
+.toggleText {
+  display: flex;
+  flex-direction: column;
+}

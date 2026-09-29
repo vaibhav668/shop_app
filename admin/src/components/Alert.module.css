@@ -1,0 +1,19 @@
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+}
+
+.danger {
+  background: var(--color-danger-tint);
+  color: var(--color-danger);
+}
+
+.warning {
+  background: var(--color-offer-tint);
+  color: var(--color-offer-text);
+}

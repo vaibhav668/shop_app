@@ -55,14 +55,21 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
 }
 
 async function send(path: string, options: RequestOptions, token: string | null) {
+  // FormData (file uploads) goes as-is so the browser sets the multipart boundary.
+  const isForm = options.body instanceof FormData;
   const headers: Record<string, string> = { Accept: 'application/json' };
-  if (options.body !== undefined) headers['Content-Type'] = 'application/json';
+  if (options.body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
   if (token) headers.Authorization = `Bearer ${token}`;
   try {
     return await fetch(`${API_URL}${path}`, {
       method: options.method ?? 'GET',
       headers,
-      body: options.body === undefined ? undefined : JSON.stringify(options.body),
+      body:
+        options.body === undefined
+          ? undefined
+          : isForm
+            ? (options.body as FormData)
+            : JSON.stringify(options.body),
       // Needed so the browser sends/stores the httpOnly refresh cookie on /auth calls.
       credentials: 'include',
     });

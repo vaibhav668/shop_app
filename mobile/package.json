@@ -50,7 +50,7 @@
     "test": "jest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "gen:api": "npx --yes openapi-typescript@7.13.0 ../backend/openapi.json -o src/api/schema.ts && prettier --write src/api/schema.ts"
+    "gen:api": "npx --yes openapi-typescript@7.13.0 ../backend/openapi.json -o src/api/schema.ts --default-non-nullable=false && prettier --write src/api/schema.ts"
   },
   "private": true,
   "jest": {

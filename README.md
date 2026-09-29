@@ -8,9 +8,9 @@ Start with [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md).
 
 | Folder | What | Status |
 |---|---|---|
-| `backend/` | FastAPI, SQLAlchemy, Alembic | Phase 2 — auth, sessions, profile |
-| `mobile/` | Expo SDK 57 + React Native customer app | Phase 2 — sign-in, onboarding, account |
-| `admin/` | Vite + React admin dashboard | Phase 2 — admin sign-in, layout shell |
+| `backend/` | FastAPI, SQLAlchemy, Alembic | Phase 3 — catalog, image upload, stock |
+| `mobile/` | Expo SDK 57 + React Native customer app | Phase 3 — categories, product grid, product detail |
+| `admin/` | Vite + React admin dashboard | Phase 3 — categories, products, product form |
 | `docs/` | Plan, architecture, schema, API, UI system | — |
 | `scripts/` | Repo-wide checks (palette guard) | — |
 
@@ -36,8 +36,11 @@ cd backend
 pip install -r requirements-dev.txt
 cp .env.example .env
 alembic upgrade head
+python -m app.cli seed-dev   # optional: sample categories and products (local only)
 uvicorn app.main:app --reload
 ```
+
+Uploaded photos are stored in `backend/media/` during local development (`STORAGE_PROVIDER=local`). Set `STORAGE_PROVIDER=cloudinary` and `CLOUDINARY_URL` to use Cloudinary.
 
 Check that it's working: <http://localhost:8000/api/v1/health/db>. The API docs are at <http://localhost:8000/docs>.
 
