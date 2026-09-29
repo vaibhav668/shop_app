@@ -15,10 +15,11 @@ export function GoogleButton({ onIdToken, onError }: GoogleButtonProps) {
   const [busy, setBusy] = useState(false);
 
   if (!isGoogleSignInAvailable) {
-    // Only in Expo Go, which can't run Google's native sign-in.
+    // Only in Expo Go, which doesn't include Google's native sign-in (a development-only case).
     return (
       <Text variant="caption" color="textSecondary" align="center">
-        Open the installed Bada Bazar app to sign in with Google.
+        Google sign-in doesn&apos;t work in Expo Go. Open the Bada Bazar development build instead,
+        or use the web preview.
       </Text>
     );
   }
