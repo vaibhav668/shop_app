@@ -15,11 +15,11 @@ FastAPI's OpenAPI document (`/api/v1/openapi.json`) is the source of truth. Both
   ```
   | HTTP | Codes |
   |---|---|
-  | 400 | `VALIDATION_ERROR` |
+  | 400 | `VALIDATION_ERROR`, `CANCEL_REASON_REQUIRED` |
   | 401 | `UNAUTHENTICATED`, `TOKEN_EXPIRED`, `INVALID_GOOGLE_TOKEN` |
   | 403 | `FORBIDDEN`, `ACCOUNT_DISABLED` |
   | 404 | `NOT_FOUND` (also used for resources that belong to another user) |
-  | 409 | `OUT_OF_STOCK`, `PRODUCT_UNAVAILABLE`, `PRICE_CHANGED`, `INVALID_STATUS_TRANSITION`, `STOCK_CONFLICT`, `PAYMENT_ALREADY_PROCESSED` |
+  | 409 | `OUT_OF_STOCK`, `PRODUCT_UNAVAILABLE`, `MAX_PER_ORDER`, `PRICE_CHANGED`, `INVALID_STATUS_TRANSITION`, `STOCK_CONFLICT`, `PAYMENT_ALREADY_PROCESSED`, `ADDRESS_LIMIT`, `ACTIVE_ORDER` |
   | 422 | `NOT_SERVICEABLE`, `BELOW_MIN_ORDER`, `SHOP_CLOSED`, `PAYMENT_METHOD_DISABLED`, `PAYMENT_VERIFICATION_FAILED`, `PHONE_REQUIRED` |
   | 429 | `RATE_LIMITED` |
 
@@ -49,7 +49,7 @@ PaymentSession{ provider, key_id, provider_order_id, amount_paise, currency, pre
 | POST | `/auth/logout` | `{ device_token? }` | 204 | |
 | GET | `/me` | | `User { id, email, name, avatar_url, phone, role, needs_onboarding }` | This is the spec's `/auth/me`; `/me` is the canonical path |
 | PATCH | `/me` | `{ name?, phone? }` | `User` | |
-| DELETE | `/me` | | 204 | Account deletion (required by the Play Store). Blocked while an order is active. |
+| DELETE | `/me` | | 204 | Account deletion (required by the Play Store). `409 ACTIVE_ORDER` while an order is in progress. Saved addresses are deleted; orders keep their own copy. |
 | POST | `/me/devices` | `{ token, platform }` | 204 | Upsert |
 | DELETE | `/me/devices/{token}` | | 204 | |
 
@@ -82,7 +82,7 @@ The first address becomes the default automatically (`is_default: true` on creat
 | Method | Path | Body | Response |
 |---|---|---|---|
 | POST | `/checkout/quote` | `{ address_id, items: [{product_id, quantity}] }` (1–100 unique products, quantity 1–50) | `{ lines: CartLine[], item_count, subtotal_paise, delivery_fee_paise, total_paise, address: Address, payment_methods[], issues: [{code, message}], can_place_order }`. Changes nothing. Blocking problems are listed in `issues` (not raised) so the app can show them together: `SHOP_CLOSED`, `NOT_SERVICEABLE`, `ITEMS_CHANGED`, `EMPTY_ORDER`, `BELOW_MIN_ORDER`, `NO_PAYMENT_METHOD`. Another user's address → 404. `payment_methods` is what the shop has switched on **and** the app supports (`COD` only until Phase 8). |
-| POST | `/orders` | `{ address_id, payment_method, items[], idempotency_key, expected_total_paise, customer_note? }` | `201 { order: OrderDetail, payment: PaymentSession \| null }`. Returns `409 PRICE_CHANGED` with a fresh quote if the total differs from `expected_total_paise`. Repeating the same `idempotency_key` returns the original order. |
+| POST | `/orders` | `{ address_id, payment_method, items[], idempotency_key, expected_total_paise, customer_note? }` | `201 { order: OrderDetail, payment: PaymentSession \| null }`. One transaction: products locked in id order, re-priced by PricingService, stock taken by InventoryService, ordered lines removed from the cart. Returns `409 PRICE_CHANGED` (`details.total_paise` = the new total; nothing is placed) if the total differs from `expected_total_paise`. Repeating the same `idempotency_key` returns the original order with **200**. `ONLINE` is refused with `PAYMENT_METHOD_DISABLED` until Phase 8. |
 | GET | `/orders` | `?scope=active\|past&limit&offset` | `Page<OrderSummary>` |
 | GET | `/orders/{id}` | | `OrderDetail` |
 | POST | `/orders/{id}/cancel` | `{ reason? }` | `OrderDetail`. Allowed only in `AWAITING_PAYMENT` or `PENDING`. |
@@ -101,7 +101,7 @@ The first address becomes the default automatically (`is_default: true` on creat
 
 | Area | Endpoints |
 |---|---|
-| Dashboard | `GET /admin/dashboard` → today's orders count, revenue (paid + delivered COD), counts by status, low-stock top 10, recent 10 orders, payments needing review · `GET /admin/orders/summary` → `{ pending_count, latest_order_at }` (polled every 15 s) |
+| Dashboard | `GET /admin/dashboard` → today's orders count, revenue (paid + delivered COD), counts by status, low-stock top 10, recent 10 orders ("payments needing review" arrives with Phase 8); "today" is midnight to midnight in `SHOP_TIMEZONE` · `GET /admin/orders/summary` → `{ pending_count, latest_order_at }` (polled every 15 s) |
 | Orders | `GET /admin/orders?status&payment_status&q&from&to&limit&offset` (default hides `AWAITING_PAYMENT`) · `GET /admin/orders/{id}` · `PATCH /admin/orders/{id}/status { to_status, note? }` (a `note` is required when cancelling) |
 | Products | `GET /admin/products?q&category_id&status=active\|inactive\|archived&low_stock&limit&offset` · `POST /admin/products` · `GET /admin/products/{id}` · `PATCH /admin/products/{id}` · `DELETE /admin/products/{id}` (archive) · `POST /admin/products/{id}/restore` |
 | Inventory | `POST /admin/products/{id}/stock-adjust { delta, note? }` · `PATCH /admin/products/{id}/stock { stock, expected_stock }` · `POST /admin/inventory/bulk { updates: [{product_id, stock, expected_stock}] }` → `{ applied: [...], conflicts: [{product_id, expected, current}] }` · `GET /admin/inventory/movements?product_id&limit&offset` |

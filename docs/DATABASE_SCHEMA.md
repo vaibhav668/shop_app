@@ -168,7 +168,7 @@ A product is *available* when `is_active AND archived_at IS NULL AND stock_quant
 | cancelled_by | uuid FK users | |
 | placed_at | timestamptz NOT NULL | |
 
-Indexes: `(user_id, created_at DESC)`, `(status, created_at DESC)`, and a partial index `(payment_expires_at) WHERE status = 'AWAITING_PAYMENT'`.
+Also `CHECK (subtotal_paise > 0)` and non-negative fee/discount. Indexes: `(user_id, placed_at DESC)`, `(status, placed_at DESC)`, and a partial index `(payment_expires_at) WHERE status = 'AWAITING_PAYMENT'`.
 
 ### order_items
 | Column | Type | Notes |
@@ -176,13 +176,15 @@ Indexes: `(user_id, created_at DESC)`, `(status, created_at DESC)`, and a partia
 | id | uuid PK | |
 | order_id | uuid FK orders ON DELETE CASCADE | |
 | product_id | uuid FK products ON DELETE RESTRICT | |
-| product_name, unit_label, image_url | text NOT NULL | Copied at order time |
+| position | int NOT NULL | Line order as the customer saw it |
+| product_name, unit_label | text NOT NULL | Copied at order time |
+| image_key | text | Storage key copied at order time; the URL is built when shown |
 | unit_price_paise, mrp_paise | bigint NOT NULL | Copied at order time |
 | quantity | int NOT NULL CHECK > 0 | |
-| line_total_paise | bigint NOT NULL | |
+| line_total_paise | bigint NOT NULL | `CHECK (line_total_paise = unit_price_paise * quantity)` |
 
 ### order_status_history
-`id`, `order_id` FK, `from_status` (nullable), `to_status`, `actor_user_id` (nullable = system), `note`, `created_at`. Index on `(order_id, created_at)`. This table drives the timestamps on the customer timeline.
+`id`, `order_id` FK, `position` (tie-breaker within one transaction), `from_status` (nullable), `to_status`, `actor_user_id` (nullable = system), `note`, `created_at`. Index on `(order_id, created_at)`. This table drives the timestamps on the customer timeline.
 
 ### payments
 One row per payment attempt, so an order can have several.

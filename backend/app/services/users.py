@@ -1,9 +1,11 @@
 """Profile changes, device registration and account deletion for the signed-in user."""
 
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
+from app.core.errors import AppError
 from app.core.security import utcnow
-from app.models import DeviceToken, User
+from app.models import TERMINAL_STATUSES, Address, DeviceToken, Order, User
 from app.repositories import users as repo
 
 
@@ -39,8 +41,20 @@ class UserService:
         self.db.commit()
 
     def delete_account(self, user: User) -> None:
-        """Anonymise personal data and end every session. Order records (Phase 7) are kept for
-        accounting and will block deletion while an order is still active."""
+        """Anonymise personal data and end every session. Orders are kept for the shop's
+        accounts, so deletion waits until none is still in progress."""
+        active = self.db.scalar(
+            select(func.count()).where(
+                Order.user_id == user.id, Order.status.not_in(TERMINAL_STATUSES)
+            )
+        )
+        if active:
+            raise AppError(
+                "ACTIVE_ORDER",
+                "You have an order in progress. You can delete your account once it's "
+                "delivered or cancelled.",
+                409,
+            )
         now = utcnow()
         marker = f"deleted:{user.id}"
         user.google_sub = marker
@@ -52,4 +66,6 @@ class UserService:
         user.deleted_at = now
         repo.revoke_all_sessions(self.db, user.id, now)
         repo.delete_all_device_tokens(self.db, user.id)
+        # Saved addresses are personal data; past orders keep their own copy.
+        self.db.execute(delete(Address).where(Address.user_id == user.id))
         self.db.commit()

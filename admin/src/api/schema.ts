@@ -172,6 +172,99 @@ export interface paths {
     patch: operations['update_category_api_v1_admin_categories__category_id__patch'];
     trace?: never;
   };
+  '/api/v1/admin/dashboard': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Dashboard */
+    get: operations['dashboard_api_v1_admin_dashboard_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/orders': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Orders
+     * @description Newest first. Without `status`, unpaid online orders (AWAITING_PAYMENT) are hidden.
+     *     `q` matches the order number, customer name or phone. Dates are in the shop's timezone.
+     */
+    get: operations['list_orders_api_v1_admin_orders_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/orders/summary': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Orders Summary */
+    get: operations['orders_summary_api_v1_admin_orders_summary_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/orders/{order_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Order */
+    get: operations['get_order_api_v1_admin_orders__order_id__get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/orders/{order_id}/status': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Change Status
+     * @description Moves the order one step. Cancelling needs a `note` (shown to the customer) and puts
+     *     the stock back.
+     */
+    patch: operations['change_status_api_v1_admin_orders__order_id__status_patch'];
+    trace?: never;
+  };
   '/api/v1/admin/products': {
     parameters: {
       query?: never;
@@ -628,6 +721,65 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/orders': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Orders */
+    get: operations['list_orders_api_v1_orders_get'];
+    put?: never;
+    /**
+     * Place Order
+     * @description Prices, stock and delivery rules are checked again here, inside one transaction.
+     *     Resending the same `idempotency_key` returns the original order with 200.
+     */
+    post: operations['place_order_api_v1_orders_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/orders/{order_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Order */
+    get: operations['get_order_api_v1_orders__order_id__get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/orders/{order_id}/cancel': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Cancel Order
+     * @description Allowed only before the shop accepts the order; the stock goes back on the shelf.
+     */
+    post: operations['cancel_order_api_v1_orders__order_id__cancel_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/products': {
     parameters: {
       query?: never;
@@ -839,6 +991,80 @@ export interface components {
       slug: string;
       /** Sort Order */
       sort_order: number;
+    };
+    /** AdminOrderDetailOut */
+    AdminOrderDetailOut: {
+      /** Can Cancel */
+      can_cancel: boolean;
+      /** Cancel Reason */
+      cancel_reason: string | null;
+      customer: components['schemas']['CustomerOut'];
+      /** Customer Note */
+      customer_note: string | null;
+      delivery_address: components['schemas']['DeliveryAddressOut'];
+      /** Delivery Fee Paise */
+      delivery_fee_paise: number;
+      /** Discount Paise */
+      discount_paise: number;
+      /** First Item Images */
+      first_item_images: string[];
+      /** History */
+      history: components['schemas']['HistoryEntry'][];
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Item Count */
+      item_count: number;
+      /** Items */
+      items: components['schemas']['OrderItemOut'][];
+      /** Next Statuses */
+      next_statuses: components['schemas']['OrderStatus'][];
+      /** Order Number */
+      order_number: number;
+      payment_method: components['schemas']['PaymentMethod'];
+      payment_status: components['schemas']['PaymentStatus'];
+      /**
+       * Placed At
+       * Format: date-time
+       */
+      placed_at: string;
+      status: components['schemas']['OrderStatus'];
+      /** Subtotal Paise */
+      subtotal_paise: number;
+      /** Timeline */
+      timeline: components['schemas']['TimelineStep'][];
+      /** Total Paise */
+      total_paise: number;
+    };
+    /** AdminOrderRow */
+    AdminOrderRow: {
+      /** Customer Name */
+      customer_name: string;
+      /** Customer Phone */
+      customer_phone: string;
+      /** Delivery Area */
+      delivery_area: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Item Count */
+      item_count: number;
+      /** Order Number */
+      order_number: number;
+      payment_method: components['schemas']['PaymentMethod'];
+      payment_status: components['schemas']['PaymentStatus'];
+      /**
+       * Placed At
+       * Format: date-time
+       */
+      placed_at: string;
+      status: components['schemas']['OrderStatus'];
+      /** Total Paise */
+      total_paise: number;
     };
     /** AdminProductOut */
     AdminProductOut: {
@@ -1053,6 +1279,11 @@ export interface components {
       /** File */
       file: string;
     };
+    /** CancelOrderRequest */
+    CancelOrderRequest: {
+      /** Reason */
+      reason?: string | null;
+    };
     /** CartLineOut */
     CartLineOut: {
       /** Available Quantity */
@@ -1196,6 +1427,54 @@ export interface components {
       /** Items */
       items: components['schemas']['CheckoutItem'][];
     };
+    /** CustomerOut */
+    CustomerOut: {
+      /** Email */
+      email: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /** Phone */
+      phone: string | null;
+    };
+    /** DashboardOut */
+    DashboardOut: {
+      /** Low Stock */
+      low_stock: components['schemas']['LowStockItem'][];
+      /** Recent Orders */
+      recent_orders: components['schemas']['AdminOrderRow'][];
+      /** Status Counts */
+      status_counts: {
+        [key: string]: number;
+      };
+      /** Today Orders */
+      today_orders: number;
+      /** Today Revenue Paise */
+      today_revenue_paise: number;
+    };
+    /** DeliveryAddressOut */
+    DeliveryAddressOut: {
+      /** City */
+      city: string;
+      /** Landmark */
+      landmark: string | null;
+      /** Line1 */
+      line1: string;
+      /** Line2 */
+      line2: string | null;
+      /** Name */
+      name: string;
+      /** Phone */
+      phone: string;
+      /** Pincode */
+      pincode: string;
+      /** State */
+      state: string;
+    };
     /**
      * DeliveryRules
      * @description Sent so the app can estimate totals instantly while a change is in flight.
@@ -1252,6 +1531,25 @@ export interface components {
        */
       status?: 'ok';
     };
+    /** HistoryEntry */
+    HistoryEntry: {
+      /**
+       * Actor
+       * @enum {string}
+       */
+      actor: 'CUSTOMER' | 'ADMIN' | 'SYSTEM';
+      /** Actor Name */
+      actor_name: string | null;
+      /**
+       * At
+       * Format: date-time
+       */
+      at: string;
+      from_status: components['schemas']['OrderStatus'] | null;
+      /** Note */
+      note: string | null;
+      to_status: components['schemas']['OrderStatus'];
+    };
     /** HomeOut */
     HomeOut: {
       /** Banners */
@@ -1266,10 +1564,157 @@ export interface components {
       /** Device Token */
       device_token?: string | null;
     };
+    /** LowStockItem */
+    LowStockItem: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /** Stock Quantity */
+      stock_quantity: number;
+      /** Threshold */
+      threshold: number;
+      /** Unit Label */
+      unit_label: string;
+    };
+    /** OrderDetailOut */
+    OrderDetailOut: {
+      /** Can Cancel */
+      can_cancel: boolean;
+      /** Cancel Reason */
+      cancel_reason: string | null;
+      /** Customer Note */
+      customer_note: string | null;
+      delivery_address: components['schemas']['DeliveryAddressOut'];
+      /** Delivery Fee Paise */
+      delivery_fee_paise: number;
+      /** Discount Paise */
+      discount_paise: number;
+      /** First Item Images */
+      first_item_images: string[];
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Item Count */
+      item_count: number;
+      /** Items */
+      items: components['schemas']['OrderItemOut'][];
+      /** Order Number */
+      order_number: number;
+      payment_method: components['schemas']['PaymentMethod'];
+      payment_status: components['schemas']['PaymentStatus'];
+      /**
+       * Placed At
+       * Format: date-time
+       */
+      placed_at: string;
+      status: components['schemas']['OrderStatus'];
+      /** Subtotal Paise */
+      subtotal_paise: number;
+      /** Timeline */
+      timeline: components['schemas']['TimelineStep'][];
+      /** Total Paise */
+      total_paise: number;
+    };
+    /** OrderItemOut */
+    OrderItemOut: {
+      /** Image Url */
+      image_url: string | null;
+      /** Line Total Paise */
+      line_total_paise: number;
+      /** Mrp Paise */
+      mrp_paise: number;
+      /** Name */
+      name: string;
+      /**
+       * Product Id
+       * Format: uuid
+       */
+      product_id: string;
+      /** Quantity */
+      quantity: number;
+      /** Unit Label */
+      unit_label: string;
+      /** Unit Price Paise */
+      unit_price_paise: number;
+    };
+    /**
+     * OrderStatus
+     * @enum {string}
+     */
+    OrderStatus:
+      | 'AWAITING_PAYMENT'
+      | 'PENDING'
+      | 'CONFIRMED'
+      | 'PREPARING'
+      | 'OUT_FOR_DELIVERY'
+      | 'DELIVERED'
+      | 'CANCELLED';
+    /** OrderSummaryOut */
+    OrderSummaryOut: {
+      /** First Item Images */
+      first_item_images: string[];
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Item Count */
+      item_count: number;
+      /** Order Number */
+      order_number: number;
+      payment_method: components['schemas']['PaymentMethod'];
+      payment_status: components['schemas']['PaymentStatus'];
+      /**
+       * Placed At
+       * Format: date-time
+       */
+      placed_at: string;
+      status: components['schemas']['OrderStatus'];
+      /** Total Paise */
+      total_paise: number;
+    };
+    /**
+     * OrdersSummaryOut
+     * @description Polled by the admin every 15 s to announce new orders.
+     */
+    OrdersSummaryOut: {
+      /** Latest Order At */
+      latest_order_at: string | null;
+      /** Pending Count */
+      pending_count: number;
+    };
+    /** Page[AdminOrderRow] */
+    Page_AdminOrderRow_: {
+      /** Items */
+      items: components['schemas']['AdminOrderRow'][];
+      /** Limit */
+      limit: number;
+      /** Offset */
+      offset: number;
+      /** Total */
+      total: number;
+    };
     /** Page[AdminProductOut] */
     Page_AdminProductOut_: {
       /** Items */
       items: components['schemas']['AdminProductOut'][];
+      /** Limit */
+      limit: number;
+      /** Offset */
+      offset: number;
+      /** Total */
+      total: number;
+    };
+    /** Page[OrderSummaryOut] */
+    Page_OrderSummaryOut_: {
+      /** Items */
+      items: components['schemas']['OrderSummaryOut'][];
       /** Limit */
       limit: number;
       /** Offset */
@@ -1287,6 +1732,42 @@ export interface components {
       offset: number;
       /** Total */
       total: number;
+    };
+    /**
+     * PaymentMethod
+     * @enum {string}
+     */
+    PaymentMethod: 'ONLINE' | 'COD';
+    /**
+     * PaymentStatus
+     * @enum {string}
+     */
+    PaymentStatus: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED' | 'REFUND_FAILED';
+    /** PlaceOrderOut */
+    PlaceOrderOut: {
+      order: components['schemas']['OrderDetailOut'];
+      /** Payment */
+      payment?: null;
+    };
+    /** PlaceOrderRequest */
+    PlaceOrderRequest: {
+      /**
+       * Address Id
+       * Format: uuid
+       */
+      address_id: string;
+      /** Customer Note */
+      customer_note?: string | null;
+      /** Expected Total Paise */
+      expected_total_paise: number;
+      /**
+       * Idempotency Key
+       * Format: uuid
+       */
+      idempotency_key: string;
+      /** Items */
+      items: components['schemas']['CheckoutItem'][];
+      payment_method: components['schemas']['PaymentMethod'];
     };
     /** ProductCardOut */
     ProductCardOut: {
@@ -1471,6 +1952,12 @@ export interface components {
       /** Phone */
       phone: string | null;
     };
+    /** StatusChangeRequest */
+    StatusChangeRequest: {
+      /** Note */
+      note?: string | null;
+      to_status: components['schemas']['OrderStatus'];
+    };
     /** StockAdjustRequest */
     StockAdjustRequest: {
       /** Delta */
@@ -1508,6 +1995,15 @@ export interface components {
       name: string;
       /** Unit Label */
       unit_label: string;
+    };
+    /** TimelineStep */
+    TimelineStep: {
+      /**
+       * At
+       * Format: date-time
+       */
+      at: string;
+      status: components['schemas']['OrderStatus'];
     };
     /** UpdateMeRequest */
     UpdateMeRequest: {
@@ -2000,6 +2496,149 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['AdminCategoryOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  dashboard_api_v1_admin_dashboard_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DashboardOut'];
+        };
+      };
+    };
+  };
+  list_orders_api_v1_admin_orders_get: {
+    parameters: {
+      query?: {
+        status?: components['schemas']['OrderStatus'] | null;
+        payment_status?: components['schemas']['PaymentStatus'] | null;
+        q?: string | null;
+        from?: string | null;
+        to?: string | null;
+        limit?: number;
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Page_AdminOrderRow_'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  orders_summary_api_v1_admin_orders_summary_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['OrdersSummaryOut'];
+        };
+      };
+    };
+  };
+  get_order_api_v1_admin_orders__order_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        order_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminOrderDetailOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  change_status_api_v1_admin_orders__order_id__status_patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        order_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['StatusChangeRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminOrderDetailOut'];
         };
       };
       /** @description Validation Error */
@@ -2975,6 +3614,138 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  list_orders_api_v1_orders_get: {
+    parameters: {
+      query?: {
+        scope?: 'active' | 'past';
+        limit?: number;
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Page_OrderSummaryOut_'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  place_order_api_v1_orders_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PlaceOrderRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PlaceOrderOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_order_api_v1_orders__order_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        order_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['OrderDetailOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  cancel_order_api_v1_orders__order_id__cancel_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        order_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CancelOrderRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['OrderDetailOut'];
+        };
       };
       /** @description Validation Error */
       422: {

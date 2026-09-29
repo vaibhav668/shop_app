@@ -486,6 +486,207 @@
         "title": "AdminCategoryOut",
         "type": "object"
       },
+      "AdminOrderDetailOut": {
+        "properties": {
+          "can_cancel": {
+            "title": "Can Cancel",
+            "type": "boolean"
+          },
+          "cancel_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancel Reason"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/CustomerOut"
+          },
+          "customer_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Note"
+          },
+          "delivery_address": {
+            "$ref": "#/components/schemas/DeliveryAddressOut"
+          },
+          "delivery_fee_paise": {
+            "title": "Delivery Fee Paise",
+            "type": "integer"
+          },
+          "discount_paise": {
+            "title": "Discount Paise",
+            "type": "integer"
+          },
+          "first_item_images": {
+            "items": {
+              "type": "string"
+            },
+            "title": "First Item Images",
+            "type": "array"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryEntry"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "item_count": {
+            "title": "Item Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_statuses": {
+            "items": {
+              "$ref": "#/components/schemas/OrderStatus"
+            },
+            "title": "Next Statuses",
+            "type": "array"
+          },
+          "order_number": {
+            "title": "Order Number",
+            "type": "integer"
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/PaymentMethod"
+          },
+          "payment_status": {
+            "$ref": "#/components/schemas/PaymentStatus"
+          },
+          "placed_at": {
+            "format": "date-time",
+            "title": "Placed At",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "subtotal_paise": {
+            "title": "Subtotal Paise",
+            "type": "integer"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineStep"
+            },
+            "title": "Timeline",
+            "type": "array"
+          },
+          "total_paise": {
+            "title": "Total Paise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "order_number",
+          "status",
+          "payment_method",
+          "payment_status",
+          "total_paise",
+          "item_count",
+          "placed_at",
+          "first_item_images",
+          "items",
+          "subtotal_paise",
+          "delivery_fee_paise",
+          "discount_paise",
+          "delivery_address",
+          "customer_note",
+          "timeline",
+          "can_cancel",
+          "cancel_reason",
+          "customer",
+          "history",
+          "next_statuses"
+        ],
+        "title": "AdminOrderDetailOut",
+        "type": "object"
+      },
+      "AdminOrderRow": {
+        "properties": {
+          "customer_name": {
+            "title": "Customer Name",
+            "type": "string"
+          },
+          "customer_phone": {
+            "title": "Customer Phone",
+            "type": "string"
+          },
+          "delivery_area": {
+            "title": "Delivery Area",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "item_count": {
+            "title": "Item Count",
+            "type": "integer"
+          },
+          "order_number": {
+            "title": "Order Number",
+            "type": "integer"
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/PaymentMethod"
+          },
+          "payment_status": {
+            "$ref": "#/components/schemas/PaymentStatus"
+          },
+          "placed_at": {
+            "format": "date-time",
+            "title": "Placed At",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "total_paise": {
+            "title": "Total Paise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "order_number",
+          "status",
+          "payment_method",
+          "payment_status",
+          "total_paise",
+          "item_count",
+          "placed_at",
+          "customer_name",
+          "customer_phone",
+          "delivery_area"
+        ],
+        "title": "AdminOrderRow",
+        "type": "object"
+      },
       "AdminProductOut": {
         "properties": {
           "archived_at": {
@@ -1263,6 +1464,24 @@
         "title": "Body_upload_image_api_v1_admin_uploads_images_post",
         "type": "object"
       },
+      "CancelOrderRequest": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "title": "CancelOrderRequest",
+        "type": "object"
+      },
       "CartLineOut": {
         "properties": {
           "available_quantity": {
@@ -1638,6 +1857,146 @@
         "title": "CheckoutQuoteRequest",
         "type": "object"
       },
+      "CustomerOut": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "phone"
+        ],
+        "title": "CustomerOut",
+        "type": "object"
+      },
+      "DashboardOut": {
+        "properties": {
+          "low_stock": {
+            "items": {
+              "$ref": "#/components/schemas/LowStockItem"
+            },
+            "title": "Low Stock",
+            "type": "array"
+          },
+          "recent_orders": {
+            "items": {
+              "$ref": "#/components/schemas/AdminOrderRow"
+            },
+            "title": "Recent Orders",
+            "type": "array"
+          },
+          "status_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Status Counts",
+            "type": "object"
+          },
+          "today_orders": {
+            "title": "Today Orders",
+            "type": "integer"
+          },
+          "today_revenue_paise": {
+            "title": "Today Revenue Paise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "today_orders",
+          "today_revenue_paise",
+          "status_counts",
+          "low_stock",
+          "recent_orders"
+        ],
+        "title": "DashboardOut",
+        "type": "object"
+      },
+      "DeliveryAddressOut": {
+        "properties": {
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "landmark": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Landmark"
+          },
+          "line1": {
+            "title": "Line1",
+            "type": "string"
+          },
+          "line2": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line2"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "pincode": {
+            "title": "Pincode",
+            "type": "string"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "phone",
+          "line1",
+          "line2",
+          "landmark",
+          "city",
+          "state",
+          "pincode"
+        ],
+        "title": "DeliveryAddressOut",
+        "type": "object"
+      },
       "DeliveryRules": {
         "description": "Sent so the app can estimate totals instantly while a change is in flight.",
         "properties": {
@@ -1758,6 +2117,69 @@
         "title": "HealthResponse",
         "type": "object"
       },
+      "HistoryEntry": {
+        "properties": {
+          "actor": {
+            "enum": [
+              "CUSTOMER",
+              "ADMIN",
+              "SYSTEM"
+            ],
+            "title": "Actor",
+            "type": "string"
+          },
+          "actor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Name"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "from_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OrderStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "to_status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          }
+        },
+        "required": [
+          "from_status",
+          "to_status",
+          "at",
+          "actor",
+          "actor_name",
+          "note"
+        ],
+        "title": "HistoryEntry",
+        "type": "object"
+      },
       "HomeOut": {
         "properties": {
           "banners": {
@@ -1808,6 +2230,341 @@
         "title": "LogoutRequest",
         "type": "object"
       },
+      "LowStockItem": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "stock_quantity": {
+            "title": "Stock Quantity",
+            "type": "integer"
+          },
+          "threshold": {
+            "title": "Threshold",
+            "type": "integer"
+          },
+          "unit_label": {
+            "title": "Unit Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "unit_label",
+          "stock_quantity",
+          "threshold"
+        ],
+        "title": "LowStockItem",
+        "type": "object"
+      },
+      "OrderDetailOut": {
+        "properties": {
+          "can_cancel": {
+            "title": "Can Cancel",
+            "type": "boolean"
+          },
+          "cancel_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancel Reason"
+          },
+          "customer_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Note"
+          },
+          "delivery_address": {
+            "$ref": "#/components/schemas/DeliveryAddressOut"
+          },
+          "delivery_fee_paise": {
+            "title": "Delivery Fee Paise",
+            "type": "integer"
+          },
+          "discount_paise": {
+            "title": "Discount Paise",
+            "type": "integer"
+          },
+          "first_item_images": {
+            "items": {
+              "type": "string"
+            },
+            "title": "First Item Images",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "item_count": {
+            "title": "Item Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "order_number": {
+            "title": "Order Number",
+            "type": "integer"
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/PaymentMethod"
+          },
+          "payment_status": {
+            "$ref": "#/components/schemas/PaymentStatus"
+          },
+          "placed_at": {
+            "format": "date-time",
+            "title": "Placed At",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "subtotal_paise": {
+            "title": "Subtotal Paise",
+            "type": "integer"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineStep"
+            },
+            "title": "Timeline",
+            "type": "array"
+          },
+          "total_paise": {
+            "title": "Total Paise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "order_number",
+          "status",
+          "payment_method",
+          "payment_status",
+          "total_paise",
+          "item_count",
+          "placed_at",
+          "first_item_images",
+          "items",
+          "subtotal_paise",
+          "delivery_fee_paise",
+          "discount_paise",
+          "delivery_address",
+          "customer_note",
+          "timeline",
+          "can_cancel",
+          "cancel_reason"
+        ],
+        "title": "OrderDetailOut",
+        "type": "object"
+      },
+      "OrderItemOut": {
+        "properties": {
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "line_total_paise": {
+            "title": "Line Total Paise",
+            "type": "integer"
+          },
+          "mrp_paise": {
+            "title": "Mrp Paise",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "product_id": {
+            "format": "uuid",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "unit_label": {
+            "title": "Unit Label",
+            "type": "string"
+          },
+          "unit_price_paise": {
+            "title": "Unit Price Paise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "product_id",
+          "name",
+          "unit_label",
+          "image_url",
+          "unit_price_paise",
+          "mrp_paise",
+          "quantity",
+          "line_total_paise"
+        ],
+        "title": "OrderItemOut",
+        "type": "object"
+      },
+      "OrderStatus": {
+        "enum": [
+          "AWAITING_PAYMENT",
+          "PENDING",
+          "CONFIRMED",
+          "PREPARING",
+          "OUT_FOR_DELIVERY",
+          "DELIVERED",
+          "CANCELLED"
+        ],
+        "title": "OrderStatus",
+        "type": "string"
+      },
+      "OrderSummaryOut": {
+        "properties": {
+          "first_item_images": {
+            "items": {
+              "type": "string"
+            },
+            "title": "First Item Images",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "item_count": {
+            "title": "Item Count",
+            "type": "integer"
+          },
+          "order_number": {
+            "title": "Order Number",
+            "type": "integer"
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/PaymentMethod"
+          },
+          "payment_status": {
+            "$ref": "#/components/schemas/PaymentStatus"
+          },
+          "placed_at": {
+            "format": "date-time",
+            "title": "Placed At",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "total_paise": {
+            "title": "Total Paise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "order_number",
+          "status",
+          "payment_method",
+          "payment_status",
+          "total_paise",
+          "item_count",
+          "placed_at",
+          "first_item_images"
+        ],
+        "title": "OrderSummaryOut",
+        "type": "object"
+      },
+      "OrdersSummaryOut": {
+        "description": "Polled by the admin every 15 s to announce new orders.",
+        "properties": {
+          "latest_order_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Order At"
+          },
+          "pending_count": {
+            "title": "Pending Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "pending_count",
+          "latest_order_at"
+        ],
+        "title": "OrdersSummaryOut",
+        "type": "object"
+      },
+      "Page_AdminOrderRow_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AdminOrderRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "Page[AdminOrderRow]",
+        "type": "object"
+      },
       "Page_AdminProductOut_": {
         "properties": {
           "items": {
@@ -1839,6 +2596,37 @@
         "title": "Page[AdminProductOut]",
         "type": "object"
       },
+      "Page_OrderSummaryOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderSummaryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "Page[OrderSummaryOut]",
+        "type": "object"
+      },
       "Page_ProductCardOut_": {
         "properties": {
           "items": {
@@ -1868,6 +2656,93 @@
           "offset"
         ],
         "title": "Page[ProductCardOut]",
+        "type": "object"
+      },
+      "PaymentMethod": {
+        "enum": [
+          "ONLINE",
+          "COD"
+        ],
+        "title": "PaymentMethod",
+        "type": "string"
+      },
+      "PaymentStatus": {
+        "enum": [
+          "PENDING",
+          "PAID",
+          "FAILED",
+          "REFUNDED",
+          "REFUND_FAILED"
+        ],
+        "title": "PaymentStatus",
+        "type": "string"
+      },
+      "PlaceOrderOut": {
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderDetailOut"
+          },
+          "payment": {
+            "title": "Payment",
+            "type": "null"
+          }
+        },
+        "required": [
+          "order"
+        ],
+        "title": "PlaceOrderOut",
+        "type": "object"
+      },
+      "PlaceOrderRequest": {
+        "properties": {
+          "address_id": {
+            "format": "uuid",
+            "title": "Address Id",
+            "type": "string"
+          },
+          "customer_note": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Note"
+          },
+          "expected_total_paise": {
+            "minimum": 0.0,
+            "title": "Expected Total Paise",
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "format": "uuid",
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CheckoutItem"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Items",
+            "type": "array"
+          },
+          "payment_method": {
+            "$ref": "#/components/schemas/PaymentMethod"
+          }
+        },
+        "required": [
+          "address_id",
+          "payment_method",
+          "items",
+          "idempotency_key",
+          "expected_total_paise"
+        ],
+        "title": "PlaceOrderRequest",
         "type": "object"
       },
       "ProductCardOut": {
@@ -2452,6 +3327,30 @@
         "title": "ShopOut",
         "type": "object"
       },
+      "StatusChangeRequest": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "to_status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          }
+        },
+        "required": [
+          "to_status"
+        ],
+        "title": "StatusChangeRequest",
+        "type": "object"
+      },
       "StockAdjustRequest": {
         "properties": {
           "delta": {
@@ -2553,6 +3452,24 @@
           "image_url"
         ],
         "title": "SuggestionOut",
+        "type": "object"
+      },
+      "TimelineStep": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          }
+        },
+        "required": [
+          "status",
+          "at"
+        ],
+        "title": "TimelineStep",
         "type": "object"
       },
       "UpdateMeRequest": {
@@ -3360,6 +4277,310 @@
           }
         ],
         "summary": "Update Category",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/dashboard": {
+      "get": {
+        "operationId": "dashboard_api_v1_admin_dashboard_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Dashboard",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/orders": {
+      "get": {
+        "description": "Newest first. Without `status`, unpaid online orders (AWAITING_PAYMENT) are hidden.\n`q` matches the order number, customer name or phone. Dates are in the shop's timezone.",
+        "operationId": "list_orders_api_v1_admin_orders_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/OrderStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "payment_status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/PaymentStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Payment Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_AdminOrderRow_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Orders",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/orders/summary": {
+      "get": {
+        "operationId": "orders_summary_api_v1_admin_orders_summary_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrdersSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Orders Summary",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/orders/{order_id}": {
+      "get": {
+        "operationId": "get_order_api_v1_admin_orders__order_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Order Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Order",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/orders/{order_id}/status": {
+      "patch": {
+        "description": "Moves the order one step. Cancelling needs a `note` (shown to the customer) and puts\nthe stock back.",
+        "operationId": "change_status_api_v1_admin_orders__order_id__status_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Order Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Change Status",
         "tags": [
           "admin"
         ]
@@ -4812,6 +6033,233 @@
         "summary": "Remove Device",
         "tags": [
           "me"
+        ]
+      }
+    },
+    "/api/v1/orders": {
+      "get": {
+        "operationId": "list_orders_api_v1_orders_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "scope",
+            "required": false,
+            "schema": {
+              "default": "active",
+              "enum": [
+                "active",
+                "past"
+              ],
+              "title": "Scope",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_OrderSummaryOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Orders",
+        "tags": [
+          "orders"
+        ]
+      },
+      "post": {
+        "description": "Prices, stock and delivery rules are checked again here, inside one transaction.\nResending the same `idempotency_key` returns the original order with 200.",
+        "operationId": "place_order_api_v1_orders_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlaceOrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaceOrderOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Place Order",
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/api/v1/orders/{order_id}": {
+      "get": {
+        "operationId": "get_order_api_v1_orders__order_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Order Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Order",
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/api/v1/orders/{order_id}/cancel": {
+      "post": {
+        "description": "Allowed only before the shop accepts the order; the stock goes back on the shelf.",
+        "operationId": "cancel_order_api_v1_orders__order_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Order Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelOrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Cancel Order",
+        "tags": [
+          "orders"
         ]
       }
     },

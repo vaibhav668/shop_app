@@ -74,6 +74,50 @@ class InventoryService:
         self._log(product_id, delta, result, InventoryReason.MANUAL_ADJUST, actor_id, note)
         return result
 
+    def take_for_order(
+        self, product_id: uuid.UUID, *, quantity: int, order_id: uuid.UUID, actor_id: uuid.UUID
+    ) -> int:
+        """Reserves stock for a new order. The caller holds the product row lock and has already
+        checked availability; the WHERE clause (and the CHECK constraint) are the safety net."""
+        result = self.db.execute(
+            update(Product)
+            .where(Product.id == product_id, Product.stock_quantity >= quantity)
+            .values(stock_quantity=Product.stock_quantity - quantity)
+            .returning(Product.stock_quantity)
+        ).scalar_one_or_none()
+        if result is None:
+            current = self._current(product_id)
+            raise AppError(
+                "OUT_OF_STOCK",
+                f"Only {current} left." if current else "This item is out of stock.",
+                409,
+                {"product_id": str(product_id), "available": current},
+            )
+        self._log(
+            product_id, -quantity, result, InventoryReason.ORDER_PLACED, actor_id, None, order_id
+        )
+        return result
+
+    def return_for_order(
+        self,
+        product_id: uuid.UUID,
+        *,
+        quantity: int,
+        order_id: uuid.UUID,
+        actor_id: uuid.UUID | None,
+    ) -> int:
+        """Puts a cancelled order's units back on the shelf."""
+        result = self.db.execute(
+            update(Product)
+            .where(Product.id == product_id)
+            .values(stock_quantity=Product.stock_quantity + quantity)
+            .returning(Product.stock_quantity)
+        ).scalar_one()
+        self._log(
+            product_id, quantity, result, InventoryReason.ORDER_CANCELLED, actor_id, None, order_id
+        )
+        return result
+
     def _current(self, product_id: uuid.UUID) -> int:
         current = self.db.scalar(select(Product.stock_quantity).where(Product.id == product_id))
         if current is None:
@@ -88,6 +132,7 @@ class InventoryService:
         reason: InventoryReason,
         actor_id: uuid.UUID | None,
         note: str | None,
+        order_id: uuid.UUID | None = None,
     ) -> None:
         self.db.add(
             InventoryMovement(
@@ -97,5 +142,6 @@ class InventoryService:
                 reason=reason,
                 actor_user_id=actor_id,
                 note=note,
+                order_id=order_id,
             )
         )

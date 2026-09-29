@@ -94,8 +94,9 @@ class InventoryMovement(UUIDPrimaryKey, CreatedAt, Base):
     reason: Mapped[InventoryReason] = mapped_column(
         Enum(InventoryReason, name="inventory_reason"), nullable=False
     )
-    # FK to orders is added with the orders table (Phase 7).
-    order_id: Mapped[uuid.UUID | None] = mapped_column()
+    order_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("orders.id", ondelete="RESTRICT"), index=True
+    )
     actor_user_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL")
     )
