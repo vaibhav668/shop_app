@@ -1,11 +1,13 @@
-import { ShoppingBasket } from 'lucide-react';
+import { LogOut, ShoppingBasket } from 'lucide-react';
 import { NavLink } from 'react-router';
 
+import { useAuth } from '@/auth/authContext';
 import { NAV_ITEMS } from '@/navigation';
 
 import styles from './Sidebar.module.css';
 
 export function Sidebar() {
+  const { user, signOut } = useAuth();
   return (
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
@@ -37,6 +39,27 @@ export function Sidebar() {
           ))}
         </ul>
       </nav>
+
+      {user ? (
+        <div className={styles.account}>
+          <span className={styles.avatar} aria-hidden>
+            {user.name.trim().charAt(0).toUpperCase()}
+          </span>
+          <span className={styles.accountText}>
+            <span className={styles.accountName}>{user.name}</span>
+            <span className={styles.caption}>{user.email}</span>
+          </span>
+          <button
+            type="button"
+            className={styles.signOut}
+            onClick={() => void signOut()}
+            title="Sign out"
+            aria-label="Sign out"
+          >
+            <LogOut size={18} strokeWidth={1.75} aria-hidden />
+          </button>
+        </div>
+      ) : null}
     </aside>
   );
 }

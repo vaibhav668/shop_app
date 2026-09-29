@@ -84,6 +84,65 @@
   color: var(--color-brand);
 }
 
+.account {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-2) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-brand-tint);
+  color: var(--color-action);
+  font-weight: 700;
+}
+
+.accountText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.accountName {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accountText .caption {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.signOut {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.signOut:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
 /* Tablet landscape: icon-only rail. */
 @media (max-width: 1199px) {
   .sidebar {
@@ -92,8 +151,15 @@
   }
 
   .brandText,
-  .label {
+  .label,
+  .accountText,
+  .avatar {
     display: none;
+  }
+
+  .account {
+    justify-content: center;
+    padding-inline: 0;
   }
 
   .brand,
