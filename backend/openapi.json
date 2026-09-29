@@ -2347,6 +2347,39 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "HandoffOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "expires_in": {
+            "title": "Expires In",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "expires_in"
+        ],
+        "title": "HandoffOut",
+        "type": "object"
+      },
+      "HandoffRedeemRequest": {
+        "properties": {
+          "code": {
+            "maxLength": 256,
+            "minLength": 20,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "HandoffRedeemRequest",
+        "type": "object"
+      },
       "HealthResponse": {
         "properties": {
           "status": {
@@ -5962,6 +5995,75 @@
         "summary": "Upload Image",
         "tags": [
           "admin"
+        ]
+      }
+    },
+    "/api/v1/auth/admin-handoff": {
+      "post": {
+        "description": "For an admin who signed in on the shop's single sign-in page: a one-time code (60 s)\nthat the admin dashboard exchanges for its own session. Ends the calling shop session.",
+        "operationId": "create_admin_handoff_api_v1_auth_admin_handoff_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HandoffOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Admin Handoff",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/admin-handoff/redeem": {
+      "post": {
+        "description": "The admin dashboard's side: works once, within a minute, for an active admin only.",
+        "operationId": "redeem_admin_handoff_api_v1_auth_admin_handoff_redeem_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HandoffRedeemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Redeem Admin Handoff",
+        "tags": [
+          "auth"
         ]
       }
     },

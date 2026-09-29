@@ -1,135 +1,75 @@
-import { GoogleLogin, googleLogout, useGoogleOneTapLogin } from '@react-oauth/google';
 import { ShoppingBasket } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
+import { Navigate, useLocation, useSearchParams } from 'react-router';
 
 import { ApiError } from '@/api/client';
 import { useAuth } from '@/auth/authContext';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
-import { GOOGLE_CLIENT_ID, SHOP_URL } from '@/lib/config';
+import { SHOP_URL } from '@/lib/config';
 import { goTo } from '@/lib/navigation';
 
 import styles from './SignInPage.module.css';
 
-function messageFor(error: unknown): string {
-  if (error instanceof ApiError) return error.message;
-  return "Sign-in didn't work. Try again?";
-}
-
-/** How long the "taking you to the shop" note stays before the page moves on. */
-export const SHOP_REDIRECT_DELAY_MS = 1500;
+/** Where everyone signs in: the shop's Welcome screen (one page for customers and admins). */
+export const SIGN_IN_URL = `${SHOP_URL}/welcome`;
 
 /**
- * Google One Tap with auto-select: someone who already signed in here with Google is signed in
- * again without a click and lands on the dashboard. First-timers (or after signing out) still
- * use the button. Rendered only inside GoogleOAuthProvider.
+ * The admin has no sign-in form of its own. People sign in once, on the shop's Welcome screen;
+ * an admin is then sent here with a one-time `?handoff=` code, which this page exchanges for an
+ * admin session. Without a code, it sends the visitor to that single sign-in page.
  */
-function AutoSignIn({ onCredential }: { onCredential: (credential: string) => void }) {
-  useGoogleOneTapLogin({
-    onSuccess: ({ credential }) => {
-      if (credential) onCredential(credential);
-    },
-    auto_select: true,
-    cancel_on_tap_outside: false,
-  });
-  return null;
-}
-
-/** One way in: Continue with Google. New admins then add their name and mobile number. */
 export function SignInPage() {
-  const { status, signInWithGoogle } = useAuth();
+  const { status, redeemHandoff } = useAuth();
   const location = useLocation();
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  // A customer (not an admin) signed in here: they belong in the shop, so send them there.
-  const [toShop, setToShop] = useState(false);
+  const [params] = useSearchParams();
+  const code = params.get('handoff');
+  const [failed, setFailed] = useState<string | null>(null);
+  // The code works once; React's development double-run of effects must not spend it twice.
+  const redeemed = useRef(false);
 
   useEffect(() => {
-    if (!toShop) return;
-    const t = setTimeout(() => goTo(SHOP_URL), SHOP_REDIRECT_DELAY_MS);
-    return () => clearTimeout(t);
-  }, [toShop]);
+    // Wait for the start-up session check to settle ('loading'): if it finished after the
+    // redeem, it would clear the session the code just created.
+    if (!code || redeemed.current || status !== 'signedOut') return;
+    redeemed.current = true;
+    // Drop the code from the address bar and history straight away.
+    window.history.replaceState(null, '', location.pathname);
+    redeemHandoff(code).catch((e: unknown) =>
+      setFailed(
+        e instanceof ApiError && e.code !== 'NETWORK_ERROR'
+          ? e.message
+          : "Couldn't reach the server. Check that the backend is running.",
+      ),
+    );
+  }, [code, redeemHandoff, status, location.pathname]);
 
-  const onCredential = async (credential: string) => {
-    setBusy(true);
-    setError(null);
-    try {
-      await signInWithGoogle(credential);
-    } catch (e) {
-      if (e instanceof ApiError && e.code === 'FORBIDDEN') {
-        // Stop Google's auto sign-in picking this account again if they come back as an admin.
-        googleLogout();
-        setToShop(true);
-      } else {
-        setError(messageFor(e));
-      }
-    } finally {
-      setBusy(false);
-    }
-  };
+  const waitingForCode = Boolean(code) && !failed;
+  useEffect(() => {
+    // Nothing to redeem and not signed in: go to the one sign-in page.
+    if (status === 'signedOut' && !code && !failed) goTo(SIGN_IN_URL);
+  }, [status, code, failed]);
 
-  if (status === 'loading') return <FullPageSpinner />;
   if (status === 'signedIn') {
     const from = (location.state as { from?: string } | null)?.from ?? '/';
     return <Navigate to={from} replace />;
   }
-
-  if (toShop) {
-    return (
-      <main className={styles.page}>
-        <section className={styles.card} role="status">
-          <span className={styles.mark} aria-hidden>
-            <ShoppingBasket size={24} strokeWidth={2} />
-          </span>
-          <h1 className={styles.title}>Taking you to the shop…</h1>
-          <p className={styles.subtitle}>
-            This is the shop owner&apos;s area. Your account is set up for shopping at Bada Bazar.
-          </p>
-          <a className={styles.shopLink} href={SHOP_URL}>
-            Go to the shop now
-          </a>
-          <button type="button" className={styles.secondaryAction} onClick={() => setToShop(false)}>
-            I&apos;m the shop owner, use a different account
-          </button>
-        </section>
-      </main>
-    );
-  }
+  if (status === 'loading' || waitingForCode) return <FullPageSpinner />;
 
   return (
     <main className={styles.page}>
-      <section className={styles.card} aria-busy={busy || undefined}>
+      <section className={styles.card} role={failed ? 'alert' : 'status'}>
         <span className={styles.mark} aria-hidden>
           <ShoppingBasket size={24} strokeWidth={2} />
         </span>
         <h1 className={styles.title}>Bada Bazar admin</h1>
-        <p className={styles.subtitle}>Sign in with the Google account the shop owner added.</p>
-
-        {error ? (
-          <p className={styles.error} role="alert">
-            {error}
-          </p>
-        ) : null}
-
-        {GOOGLE_CLIENT_ID ? (
-          <div className={styles.google}>
-            <AutoSignIn onCredential={(c) => void onCredential(c)} />
-            <GoogleLogin
-              onSuccess={({ credential }) => {
-                if (credential) void onCredential(credential);
-              }}
-              onError={() => setError("Google sign-in didn't open. Try again?")}
-              theme="outline"
-              size="large"
-              text="continue_with"
-              width="320"
-            />
-          </div>
+        {failed ? (
+          <p className={styles.error}>{failed}</p>
         ) : (
-          <p className={styles.note}>
-            Google sign-in isn&apos;t configured yet (set <code>VITE_GOOGLE_CLIENT_ID</code>).
-          </p>
+          <p className={styles.subtitle}>Taking you to the Bada Bazar sign-in page…</p>
         )}
+        <a className={styles.shopLink} href={SIGN_IN_URL}>
+          {failed ? 'Sign in again' : 'Go to sign-in'}
+        </a>
       </section>
     </main>
   );

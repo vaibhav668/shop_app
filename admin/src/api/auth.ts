@@ -5,10 +5,11 @@ export type User = components['schemas']['UserOut'];
 export type AuthResponse = components['schemas']['AuthResponse'];
 
 export const authApi = {
-  signInWithGoogle: (idToken: string) =>
-    api<AuthResponse>('/auth/google', {
+  /** Exchanges the one-time code from the shop's sign-in page for an admin session. */
+  redeemHandoff: (code: string) =>
+    api<AuthResponse>('/auth/admin-handoff/redeem', {
       method: 'POST',
-      body: { id_token: idToken, client: 'admin' },
+      body: { code },
       auth: false,
     }),
 

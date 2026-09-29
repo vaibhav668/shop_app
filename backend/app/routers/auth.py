@@ -11,11 +11,13 @@ from app.schemas.auth import (
     AuthResponse,
     DevSignInRequest,
     GoogleSignInRequest,
+    HandoffOut,
+    HandoffRedeemRequest,
     LogoutRequest,
     RefreshRequest,
     UserOut,
 )
-from app.services.auth import DEV_SUB_PREFIX, AuthResult, AuthService
+from app.services.auth import DEV_SUB_PREFIX, HANDOFF_TTL_SECONDS, AuthResult, AuthService
 
 REFRESH_COOKIE = "bb_refresh"
 REFRESH_COOKIE_PATH = "/api/v1/auth"
@@ -74,6 +76,33 @@ def refresh(
     if not token:
         raise AppError("UNAUTHENTICATED", "Please sign in.", status_code=401)
     result = AuthService(db, settings).refresh(token)
+    return _respond(result, response, settings)
+
+
+@router.post("/admin-handoff", response_model=HandoffOut)
+def create_admin_handoff(
+    current: CurrentSession = Depends(get_current_session),
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+) -> HandoffOut:
+    """For an admin who signed in on the shop's single sign-in page: a one-time code (60 s)
+    that the admin dashboard exchanges for its own session. Ends the calling shop session."""
+    code = AuthService(db, settings).create_admin_handoff(current.user, current.claims.session_id)
+    return HandoffOut(code=code, expires_in=HANDOFF_TTL_SECONDS)
+
+
+@router.post("/admin-handoff/redeem", response_model=AuthResponse, response_model_exclude_none=True)
+def redeem_admin_handoff(
+    payload: HandoffRedeemRequest,
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+) -> AuthResponse:
+    """The admin dashboard's side: works once, within a minute, for an active admin only."""
+    result = AuthService(db, settings).redeem_admin_handoff(
+        payload.code, request.headers.get("user-agent")
+    )
     return _respond(result, response, settings)
 
 

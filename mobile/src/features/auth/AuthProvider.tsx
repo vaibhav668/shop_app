@@ -26,6 +26,8 @@ type AuthContextValue = {
   signOut: () => Promise<void>;
   updateProfile: (changes: { name?: string; phone?: string }) => Promise<void>;
   deleteAccount: () => Promise<void>;
+  /** Clears this device's session without calling the server (it already ended it). */
+  forgetSession: () => Promise<void>;
   retry: () => void;
 };
 
@@ -126,6 +128,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await authApi.deleteMe();
         forgetPushToken(); // the server dropped this phone's token with the account
         await signOutOfGoogle();
+        await endSession();
+      },
+      forgetSession: async () => {
+        forgetPushToken();
         await endSession();
       },
       retry: () => {

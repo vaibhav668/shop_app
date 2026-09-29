@@ -4,7 +4,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -59,8 +59,8 @@ function RootNavigator() {
   const signedIn = status === 'signedIn' && user !== null;
   const onboarded = signedIn && !user.needs_onboarding;
 
-  // On the web, the shop's admins belong in the admin dashboard, not the customer shop.
-  if (Platform.OS === 'web' && onboarded && user.role === 'ADMIN') return <AdminRedirect />;
+  // One sign-in page for everyone: shop admins are handed on to the admin dashboard.
+  if (onboarded && user.role === 'ADMIN') return <AdminRedirect />;
 
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>

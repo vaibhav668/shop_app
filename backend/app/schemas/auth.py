@@ -24,6 +24,15 @@ class RefreshRequest(BaseModel):
     refresh_token: str | None = Field(default=None, max_length=256)
 
 
+class HandoffOut(BaseModel):
+    code: str
+    expires_in: int
+
+
+class HandoffRedeemRequest(BaseModel):
+    code: str = Field(min_length=20, max_length=256)
+
+
 class LogoutRequest(BaseModel):
     device_token: str | None = Field(default=None, max_length=4096)
 

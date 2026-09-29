@@ -26,8 +26,14 @@ export const API_URL =
 
 export const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? '';
 
-/** The shop's admin dashboard; admins signing in on the web are sent there. */
-export const ADMIN_URL = (process.env.EXPO_PUBLIC_ADMIN_URL ?? 'http://localhost:5173').replace(
+/** The shop's admin dashboard; admins who sign in here are handed into it. */
+const CONFIGURED_ADMIN_URL = (process.env.EXPO_PUBLIC_ADMIN_URL ?? 'http://localhost:5173').replace(
   /\/$/,
   '',
 );
+
+/** On a phone in development, "localhost" is swapped for the PC's address, as for the API. */
+export const ADMIN_URL =
+  __DEV__ && Platform.OS !== 'web'
+    ? resolveApiUrl(CONFIGURED_ADMIN_URL, Constants.expoConfig?.hostUri)
+    : CONFIGURED_ADMIN_URL;

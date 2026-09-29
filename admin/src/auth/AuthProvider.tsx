@@ -1,4 +1,3 @@
-import { googleLogout } from '@react-oauth/google';
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { type AuthResponse, authApi, type User } from '@/api/auth';
@@ -55,11 +54,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       status,
       user,
-      signInWithGoogle: async (idToken) => accept(await authApi.signInWithGoogle(idToken)),
+      redeemHandoff: async (code) => accept(await authApi.redeemHandoff(code)),
       updateProfile: async (changes) => setUser(await authApi.updateMe(changes)),
       signOut: async () => {
-        // Stops Google's automatic sign-in, or signing out would sign straight back in.
-        googleLogout();
         try {
           await authApi.logout();
         } finally {

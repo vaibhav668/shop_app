@@ -20,6 +20,11 @@ export const authApi = {
       auth: false,
     }),
 
+  /** Admins only: a one-time code that signs them into the admin dashboard (and ends this
+   *  shop session on the server). */
+  adminHandoff: () =>
+    api<{ code: string; expires_in: number }>('/auth/admin-handoff', { method: 'POST' }),
+
   /** Passing this phone's push token makes the server stop sending it pushes. */
   logout: (deviceToken?: string | null) =>
     api<void>('/auth/logout', {

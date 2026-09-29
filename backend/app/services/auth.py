@@ -4,13 +4,14 @@ import uuid
 from dataclasses import dataclass
 from datetime import timedelta
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.core.errors import AppError
 from app.core.security import create_access_token, hash_token, new_refresh_token, utcnow
 from app.integrations.google_auth import GoogleIdentity
-from app.models import SessionClient, User, UserRole, UserSession
+from app.models import AuthHandoff, SessionClient, User, UserRole, UserSession
 from app.repositories import users as repo
 
 
@@ -26,6 +27,8 @@ class AuthResult:
 
 # Prefix of google_sub for accounts created by the local-only dev login.
 DEV_SUB_PREFIX = "dev:"
+# The shop → admin dashboard pass is used immediately by the browser; a minute is plenty.
+HANDOFF_TTL_SECONDS = 60
 
 
 def _session_expired() -> AppError:
@@ -89,6 +92,47 @@ class AuthService:
         )
         self.db.commit()
         return AuthResult(user, access, expires_in, new_token, False, session.client)
+
+    # --- single sign-in page → admin dashboard ---------------------------------------------
+
+    def create_admin_handoff(self, user: User, session_id: uuid.UUID) -> str:
+        """An admin signed in on the shop's sign-in page: give them a one-time code for the
+        admin dashboard, and end this shop session (they are moving over, not staying)."""
+        if user.role is not UserRole.ADMIN:
+            raise AppError("FORBIDDEN", "Admins only.", 403)
+        code = new_refresh_token()  # 32 random bytes, URL-safe
+        now = utcnow()
+        self.db.add(
+            AuthHandoff(
+                user_id=user.id,
+                code_hash=hash_token(code),
+                expires_at=now + timedelta(seconds=HANDOFF_TTL_SECONDS),
+            )
+        )
+        session = repo.get_session(self.db, session_id)
+        if session is not None and session.user_id == user.id and session.revoked_at is None:
+            session.revoked_at = now
+        self.db.commit()
+        return code
+
+    def redeem_admin_handoff(self, code: str, user_agent: str | None) -> AuthResult:
+        handoff = self.db.scalar(
+            select(AuthHandoff).where(AuthHandoff.code_hash == hash_token(code)).with_for_update()
+        )
+        now = utcnow()
+        if handoff is None or handoff.used_at is not None or handoff.expires_at <= now:
+            raise AppError(
+                "HANDOFF_INVALID", "This sign-in link has expired. Please sign in again.", 401
+            )
+        handoff.used_at = now  # single use, even if the checks below refuse
+        user = handoff.user
+        try:
+            self._assert_can_sign_in(user, SessionClient.ADMIN)
+        except AppError:
+            self.db.commit()
+            raise
+        user.last_login_at = now
+        return self._issue(user, SessionClient.ADMIN, user_agent, is_new_user=False)
 
     def sign_out(self, user: User, session_id: uuid.UUID, device_token: str | None) -> None:
         session = repo.get_session(self.db, session_id)
