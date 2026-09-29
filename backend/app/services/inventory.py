@@ -74,6 +74,33 @@ class InventoryService:
         self._log(product_id, delta, result, InventoryReason.MANUAL_ADJUST, actor_id, note)
         return result
 
+    def bulk_set(
+        self, rows: list[tuple[uuid.UUID, int, int]], *, actor_id: uuid.UUID | None
+    ) -> tuple[list[tuple[uuid.UUID, int]], list[tuple[uuid.UUID, int, int]]]:
+        """Quick Stock save: (product_id, new_stock, expected) per row.
+        Returns (applied [(id, stock)], conflicts [(id, expected, current)]). Rows are processed
+        in product-id order, the same order checkout locks them, so the two never deadlock."""
+        ids = [product_id for product_id, _, _ in rows]
+        found = set(self.db.scalars(select(Product.id).where(Product.id.in_(ids))))
+        missing = [str(i) for i in ids if i not in found]
+        if missing:
+            raise AppError("NOT_FOUND", "Some products no longer exist.", 404, {"ids": missing})
+
+        applied: list[tuple[uuid.UUID, int]] = []
+        conflicts: list[tuple[uuid.UUID, int, int]] = []
+        for product_id, new_stock, expected in sorted(rows, key=lambda r: r[0]):
+            try:
+                stock = self.set_stock(
+                    product_id, new_stock=new_stock, expected=expected, actor_id=actor_id
+                )
+            except AppError as exc:
+                if exc.code != "STOCK_CONFLICT":
+                    raise
+                conflicts.append((product_id, expected, exc.details["current"]))
+            else:
+                applied.append((product_id, stock))
+        return applied, conflicts
+
     def take_for_order(
         self, product_id: uuid.UUID, *, quantity: int, order_id: uuid.UUID, actor_id: uuid.UUID
     ) -> int:

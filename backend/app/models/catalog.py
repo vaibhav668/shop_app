@@ -13,11 +13,12 @@ from sqlalchemy import (
     Integer,
     SmallInteger,
     Text,
+    func,
 )
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import Base, CreatedAt, Timestamps, UUIDPrimaryKey
+from app.models.base import Base, Timestamps, UUIDPrimaryKey
 
 
 class Category(UUIDPrimaryKey, Timestamps, Base):
@@ -80,11 +81,17 @@ class InventoryReason(str, enum.Enum):
     STOCK_SET = "STOCK_SET"
 
 
-class InventoryMovement(UUIDPrimaryKey, CreatedAt, Base):
+class InventoryMovement(UUIDPrimaryKey, Base):
     """Append-only log: every change to products.stock_quantity writes one row."""
 
     __tablename__ = "inventory_movements"
     __table_args__ = (Index("ix_inventory_movements_product_time", "product_id", "created_at"),)
+
+    # clock_timestamp(), not now(): one transaction (a big order, a Quick Stock save) writes
+    # several rows, and the history must still show them in the order they happened.
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.clock_timestamp()
+    )
 
     product_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("products.id", ondelete="CASCADE"), nullable=False
