@@ -10,6 +10,9 @@ export type ProductUpdate = S['ProductUpdate'];
 export type CategoryCreate = S['CategoryCreate'];
 export type CategoryUpdate = S['CategoryUpdate'];
 export type Upload = S['UploadOut'];
+export type AdminBanner = S['AdminBannerOut'];
+export type BannerCreate = S['BannerCreate'];
+export type BannerUpdate = S['BannerUpdate'];
 export type ProductStatus = 'all' | 'active' | 'inactive' | 'archived';
 
 export type ProductFilters = {
@@ -58,6 +61,15 @@ export const adminCatalogApi = {
       body: { stock, expected_stock: expected },
     }),
 
+  banners: () => api<AdminBanner[]>('/admin/banners'),
+  createBanner: (body: BannerCreate) =>
+    api<AdminBanner>('/admin/banners', { method: 'POST', body }),
+  updateBanner: (id: string, body: BannerUpdate) =>
+    api<AdminBanner>(`/admin/banners/${id}`, { method: 'PATCH', body }),
+  deleteBanner: (id: string) => api<void>(`/admin/banners/${id}`, { method: 'DELETE' }),
+  reorderBanners: (ids: string[]) =>
+    api<void>('/admin/banners/reorder', { method: 'POST', body: { ids } }),
+
   uploadImage: (file: File) => {
     const form = new FormData();
     form.append('file', file);
@@ -67,6 +79,7 @@ export const adminCatalogApi = {
 
 export const catalogKeys = {
   categories: ['admin', 'categories'] as const,
+  banners: ['admin', 'banners'] as const,
   products: (f: ProductFilters) => ['admin', 'products', f] as const,
   allProducts: ['admin', 'products'] as const,
   product: (id: string) => ['admin', 'product', id] as const,

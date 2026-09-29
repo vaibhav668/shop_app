@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   LayoutGrid,
   type LucideIcon,
+  Megaphone,
   Package,
   ReceiptText,
   Settings,
@@ -47,6 +48,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Categories',
     icon: LayoutGrid,
     description: 'Group products into categories like Dairy or Bakery.',
+  },
+  {
+    path: '/banners',
+    label: 'Banners',
+    icon: Megaphone,
+    description: 'Promotions shown at the top of the app home screen.',
   },
   {
     path: '/customers',
