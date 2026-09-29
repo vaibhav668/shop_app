@@ -385,7 +385,7 @@ admin.<shopdomain>  →  static hosting (Vercel / Netlify / Cloudflare Pages)
 
 | Item | Plan |
 |---|---|
-| Package name | `in.<shopslug>.app`. This is permanent once published, so it must be decided before the first EAS build. |
+| Package name | `com.badabazar.app` (decided). This is permanent once published. |
 | Icon / splash | Adaptive icon (foreground + `#FAFAF7` background), monochrome icon for Android 13 themed icons, splash via `expo-splash-screen` |
 | Permissions | `INTERNET`, `POST_NOTIFICATIONS` only. No location in V1. Unused defaults are removed with `android.blockedPermissions`. |
 | Signing | EAS-managed upload key + Play App Signing. **Register both SHA-1 fingerprints (upload key and Play signing key) on the Google OAuth Android client**, otherwise Google Sign-In fails in Play builds with `DEVELOPER_ERROR`. |
@@ -474,7 +474,7 @@ Coupons & offers (`coupons`, `offers`), product reviews, `delivery_zones` with r
 ## Decisions needed before implementation
 
 1. **Git:** OK to `git init` a dedicated repo inside `shop_app/`? Will you push to GitHub (needed for CI)?
-2. **Brand:** shop name, and the Android package name (`in.<shopslug>.app`, which cannot be changed later).
+2. ~~**Brand:**~~ Decided: **Bada Bazar**, package `com.badabazar.app`.
 3. **Payments:** Razorpay (recommended) or another provider (Cashfree / PhonePe PG)? Offer **Cash on Delivery** as well? (Recommended: yes.)
 4. **Delivery rules:** delivery fee, free-delivery threshold, minimum order, and serviceable area (a list of pincodes is recommended for V1).
 5. **Cancellation/refund policy:** can the admin cancel a paid order after dispatch? Automatic refund on admin cancel? (Recommended: yes.)

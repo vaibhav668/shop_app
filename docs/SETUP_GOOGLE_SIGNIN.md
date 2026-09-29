@@ -31,7 +31,7 @@ The mobile app asks Google for an ID token *for the web client*. That's why the 
    - **EAS development build**: run `npx eas-cli@latest credentials -p android` in `mobile/`, choose the *development* profile, and copy the **SHA1 Fingerprint**. You can also create the first build with step 5 below, then read the fingerprint from the same menu.
    - **Play Store builds (later)**: also add the **App signing key** SHA-1 from Play Console → Setup → App integrity. If this is missing, sign-in fails only in Play builds.
 2. **Create credentials → OAuth client ID → Android**.
-3. Package name: `com.placeholder.badabazar` (update this when the real package name is chosen).
+3. Package name: `com.badabazar.app`.
 4. Paste the SHA-1 and create the client.
 
 ## 4. Put the IDs in place
