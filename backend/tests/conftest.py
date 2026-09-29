@@ -13,9 +13,11 @@ from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
-from app.core.config import get_settings
+from app.core.config import Settings, get_settings
+from app.dependencies.auth import get_google_verifier
 from app.dependencies.db import get_db
 from app.main import create_app
+from tests.fakes import FakeGoogleVerifier
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 
@@ -62,8 +64,19 @@ def db_session(db_engine: Engine) -> Iterator[Session]:
 
 
 @pytest.fixture
-def client(db_session: Session) -> Iterator[TestClient]:
-    app = create_app()
+def test_settings() -> Settings:
+    return Settings(
+        app_env="test",
+        dev_login_enabled=True,
+        google_allowed_client_ids="test-web-client",
+        access_token_ttl_minutes=15,
+    )
+
+
+@pytest.fixture
+def client(db_session: Session, test_settings: Settings) -> Iterator[TestClient]:
+    app = create_app(test_settings)
     app.dependency_overrides[get_db] = lambda: db_session
+    app.dependency_overrides[get_google_verifier] = lambda: FakeGoogleVerifier()
     with TestClient(app) as test_client:
         yield test_client
