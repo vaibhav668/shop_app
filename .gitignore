@@ -1,0 +1,46 @@
+# Secrets & local config
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+google-services.json
+GoogleService-Info.plist
+firebase-credentials*.json
+credentials.json
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.venv/
+venv/
+
+# Node / frontends
+node_modules/
+dist/
+build/
+.expo/
+web-build/
+expo-env.d.ts
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+
+# Native (Expo prebuild output)
+/mobile/android/
+/mobile/ios/
+
+# Local uploads (LocalStorage provider)
+/backend/media/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
