@@ -1,11 +1,14 @@
 """The cart stores product IDs and quantities only; every price and total comes from the server."""
 
+from datetime import timedelta
+
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import func, update
 from sqlalchemy.orm import Session
 
 from app.core.security import utcnow
-from app.models import Product, ShopSettings
+from app.models import Favourite, Product, ShopSettings
 from app.services.pricing import delivery_fee_for, quote
 from tests.factories import make_category, make_product
 from tests.helpers import bearer, sign_in
@@ -193,6 +196,12 @@ class TestFavourites:
 
         for product in (milk, bread, milk):  # repeat is harmless
             assert client.put(f"/api/v1/favourites/{product.id}", headers=user).status_code == 204
+        # Tests run in one transaction, where now() never moves; make Milk clearly older.
+        db_session.execute(
+            update(Favourite)
+            .where(Favourite.product_id == milk.id)
+            .values(created_at=func.now() - timedelta(minutes=1))
+        )
 
         page = client.get("/api/v1/favourites", headers=user).json()
         assert [p["name"] for p in page["items"]] == ["Bread", "Milk"]  # newest first

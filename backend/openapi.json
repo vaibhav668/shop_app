@@ -1,6 +1,297 @@
 {
   "components": {
     "schemas": {
+      "AddressCreate": {
+        "properties": {
+          "city": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "City",
+            "type": "string"
+          },
+          "is_default": {
+            "default": false,
+            "title": "Is Default",
+            "type": "boolean"
+          },
+          "label": {
+            "default": "Home",
+            "maxLength": 30,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "landmark": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Landmark"
+          },
+          "line1": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Line1",
+            "type": "string"
+          },
+          "line2": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line2"
+          },
+          "phone": {
+            "pattern": "^[6-9]\\d{9}$",
+            "title": "Phone",
+            "type": "string"
+          },
+          "pincode": {
+            "pattern": "^[1-9]\\d{5}$",
+            "title": "Pincode",
+            "type": "string"
+          },
+          "recipient_name": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Recipient Name",
+            "type": "string"
+          },
+          "state": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "recipient_name",
+          "phone",
+          "line1",
+          "city",
+          "state",
+          "pincode"
+        ],
+        "title": "AddressCreate",
+        "type": "object"
+      },
+      "AddressOut": {
+        "properties": {
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_default": {
+            "title": "Is Default",
+            "type": "boolean"
+          },
+          "is_serviceable": {
+            "title": "Is Serviceable",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "landmark": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Landmark"
+          },
+          "line1": {
+            "title": "Line1",
+            "type": "string"
+          },
+          "line2": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line2"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "pincode": {
+            "title": "Pincode",
+            "type": "string"
+          },
+          "recipient_name": {
+            "title": "Recipient Name",
+            "type": "string"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "recipient_name",
+          "phone",
+          "line1",
+          "line2",
+          "landmark",
+          "city",
+          "state",
+          "pincode",
+          "is_default",
+          "is_serviceable"
+        ],
+        "title": "AddressOut",
+        "type": "object"
+      },
+      "AddressUpdate": {
+        "description": "Only the fields sent are changed. Use POST /addresses/{id}/default to change the default.",
+        "properties": {
+          "city": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "maxLength": 30,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "landmark": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Landmark"
+          },
+          "line1": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line1"
+          },
+          "line2": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line2"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "pattern": "^[6-9]\\d{9}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "pincode": {
+            "anyOf": [
+              {
+                "pattern": "^[1-9]\\d{5}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pincode"
+          },
+          "recipient_name": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipient Name"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          }
+        },
+        "title": "AddressUpdate",
+        "type": "object"
+      },
       "AdminBannerOut": {
         "properties": {
           "ends_at": {
@@ -354,6 +645,285 @@
           "updated_at"
         ],
         "title": "AdminProductOut",
+        "type": "object"
+      },
+      "AdminSettingsOut": {
+        "properties": {
+          "closed_message": {
+            "title": "Closed Message",
+            "type": "string"
+          },
+          "cod_enabled": {
+            "title": "Cod Enabled",
+            "type": "boolean"
+          },
+          "default_low_stock_threshold": {
+            "title": "Default Low Stock Threshold",
+            "type": "integer"
+          },
+          "delivery_fee_paise": {
+            "title": "Delivery Fee Paise",
+            "type": "integer"
+          },
+          "empty_pincodes_accept_all": {
+            "title": "Empty Pincodes Accept All",
+            "type": "boolean"
+          },
+          "free_delivery_above_paise": {
+            "title": "Free Delivery Above Paise",
+            "type": "integer"
+          },
+          "is_accepting_orders": {
+            "title": "Is Accepting Orders",
+            "type": "boolean"
+          },
+          "min_order_paise": {
+            "title": "Min Order Paise",
+            "type": "integer"
+          },
+          "online_payment_enabled": {
+            "title": "Online Payment Enabled",
+            "type": "boolean"
+          },
+          "payment_timeout_minutes": {
+            "title": "Payment Timeout Minutes",
+            "type": "integer"
+          },
+          "serviceable_pincodes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Serviceable Pincodes",
+            "type": "array"
+          },
+          "shop_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shop Address"
+          },
+          "shop_name": {
+            "title": "Shop Name",
+            "type": "string"
+          },
+          "shop_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shop Phone"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "required": [
+          "shop_name",
+          "shop_phone",
+          "shop_address",
+          "is_accepting_orders",
+          "closed_message",
+          "delivery_fee_paise",
+          "free_delivery_above_paise",
+          "min_order_paise",
+          "serviceable_pincodes",
+          "empty_pincodes_accept_all",
+          "cod_enabled",
+          "online_payment_enabled",
+          "payment_timeout_minutes",
+          "default_low_stock_threshold",
+          "updated_at"
+        ],
+        "title": "AdminSettingsOut",
+        "type": "object"
+      },
+      "AdminSettingsUpdate": {
+        "description": "Only the fields sent are changed.",
+        "properties": {
+          "closed_message": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed Message"
+          },
+          "cod_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cod Enabled"
+          },
+          "default_low_stock_threshold": {
+            "anyOf": [
+              {
+                "maximum": 1000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Low Stock Threshold"
+          },
+          "delivery_fee_paise": {
+            "anyOf": [
+              {
+                "maximum": 1000000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delivery Fee Paise"
+          },
+          "free_delivery_above_paise": {
+            "anyOf": [
+              {
+                "maximum": 1000000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Free Delivery Above Paise"
+          },
+          "is_accepting_orders": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Accepting Orders"
+          },
+          "min_order_paise": {
+            "anyOf": [
+              {
+                "maximum": 1000000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Order Paise"
+          },
+          "online_payment_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Online Payment Enabled"
+          },
+          "payment_timeout_minutes": {
+            "anyOf": [
+              {
+                "maximum": 60.0,
+                "minimum": 5.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Timeout Minutes"
+          },
+          "serviceable_pincodes": {
+            "anyOf": [
+              {
+                "items": {
+                  "pattern": "^[1-9]\\d{5}$",
+                  "type": "string"
+                },
+                "maxItems": 500,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Serviceable Pincodes"
+          },
+          "shop_address": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shop Address"
+          },
+          "shop_name": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shop Name"
+          },
+          "shop_phone": {
+            "anyOf": [
+              {
+                "pattern": "^\\+?[0-9 -]{8,16}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shop Phone"
+          }
+        },
+        "title": "AdminSettingsUpdate",
         "type": "object"
       },
       "AuthResponse": {
@@ -929,6 +1499,143 @@
           }
         },
         "title": "CategoryUpdate",
+        "type": "object"
+      },
+      "CheckoutIssue": {
+        "properties": {
+          "code": {
+            "enum": [
+              "SHOP_CLOSED",
+              "NOT_SERVICEABLE",
+              "BELOW_MIN_ORDER",
+              "ITEMS_CHANGED",
+              "EMPTY_ORDER",
+              "NO_PAYMENT_METHOD"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "CheckoutIssue",
+        "type": "object"
+      },
+      "CheckoutItem": {
+        "properties": {
+          "product_id": {
+            "format": "uuid",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "quantity": {
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "product_id",
+          "quantity"
+        ],
+        "title": "CheckoutItem",
+        "type": "object"
+      },
+      "CheckoutQuoteOut": {
+        "description": "Exactly what placing the order would charge right now. Computing it changes nothing.",
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/AddressOut"
+          },
+          "can_place_order": {
+            "title": "Can Place Order",
+            "type": "boolean"
+          },
+          "delivery_fee_paise": {
+            "title": "Delivery Fee Paise",
+            "type": "integer"
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/CheckoutIssue"
+            },
+            "title": "Issues",
+            "type": "array"
+          },
+          "item_count": {
+            "title": "Item Count",
+            "type": "integer"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/CartLineOut"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "payment_methods": {
+            "items": {
+              "enum": [
+                "COD",
+                "ONLINE"
+              ],
+              "type": "string"
+            },
+            "title": "Payment Methods",
+            "type": "array"
+          },
+          "subtotal_paise": {
+            "title": "Subtotal Paise",
+            "type": "integer"
+          },
+          "total_paise": {
+            "title": "Total Paise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "lines",
+          "item_count",
+          "subtotal_paise",
+          "delivery_fee_paise",
+          "total_paise",
+          "address",
+          "payment_methods",
+          "issues",
+          "can_place_order"
+        ],
+        "title": "CheckoutQuoteOut",
+        "type": "object"
+      },
+      "CheckoutQuoteRequest": {
+        "properties": {
+          "address_id": {
+            "format": "uuid",
+            "title": "Address Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CheckoutItem"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "address_id",
+          "items"
+        ],
+        "title": "CheckoutQuoteRequest",
         "type": "object"
       },
       "DeliveryRules": {
@@ -2016,6 +2723,228 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/addresses": {
+      "get": {
+        "description": "The default address comes first, then the newest.",
+        "operationId": "list_addresses_api_v1_addresses_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AddressOut"
+                  },
+                  "title": "Response List Addresses Api V1 Addresses Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Addresses",
+        "tags": [
+          "addresses"
+        ]
+      },
+      "post": {
+        "description": "The first address becomes the default. Unserviceable pincodes are saved but flagged.",
+        "operationId": "create_address_api_v1_addresses_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Address",
+        "tags": [
+          "addresses"
+        ]
+      }
+    },
+    "/api/v1/addresses/{address_id}": {
+      "delete": {
+        "description": "Deleting the default promotes the most recently used remaining address.",
+        "operationId": "delete_address_api_v1_addresses__address_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "address_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Address Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Address",
+        "tags": [
+          "addresses"
+        ]
+      },
+      "patch": {
+        "operationId": "update_address_api_v1_addresses__address_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "address_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Address Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Address",
+        "tags": [
+          "addresses"
+        ]
+      }
+    },
+    "/api/v1/addresses/{address_id}/default": {
+      "post": {
+        "operationId": "set_default_address_api_v1_addresses__address_id__default_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "address_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Address Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Set Default Address",
+        "tags": [
+          "addresses"
+        ]
+      }
+    },
     "/api/v1/admin/banners": {
       "get": {
         "operationId": "list_banners_api_v1_admin_banners_get",
@@ -2916,6 +3845,76 @@
         ]
       }
     },
+    "/api/v1/admin/settings": {
+      "get": {
+        "operationId": "read_settings_api_v1_admin_settings_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Settings",
+        "tags": [
+          "admin"
+        ]
+      },
+      "patch": {
+        "operationId": "update_settings_api_v1_admin_settings_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminSettingsUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Settings",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/api/v1/admin/uploads/images": {
       "post": {
         "operationId": "upload_image_api_v1_admin_uploads_images_post",
@@ -3357,6 +4356,53 @@
         "summary": "Get Category",
         "tags": [
           "catalog"
+        ]
+      }
+    },
+    "/api/v1/checkout/quote": {
+      "post": {
+        "description": "Prices come from the server only. Blocking problems are listed in `issues` rather than\nraised, so the checkout screen can show all of them at once.",
+        "operationId": "checkout_quote_api_v1_checkout_quote_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutQuoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutQuoteOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Checkout Quote",
+        "tags": [
+          "checkout"
         ]
       }
     },

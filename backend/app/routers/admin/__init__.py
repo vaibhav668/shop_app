@@ -4,8 +4,9 @@ Section routers (orders, products, inventory, ...) are included here as their ph
 from fastapi import APIRouter, Depends
 
 from app.dependencies.auth import require_admin
-from app.routers.admin import banners, catalog
+from app.routers.admin import banners, catalog, settings
 
 router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])
 router.include_router(catalog.router)
 router.include_router(banners.router)
+router.include_router(settings.router)

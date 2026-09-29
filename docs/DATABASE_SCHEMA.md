@@ -90,11 +90,12 @@ Refresh-token sessions.
 | landmark | text | |
 | city | text NOT NULL | |
 | state | text NOT NULL | |
-| pincode | char(6) NOT NULL | `^\d{6}$` |
+| pincode | text NOT NULL | `CHECK (pincode ~ '^[1-9][0-9]{5}$')` |
 | latitude, longitude | numeric(9,6) | Optional, reserved for later |
 | is_default | bool NOT NULL DEFAULT false | |
+| last_used_at | timestamptz | Set when an order is placed to it (Phase 7); picks the next default on delete |
 
-Index: `UNIQUE (user_id) WHERE is_default` enforces one default address per user. Rows are hard-deleted, which is safe because orders keep their own copy of the address.
+Index: `uq_addresses_one_default_per_user` = `UNIQUE (user_id) WHERE is_default` enforces one default address per user; the service also locks the user row while changing addresses. Rows are hard-deleted, which is safe because orders keep their own copy of the address.
 
 ### categories
 | Column | Type | Notes |
@@ -220,7 +221,7 @@ One row per payment attempt, so an order can have several.
 | delivery_fee_paise | bigint | 2000 (₹20) |
 | free_delivery_above_paise | bigint | 29900 (₹299) |
 | min_order_paise | bigint | 9900 (₹99) |
-| serviceable_pincodes | text[] | `{}`. An empty list means all pincodes are accepted (dev only). |
+| serviceable_pincodes | text[] | `{}`. An empty list accepts every pincode only when `APP_ENV` is local/test; in staging/production it means no delivery anywhere until the shop sets its area. |
 | cod_enabled, online_payment_enabled | bool | true, true |
 | payment_timeout_minutes | int | 15 |
 | default_low_stock_threshold | int | 5 |

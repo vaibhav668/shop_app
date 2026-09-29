@@ -4,6 +4,68 @@
  */
 
 export interface paths {
+  '/api/v1/addresses': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Addresses
+     * @description The default address comes first, then the newest.
+     */
+    get: operations['list_addresses_api_v1_addresses_get'];
+    put?: never;
+    /**
+     * Create Address
+     * @description The first address becomes the default. Unserviceable pincodes are saved but flagged.
+     */
+    post: operations['create_address_api_v1_addresses_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/addresses/{address_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Delete Address
+     * @description Deleting the default promotes the most recently used remaining address.
+     */
+    delete: operations['delete_address_api_v1_addresses__address_id__delete'];
+    options?: never;
+    head?: never;
+    /** Update Address */
+    patch: operations['update_address_api_v1_addresses__address_id__patch'];
+    trace?: never;
+  };
+  '/api/v1/addresses/{address_id}/default': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Set Default Address */
+    post: operations['set_default_address_api_v1_addresses__address_id__default_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/admin/banners': {
     parameters: {
       query?: never;
@@ -201,6 +263,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/admin/settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read Settings */
+    get: operations['read_settings_api_v1_admin_settings_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update Settings */
+    patch: operations['update_settings_api_v1_admin_settings_patch'];
+    trace?: never;
+  };
   '/api/v1/admin/uploads/images': {
     parameters: {
       query?: never;
@@ -353,6 +433,27 @@ export interface paths {
     get: operations['get_category_api_v1_categories__slug__get'];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/checkout/quote': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Checkout Quote
+     * @description Prices come from the server only. Blocking problems are listed in `issues` rather than
+     *     raised, so the checkout screen can show all of them at once.
+     */
+    post: operations['checkout_quote_api_v1_checkout_quote_post'];
     delete?: never;
     options?: never;
     head?: never;
@@ -599,6 +700,89 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** AddressCreate */
+    AddressCreate: {
+      /** City */
+      city: string;
+      /**
+       * Is Default
+       * @default false
+       */
+      is_default?: boolean;
+      /**
+       * Label
+       * @default Home
+       */
+      label?: string;
+      /** Landmark */
+      landmark?: string | null;
+      /** Line1 */
+      line1: string;
+      /** Line2 */
+      line2?: string | null;
+      /** Phone */
+      phone: string;
+      /** Pincode */
+      pincode: string;
+      /** Recipient Name */
+      recipient_name: string;
+      /** State */
+      state: string;
+    };
+    /** AddressOut */
+    AddressOut: {
+      /** City */
+      city: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Is Default */
+      is_default: boolean;
+      /** Is Serviceable */
+      is_serviceable: boolean;
+      /** Label */
+      label: string;
+      /** Landmark */
+      landmark: string | null;
+      /** Line1 */
+      line1: string;
+      /** Line2 */
+      line2: string | null;
+      /** Phone */
+      phone: string;
+      /** Pincode */
+      pincode: string;
+      /** Recipient Name */
+      recipient_name: string;
+      /** State */
+      state: string;
+    };
+    /**
+     * AddressUpdate
+     * @description Only the fields sent are changed. Use POST /addresses/{id}/default to change the default.
+     */
+    AddressUpdate: {
+      /** City */
+      city?: string | null;
+      /** Label */
+      label?: string | null;
+      /** Landmark */
+      landmark?: string | null;
+      /** Line1 */
+      line1?: string | null;
+      /** Line2 */
+      line2?: string | null;
+      /** Phone */
+      phone?: string | null;
+      /** Pincode */
+      pincode?: string | null;
+      /** Recipient Name */
+      recipient_name?: string | null;
+      /** State */
+      state?: string | null;
+    };
     /** AdminBannerOut */
     AdminBannerOut: {
       /** Ends At */
@@ -707,6 +891,71 @@ export interface components {
        * Format: date-time
        */
       updated_at: string;
+    };
+    /** AdminSettingsOut */
+    AdminSettingsOut: {
+      /** Closed Message */
+      closed_message: string;
+      /** Cod Enabled */
+      cod_enabled: boolean;
+      /** Default Low Stock Threshold */
+      default_low_stock_threshold: number;
+      /** Delivery Fee Paise */
+      delivery_fee_paise: number;
+      /** Empty Pincodes Accept All */
+      empty_pincodes_accept_all: boolean;
+      /** Free Delivery Above Paise */
+      free_delivery_above_paise: number;
+      /** Is Accepting Orders */
+      is_accepting_orders: boolean;
+      /** Min Order Paise */
+      min_order_paise: number;
+      /** Online Payment Enabled */
+      online_payment_enabled: boolean;
+      /** Payment Timeout Minutes */
+      payment_timeout_minutes: number;
+      /** Serviceable Pincodes */
+      serviceable_pincodes: string[];
+      /** Shop Address */
+      shop_address: string | null;
+      /** Shop Name */
+      shop_name: string;
+      /** Shop Phone */
+      shop_phone: string | null;
+      /** Updated At */
+      updated_at: string | null;
+    };
+    /**
+     * AdminSettingsUpdate
+     * @description Only the fields sent are changed.
+     */
+    AdminSettingsUpdate: {
+      /** Closed Message */
+      closed_message?: string | null;
+      /** Cod Enabled */
+      cod_enabled?: boolean | null;
+      /** Default Low Stock Threshold */
+      default_low_stock_threshold?: number | null;
+      /** Delivery Fee Paise */
+      delivery_fee_paise?: number | null;
+      /** Free Delivery Above Paise */
+      free_delivery_above_paise?: number | null;
+      /** Is Accepting Orders */
+      is_accepting_orders?: boolean | null;
+      /** Min Order Paise */
+      min_order_paise?: number | null;
+      /** Online Payment Enabled */
+      online_payment_enabled?: boolean | null;
+      /** Payment Timeout Minutes */
+      payment_timeout_minutes?: number | null;
+      /** Serviceable Pincodes */
+      serviceable_pincodes?: string[] | null;
+      /** Shop Address */
+      shop_address?: string | null;
+      /** Shop Name */
+      shop_name?: string | null;
+      /** Shop Phone */
+      shop_phone?: string | null;
     };
     /** AuthResponse */
     AuthResponse: {
@@ -887,6 +1136,65 @@ export interface components {
        * @default false
        */
       remove_image?: boolean;
+    };
+    /** CheckoutIssue */
+    CheckoutIssue: {
+      /**
+       * Code
+       * @enum {string}
+       */
+      code:
+        | 'SHOP_CLOSED'
+        | 'NOT_SERVICEABLE'
+        | 'BELOW_MIN_ORDER'
+        | 'ITEMS_CHANGED'
+        | 'EMPTY_ORDER'
+        | 'NO_PAYMENT_METHOD';
+      /** Message */
+      message: string;
+    };
+    /** CheckoutItem */
+    CheckoutItem: {
+      /**
+       * Product Id
+       * Format: uuid
+       */
+      product_id: string;
+      /** Quantity */
+      quantity: number;
+    };
+    /**
+     * CheckoutQuoteOut
+     * @description Exactly what placing the order would charge right now. Computing it changes nothing.
+     */
+    CheckoutQuoteOut: {
+      address: components['schemas']['AddressOut'];
+      /** Can Place Order */
+      can_place_order: boolean;
+      /** Delivery Fee Paise */
+      delivery_fee_paise: number;
+      /** Issues */
+      issues: components['schemas']['CheckoutIssue'][];
+      /** Item Count */
+      item_count: number;
+      /** Lines */
+      lines: components['schemas']['CartLineOut'][];
+      /** Payment Methods */
+      payment_methods: ('COD' | 'ONLINE')[];
+      /** Subtotal Paise */
+      subtotal_paise: number;
+      /** Total Paise */
+      total_paise: number;
+    };
+    /** CheckoutQuoteRequest */
+    CheckoutQuoteRequest: {
+      /**
+       * Address Id
+       * Format: uuid
+       */
+      address_id: string;
+      /** Items */
+      items: components['schemas']['CheckoutItem'][];
     };
     /**
      * DeliveryRules
@@ -1261,6 +1569,154 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+  list_addresses_api_v1_addresses_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AddressOut'][];
+        };
+      };
+    };
+  };
+  create_address_api_v1_addresses_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddressCreate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AddressOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  delete_address_api_v1_addresses__address_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        address_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  update_address_api_v1_addresses__address_id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        address_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddressUpdate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AddressOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  set_default_address_api_v1_addresses__address_id__default_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        address_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AddressOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
   list_banners_api_v1_admin_banners_get: {
     parameters: {
       query?: never;
@@ -1824,6 +2280,59 @@ export interface operations {
       };
     };
   };
+  read_settings_api_v1_admin_settings_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminSettingsOut'];
+        };
+      };
+    };
+  };
+  update_settings_api_v1_admin_settings_patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AdminSettingsUpdate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminSettingsOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
   upload_image_api_v1_admin_uploads_images_post: {
     parameters: {
       query?: never;
@@ -2131,6 +2640,39 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['CategoryOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  checkout_quote_api_v1_checkout_quote_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CheckoutQuoteRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CheckoutQuoteOut'];
         };
       };
       /** @description Validation Error */

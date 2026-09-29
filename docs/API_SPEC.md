@@ -76,12 +76,12 @@ PaymentSession{ provider, key_id, provider_order_id, amount_paise, currency, pre
 
 ### Addresses
 `GET /addresses` · `POST /addresses` · `PATCH /addresses/{id}` · `DELETE /addresses/{id}` · `POST /addresses/{id}/default`
-The first address becomes the default automatically. Deleting the default address promotes the most recently used remaining one.
+The first address becomes the default automatically (`is_default: true` on create moves it). Deleting the default address promotes the most recently used remaining one, or the newest if none has been used. At most 20 per user (`409 ADDRESS_LIMIT`). An unserviceable pincode is saved but comes back with `is_serviceable: false`. Pincode: `^[1-9]\d{5}$`; phone: Indian mobile `^[6-9]\d{9}$`. `PATCH` changes only the fields sent; `line2`/`landmark` can be cleared with `null` or `""`.
 
 ### Checkout & orders
 | Method | Path | Body | Response |
 |---|---|---|---|
-| POST | `/checkout/quote` | `{ address_id, items: [{product_id, quantity}] }` | `{ lines, subtotal_paise, delivery_fee_paise, total_paise, issues[], payment_methods[] }`. Changes nothing. |
+| POST | `/checkout/quote` | `{ address_id, items: [{product_id, quantity}] }` (1–100 unique products, quantity 1–50) | `{ lines: CartLine[], item_count, subtotal_paise, delivery_fee_paise, total_paise, address: Address, payment_methods[], issues: [{code, message}], can_place_order }`. Changes nothing. Blocking problems are listed in `issues` (not raised) so the app can show them together: `SHOP_CLOSED`, `NOT_SERVICEABLE`, `ITEMS_CHANGED`, `EMPTY_ORDER`, `BELOW_MIN_ORDER`, `NO_PAYMENT_METHOD`. Another user's address → 404. `payment_methods` is what the shop has switched on **and** the app supports (`COD` only until Phase 8). |
 | POST | `/orders` | `{ address_id, payment_method, items[], idempotency_key, expected_total_paise, customer_note? }` | `201 { order: OrderDetail, payment: PaymentSession \| null }`. Returns `409 PRICE_CHANGED` with a fresh quote if the total differs from `expected_total_paise`. Repeating the same `idempotency_key` returns the original order. |
 | GET | `/orders` | `?scope=active\|past&limit&offset` | `Page<OrderSummary>` |
 | GET | `/orders/{id}` | | `OrderDetail` |
@@ -108,7 +108,7 @@ The first address becomes the default automatically. Deleting the default addres
 | Categories | `GET/POST /admin/categories` · `PATCH/DELETE /admin/categories/{id}` (delete only when the category is empty) · `POST /admin/categories/reorder { ids: [] }` |
 | Banners | `GET/POST /admin/banners` · `PATCH/DELETE /admin/banners/{id}` · `POST /admin/banners/reorder { ids }`. A banner opens nothing, a category or a product (`target_type` + `target_id` must agree); optional `starts_at`/`ends_at` schedule. |
 | Customers | `GET /admin/customers?q&limit&offset` (with order_count, total_spent_paise, last_order_at) · `GET /admin/customers/{id}` |
-| Settings | `GET /admin/settings` · `PATCH /admin/settings` |
+| Settings | `GET /admin/settings` · `PATCH /admin/settings` (only the fields sent; pincodes are trimmed, de-duplicated and sorted; fees 0–₹10,000; at least one payment method must stay on). The response's `empty_pincodes_accept_all` says whether an empty pincode list means "everywhere" (local/test) or "nowhere" (staging/production). |
 | Uploads | `POST /admin/uploads/images` (multipart `file`, ≤ 5 MB, jpeg/png/webp) → `{ url, key }` |
 
 ## Operational

@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
-from app.routers import admin, auth, cart, catalog, health, me
+from app.routers import addresses, admin, auth, cart, catalog, checkout, health, me
 
 API_PREFIX = "/api/v1"
 
@@ -39,6 +39,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(me.router, prefix=API_PREFIX)
     app.include_router(catalog.router, prefix=API_PREFIX)
     app.include_router(cart.router, prefix=API_PREFIX)
+    app.include_router(addresses.router, prefix=API_PREFIX)
+    app.include_router(checkout.router, prefix=API_PREFIX)
     app.include_router(admin.router, prefix=API_PREFIX)
 
     if settings.storage_provider == "local":

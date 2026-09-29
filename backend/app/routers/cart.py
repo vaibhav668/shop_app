@@ -14,7 +14,7 @@ from app.schemas.common import MAX_PAGE_SIZE, Page
 from app.services.cart import CartService
 from app.services.catalog_views import CatalogViews
 from app.services.favourites import FavouritesService
-from app.services.pricing import Quote
+from app.services.pricing import PricedLine, Quote
 from app.services.shop import get_shop_settings
 
 router = APIRouter(tags=["cart"])
@@ -26,19 +26,20 @@ def get_views(
     return CatalogViews(storage, get_shop_settings(db).default_low_stock_threshold)
 
 
+def line_out(line: PricedLine, views: CatalogViews) -> CartLineOut:
+    return CartLineOut(
+        product=views.card(line.product),
+        quantity=line.quantity,
+        available_quantity=line.effective_quantity,
+        line_total_paise=line.line_total_paise,
+        issue=line.issue,
+    )
+
+
 def _cart_out(result: Quote, views: CatalogViews, db: Session) -> CartOut:
     settings = get_shop_settings(db)
     return CartOut(
-        lines=[
-            CartLineOut(
-                product=views.card(line.product),
-                quantity=line.quantity,
-                available_quantity=line.effective_quantity,
-                line_total_paise=line.line_total_paise,
-                issue=line.issue,
-            )
-            for line in result.lines
-        ],
+        lines=[line_out(line, views) for line in result.lines],
         item_count=result.item_count,
         subtotal_paise=result.subtotal_paise,
         delivery_fee_paise=result.delivery_fee_paise,
