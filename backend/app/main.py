@@ -1,25 +1,27 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import get_settings
+from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
-from app.routers import health
+from app.routers import admin, auth, health, me
 
 API_PREFIX = "/api/v1"
 
 
-def create_app() -> FastAPI:
-    settings = get_settings()
+def create_app(settings: Settings | None = None) -> FastAPI:
+    settings = settings or get_settings()
     configure_logging(settings.log_level)
 
     app = FastAPI(
-        title="Shop API",
+        title="Daily Basket API",
         version="0.1.0",
         openapi_url=f"{API_PREFIX}/openapi.json",
         docs_url=None if settings.is_production else "/docs",
         redoc_url=None,
     )
+    # Request-time dependencies must see the same settings the app was built with.
+    app.dependency_overrides[get_settings] = lambda: settings
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
@@ -30,6 +32,11 @@ def create_app() -> FastAPI:
     register_error_handlers(app)
 
     app.include_router(health.router, prefix=API_PREFIX)
+    app.include_router(auth.router, prefix=API_PREFIX)
+    if settings.dev_login_enabled and settings.app_env in ("local", "test"):
+        app.include_router(auth.dev_router, prefix=API_PREFIX)
+    app.include_router(me.router, prefix=API_PREFIX)
+    app.include_router(admin.router, prefix=API_PREFIX)
     return app
 
 
