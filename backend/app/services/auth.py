@@ -24,6 +24,10 @@ class AuthResult:
     client: SessionClient
 
 
+# Prefix of google_sub for accounts created by the local-only dev login.
+DEV_SUB_PREFIX = "dev:"
+
+
 def _session_expired() -> AppError:
     return AppError("UNAUTHENTICATED", "Your session has ended. Please sign in again.", 401)
 
@@ -37,7 +41,13 @@ class AuthService:
         self, identity: GoogleIdentity, client: SessionClient, user_agent: str | None
     ) -> AuthResult:
         user, is_new = self._upsert_user(identity)
-        self._assert_can_sign_in(user, client)
+        try:
+            self._assert_can_sign_in(user, client)
+        except AppError:
+            # Keep the account even when this sign-in is refused, so an owner can run
+            # `make-admin` for someone who just tried the admin dashboard.
+            self.db.commit()
+            raise
         user.last_login_at = utcnow()
         return self._issue(user, client, user_agent, is_new_user=is_new)
 
@@ -87,7 +97,13 @@ class AuthService:
             user.avatar_url = identity.picture
             return user, False
 
-        if repo.get_user_by_email(self.db, identity.email) is not None:
+        existing = repo.get_user_by_email(self.db, identity.email)
+        if existing is not None and self._is_local_dev_account(existing, identity):
+            # Local/test only: a dev-login account is claimed by the real Google account.
+            existing.google_sub = identity.sub
+            existing.avatar_url = identity.picture
+            return existing, False
+        if existing is not None:
             # Same email, different Google account. Never merge silently.
             raise AppError(
                 "ACCOUNT_CONFLICT",
@@ -105,6 +121,13 @@ class AuthService:
         self.db.add(user)
         self.db.flush()
         return user, True
+
+    def _is_local_dev_account(self, user: User, identity: GoogleIdentity) -> bool:
+        return (
+            self.settings.app_env in ("local", "test")
+            and user.google_sub.startswith(DEV_SUB_PREFIX)
+            and not identity.sub.startswith(DEV_SUB_PREFIX)
+        )
 
     def _assert_can_sign_in(self, user: User, client: SessionClient) -> None:
         if not user.is_active or user.deleted_at is not None:

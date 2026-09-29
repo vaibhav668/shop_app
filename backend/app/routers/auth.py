@@ -15,7 +15,7 @@ from app.schemas.auth import (
     RefreshRequest,
     UserOut,
 )
-from app.services.auth import AuthResult, AuthService
+from app.services.auth import DEV_SUB_PREFIX, AuthResult, AuthService
 
 REFRESH_COOKIE = "bb_refresh"
 REFRESH_COOKIE_PATH = "/api/v1/auth"
@@ -105,7 +105,10 @@ def dev_login(
 ) -> AuthResponse:
     email = payload.email.lower()
     identity = GoogleIdentity(
-        sub=f"dev:{email}", email=email, name=payload.name or email.split("@")[0], picture=None
+        sub=f"{DEV_SUB_PREFIX}{email}",
+        email=email,
+        name=payload.name or email.split("@")[0],
+        picture=None,
     )
     result = AuthService(db, settings).sign_in(
         identity, payload.client, request.headers.get("user-agent")

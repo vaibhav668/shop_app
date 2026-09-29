@@ -51,6 +51,24 @@ class TestAdminSignIn:
         assert response.status_code == 403
         assert response.json()["error"]["code"] == "FORBIDDEN"
 
+    def test_refused_admin_sign_in_still_creates_account(
+        self, client: TestClient, db_session: Session
+    ) -> None:
+        """So the owner can run make-admin for someone who only ever tried the dashboard."""
+        response = client.post(
+            f"{AUTH}/google",
+            json={"id_token": google_token("newstaff@example.com"), "client": "admin"},
+        )
+        assert response.status_code == 403
+        assert repo.get_user_by_email(db_session, "newstaff@example.com") is not None
+
+        promote(db_session, "newstaff@example.com")
+        again = client.post(
+            f"{AUTH}/google",
+            json={"id_token": google_token("newstaff@example.com"), "client": "admin"},
+        )
+        assert again.status_code == 200
+
     def test_admin_gets_cookie_not_body_token(
         self, client: TestClient, db_session: Session
     ) -> None:
@@ -177,6 +195,34 @@ class TestDisabledAccount:
 
 
 class TestDevLogin:
+    def test_real_google_sign_in_claims_local_dev_account(self, client: TestClient) -> None:
+        dev = client.post(f"{AUTH}/dev-login", json={"email": "me@example.com"}).json()
+        google = sign_in(client, "me@example.com")
+        assert google["user"]["id"] == dev["user"]["id"]
+        assert google["is_new_user"] is False
+
+    def test_dev_account_is_not_claimed_outside_local(
+        self, db_session: Session, test_settings: Settings
+    ) -> None:
+        from app.core.errors import AppError
+        from app.integrations.google_auth import GoogleIdentity
+        from app.models import SessionClient
+        from app.services.auth import AuthService
+
+        dev = GoogleIdentity(
+            sub="dev:me@example.com", email="me@example.com", name="Me", picture=None
+        )
+        real = GoogleIdentity(sub="real-sub", email="me@example.com", name="Me", picture=None)
+        AuthService(db_session, test_settings).sign_in(dev, SessionClient.MOBILE, None)
+
+        staging = test_settings.model_copy(update={"app_env": "staging"})
+        try:
+            AuthService(db_session, staging).sign_in(real, SessionClient.MOBILE, None)
+        except AppError as exc:
+            assert exc.code == "ACCOUNT_CONFLICT"
+        else:
+            raise AssertionError("dev account was merged outside local/test")
+
     def test_dev_login_works_when_enabled(self, client: TestClient) -> None:
         response = client.post(f"{AUTH}/dev-login", json={"email": "dev@example.com"})
         assert response.status_code == 200
