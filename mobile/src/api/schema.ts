@@ -172,6 +172,43 @@ export interface paths {
     patch: operations['update_category_api_v1_admin_categories__category_id__patch'];
     trace?: never;
   };
+  '/api/v1/admin/customers': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Customers
+     * @description Most recent buyers first. `q` matches name, email or phone.
+     */
+    get: operations['list_customers_api_v1_admin_customers_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/customers/{customer_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Customer */
+    get: operations['get_customer_api_v1_admin_customers__customer_id__get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/admin/dashboard': {
     parameters: {
       query?: never;
@@ -181,6 +218,44 @@ export interface paths {
     };
     /** Dashboard */
     get: operations['dashboard_api_v1_admin_dashboard_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/inventory/bulk': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Bulk Set Stock
+     * @description Quick Stock save. Each row applies only if the stock still equals `expected_stock`;
+     *     the others come back in `conflicts` with the current count, unchanged.
+     */
+    post: operations['bulk_set_stock_api_v1_admin_inventory_bulk_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/inventory/movements': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Movements */
+    get: operations['list_movements_api_v1_admin_inventory_movements_get'];
     put?: never;
     post?: never;
     delete?: never;
@@ -1183,6 +1258,16 @@ export interface components {
       /** Shop Phone */
       shop_phone?: string | null;
     };
+    /** AppliedStock */
+    AppliedStock: {
+      /**
+       * Product Id
+       * Format: uuid
+       */
+      product_id: string;
+      /** Stock Quantity */
+      stock_quantity: number;
+    };
     /** AuthResponse */
     AuthResponse: {
       /** Access Token */
@@ -1278,6 +1363,34 @@ export interface components {
     Body_upload_image_api_v1_admin_uploads_images_post: {
       /** File */
       file: string;
+    };
+    /**
+     * BulkStockOut
+     * @description Rows that matched were saved; conflicting rows were left untouched for the admin to
+     *     decide on. One bad row never blocks the others.
+     */
+    BulkStockOut: {
+      /** Applied */
+      applied: components['schemas']['AppliedStock'][];
+      /** Conflicts */
+      conflicts: components['schemas']['StockConflict'][];
+    };
+    /** BulkStockRequest */
+    BulkStockRequest: {
+      /** Updates */
+      updates: components['schemas']['BulkStockRow'][];
+    };
+    /** BulkStockRow */
+    BulkStockRow: {
+      /** Expected Stock */
+      expected_stock: number;
+      /**
+       * Product Id
+       * Format: uuid
+       */
+      product_id: string;
+      /** Stock */
+      stock: number;
     };
     /** CancelOrderRequest */
     CancelOrderRequest: {
@@ -1427,6 +1540,37 @@ export interface components {
       /** Items */
       items: components['schemas']['CheckoutItem'][];
     };
+    /** CustomerDetailOut */
+    CustomerDetailOut: {
+      /** Cancelled Count */
+      cancelled_count: number;
+      /** Email */
+      email: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Is Active */
+      is_active: boolean;
+      /**
+       * Joined At
+       * Format: date-time
+       */
+      joined_at: string;
+      /** Last Order At */
+      last_order_at: string | null;
+      /** Name */
+      name: string;
+      /** Order Count */
+      order_count: number;
+      /** Phone */
+      phone: string | null;
+      /** Recent Orders */
+      recent_orders: components['schemas']['AdminOrderRow'][];
+      /** Total Spent Paise */
+      total_spent_paise: number;
+    };
     /** CustomerOut */
     CustomerOut: {
       /** Email */
@@ -1440,6 +1584,33 @@ export interface components {
       name: string;
       /** Phone */
       phone: string | null;
+    };
+    /** CustomerRow */
+    CustomerRow: {
+      /** Email */
+      email: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Is Active */
+      is_active: boolean;
+      /**
+       * Joined At
+       * Format: date-time
+       */
+      joined_at: string;
+      /** Last Order At */
+      last_order_at: string | null;
+      /** Name */
+      name: string;
+      /** Order Count */
+      order_count: number;
+      /** Phone */
+      phone: string | null;
+      /** Total Spent Paise */
+      total_spent_paise: number;
     };
     /** DashboardOut */
     DashboardOut: {
@@ -1559,6 +1730,11 @@ export interface components {
       /** Featured */
       featured: components['schemas']['ProductCardOut'][];
     };
+    /**
+     * InventoryReason
+     * @enum {string}
+     */
+    InventoryReason: 'INITIAL' | 'ORDER_PLACED' | 'ORDER_CANCELLED' | 'MANUAL_ADJUST' | 'STOCK_SET';
     /** LogoutRequest */
     LogoutRequest: {
       /** Device Token */
@@ -1579,6 +1755,39 @@ export interface components {
       threshold: number;
       /** Unit Label */
       unit_label: string;
+    };
+    /** MovementOut */
+    MovementOut: {
+      /** Actor Name */
+      actor_name: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Delta */
+      delta: number;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Note */
+      note: string | null;
+      /** Order Id */
+      order_id: string | null;
+      /** Order Number */
+      order_number: number | null;
+      /**
+       * Product Id
+       * Format: uuid
+       */
+      product_id: string;
+      /** Product Name */
+      product_name: string;
+      reason: components['schemas']['InventoryReason'];
+      /** Resulting Stock */
+      resulting_stock: number;
     };
     /** OrderDetailOut */
     OrderDetailOut: {
@@ -1704,6 +1913,28 @@ export interface components {
     Page_AdminProductOut_: {
       /** Items */
       items: components['schemas']['AdminProductOut'][];
+      /** Limit */
+      limit: number;
+      /** Offset */
+      offset: number;
+      /** Total */
+      total: number;
+    };
+    /** Page[CustomerRow] */
+    Page_CustomerRow_: {
+      /** Items */
+      items: components['schemas']['CustomerRow'][];
+      /** Limit */
+      limit: number;
+      /** Offset */
+      offset: number;
+      /** Total */
+      total: number;
+    };
+    /** Page[MovementOut] */
+    Page_MovementOut_: {
+      /** Items */
+      items: components['schemas']['MovementOut'][];
       /** Limit */
       limit: number;
       /** Offset */
@@ -1964,6 +2195,18 @@ export interface components {
       delta: number;
       /** Note */
       note?: string | null;
+    };
+    /** StockConflict */
+    StockConflict: {
+      /** Current */
+      current: number;
+      /** Expected */
+      expected: number;
+      /**
+       * Product Id
+       * Format: uuid
+       */
+      product_id: string;
     };
     /** StockOut */
     StockOut: {
@@ -2509,6 +2752,70 @@ export interface operations {
       };
     };
   };
+  list_customers_api_v1_admin_customers_get: {
+    parameters: {
+      query?: {
+        q?: string | null;
+        limit?: number;
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Page_CustomerRow_'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_customer_api_v1_admin_customers__customer_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        customer_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CustomerDetailOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
   dashboard_api_v1_admin_dashboard_get: {
     parameters: {
       query?: never;
@@ -2525,6 +2832,72 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['DashboardOut'];
+        };
+      };
+    };
+  };
+  bulk_set_stock_api_v1_admin_inventory_bulk_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BulkStockRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BulkStockOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  list_movements_api_v1_admin_inventory_movements_get: {
+    parameters: {
+      query?: {
+        product_id?: string | null;
+        limit?: number;
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Page_MovementOut_'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
         };
       };
     };

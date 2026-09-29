@@ -1127,6 +1127,25 @@
         "title": "AdminSettingsUpdate",
         "type": "object"
       },
+      "AppliedStock": {
+        "properties": {
+          "product_id": {
+            "format": "uuid",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "stock_quantity": {
+            "title": "Stock Quantity",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "product_id",
+          "stock_quantity"
+        ],
+        "title": "AppliedStock",
+        "type": "object"
+      },
       "AuthResponse": {
         "properties": {
           "access_token": {
@@ -1462,6 +1481,76 @@
           "file"
         ],
         "title": "Body_upload_image_api_v1_admin_uploads_images_post",
+        "type": "object"
+      },
+      "BulkStockOut": {
+        "description": "Rows that matched were saved; conflicting rows were left untouched for the admin to\ndecide on. One bad row never blocks the others.",
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedStock"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "conflicts": {
+            "items": {
+              "$ref": "#/components/schemas/StockConflict"
+            },
+            "title": "Conflicts",
+            "type": "array"
+          }
+        },
+        "required": [
+          "applied",
+          "conflicts"
+        ],
+        "title": "BulkStockOut",
+        "type": "object"
+      },
+      "BulkStockRequest": {
+        "properties": {
+          "updates": {
+            "items": {
+              "$ref": "#/components/schemas/BulkStockRow"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Updates",
+            "type": "array"
+          }
+        },
+        "required": [
+          "updates"
+        ],
+        "title": "BulkStockRequest",
+        "type": "object"
+      },
+      "BulkStockRow": {
+        "properties": {
+          "expected_stock": {
+            "minimum": 0.0,
+            "title": "Expected Stock",
+            "type": "integer"
+          },
+          "product_id": {
+            "format": "uuid",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "stock": {
+            "maximum": 100000.0,
+            "minimum": 0.0,
+            "title": "Stock",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "product_id",
+          "stock",
+          "expected_stock"
+        ],
+        "title": "BulkStockRow",
         "type": "object"
       },
       "CancelOrderRequest": {
@@ -1857,6 +1946,89 @@
         "title": "CheckoutQuoteRequest",
         "type": "object"
       },
+      "CustomerDetailOut": {
+        "properties": {
+          "cancelled_count": {
+            "title": "Cancelled Count",
+            "type": "integer"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "joined_at": {
+            "format": "date-time",
+            "title": "Joined At",
+            "type": "string"
+          },
+          "last_order_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Order At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "order_count": {
+            "title": "Order Count",
+            "type": "integer"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "recent_orders": {
+            "items": {
+              "$ref": "#/components/schemas/AdminOrderRow"
+            },
+            "title": "Recent Orders",
+            "type": "array"
+          },
+          "total_spent_paise": {
+            "title": "Total Spent Paise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "phone",
+          "is_active",
+          "joined_at",
+          "order_count",
+          "total_spent_paise",
+          "last_order_at",
+          "cancelled_count",
+          "recent_orders"
+        ],
+        "title": "CustomerDetailOut",
+        "type": "object"
+      },
       "CustomerOut": {
         "properties": {
           "email": {
@@ -1891,6 +2063,76 @@
           "phone"
         ],
         "title": "CustomerOut",
+        "type": "object"
+      },
+      "CustomerRow": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "joined_at": {
+            "format": "date-time",
+            "title": "Joined At",
+            "type": "string"
+          },
+          "last_order_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Order At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "order_count": {
+            "title": "Order Count",
+            "type": "integer"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "total_spent_paise": {
+            "title": "Total Spent Paise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "phone",
+          "is_active",
+          "joined_at",
+          "order_count",
+          "total_spent_paise",
+          "last_order_at"
+        ],
+        "title": "CustomerRow",
         "type": "object"
       },
       "DashboardOut": {
@@ -2212,6 +2454,17 @@
         "title": "HomeOut",
         "type": "object"
       },
+      "InventoryReason": {
+        "enum": [
+          "INITIAL",
+          "ORDER_PLACED",
+          "ORDER_CANCELLED",
+          "MANUAL_ADJUST",
+          "STOCK_SET"
+        ],
+        "title": "InventoryReason",
+        "type": "string"
+      },
       "LogoutRequest": {
         "properties": {
           "device_token": {
@@ -2262,6 +2515,100 @@
           "threshold"
         ],
         "title": "LowStockItem",
+        "type": "object"
+      },
+      "MovementOut": {
+        "properties": {
+          "actor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Name"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "delta": {
+            "title": "Delta",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "order_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order Id"
+          },
+          "order_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order Number"
+          },
+          "product_id": {
+            "format": "uuid",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "product_name": {
+            "title": "Product Name",
+            "type": "string"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/InventoryReason"
+          },
+          "resulting_stock": {
+            "title": "Resulting Stock",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "product_id",
+          "product_name",
+          "delta",
+          "resulting_stock",
+          "reason",
+          "order_id",
+          "order_number",
+          "actor_name",
+          "note",
+          "created_at"
+        ],
+        "title": "MovementOut",
         "type": "object"
       },
       "OrderDetailOut": {
@@ -2594,6 +2941,68 @@
           "offset"
         ],
         "title": "Page[AdminProductOut]",
+        "type": "object"
+      },
+      "Page_CustomerRow_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CustomerRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "Page[CustomerRow]",
+        "type": "object"
+      },
+      "Page_MovementOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MovementOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "Page[MovementOut]",
         "type": "object"
       },
       "Page_OrderSummaryOut_": {
@@ -3376,6 +3785,30 @@
           "delta"
         ],
         "title": "StockAdjustRequest",
+        "type": "object"
+      },
+      "StockConflict": {
+        "properties": {
+          "current": {
+            "title": "Current",
+            "type": "integer"
+          },
+          "expected": {
+            "title": "Expected",
+            "type": "integer"
+          },
+          "product_id": {
+            "format": "uuid",
+            "title": "Product Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_id",
+          "expected",
+          "current"
+        ],
+        "title": "StockConflict",
         "type": "object"
       },
       "StockOut": {
@@ -4282,6 +4715,133 @@
         ]
       }
     },
+    "/api/v1/admin/customers": {
+      "get": {
+        "description": "Most recent buyers first. `q` matches name, email or phone.",
+        "operationId": "list_customers_api_v1_admin_customers_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_CustomerRow_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Customers",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/customers/{customer_id}": {
+      "get": {
+        "operationId": "get_customer_api_v1_admin_customers__customer_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "customer_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Customer Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Customer",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/api/v1/admin/dashboard": {
       "get": {
         "operationId": "dashboard_api_v1_admin_dashboard_get",
@@ -4303,6 +4863,131 @@
           }
         ],
         "summary": "Dashboard",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/inventory/bulk": {
+      "post": {
+        "description": "Quick Stock save. Each row applies only if the stock still equals `expected_stock`;\nthe others come back in `conflicts` with the current count, unchanged.",
+        "operationId": "bulk_set_stock_api_v1_admin_inventory_bulk_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkStockRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkStockOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Bulk Set Stock",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/inventory/movements": {
+      "get": {
+        "operationId": "list_movements_api_v1_admin_inventory_movements_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "product_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Product Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_MovementOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Movements",
         "tags": [
           "admin"
         ]

@@ -205,7 +205,7 @@ One row per payment attempt, so an order can have several.
 | needs_review | bool NOT NULL DEFAULT false | Set for a late capture after expiry, or a refund failure |
 
 ### inventory_movements (append-only)
-`id`, `product_id` FK, `delta` int, `resulting_stock` int, `reason` inventory_reason, `order_id` FK nullable, `actor_user_id` FK nullable, `note`, `created_at`. Index on `(product_id, created_at DESC)`.
+`id`, `product_id` FK, `delta` int, `resulting_stock` int, `reason` inventory_reason, `order_id` FK nullable, `actor_user_id` FK nullable, `note`, `created_at` (default `clock_timestamp()`, so rows written in one transaction keep their real order). Index on `(product_id, created_at DESC)`.
 
 ### notifications
 `id`, `user_id` FK, `type` text (e.g. `ORDER_STATUS`), `title`, `body`, `data` jsonb (`{order_id, route}`), `read_at`, `created_at`. Index on `(user_id, created_at DESC)`.

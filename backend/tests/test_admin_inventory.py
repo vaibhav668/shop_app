@@ -1,4 +1,4 @@
-"""Inventory tools (Quick Stock bulk save, +/−, history) and the Customers pages."""
+"""Inventory tools (Quick Stock bulk save, +/- adjust, history) and the Customers pages."""
 
 import uuid
 from typing import Any

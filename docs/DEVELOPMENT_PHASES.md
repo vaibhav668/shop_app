@@ -83,6 +83,8 @@ Commits: `feat(backend): add users and sessions models` · `feat(backend): add g
 - Outside the code: start Razorpay KYC and draft the policy pages
 
 ## Phase 8 — Online payments
+> **On hold** (decided after Phase 7): the shop launches with Cash on Delivery only. The `payments` table and the Online switch in Settings already exist; checkout offers only COD until this phase is picked up again.
+
 - `PaymentProvider` protocol, `FakePaymentProvider`, `RazorpayProvider` (httpx + HMAC)
 - `PaymentService`: create session, verify, webhook, retry, expiry job (advisory lock), refund on cancel, late-capture auto-refund + `needs_review`
 - Mobile: `react-native-razorpay` integration (fallback: WebView checkout), payment result screen with the "waiting for confirmation" state, retry payment on the order detail
