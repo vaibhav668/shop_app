@@ -6,12 +6,13 @@ import { BannersPage } from '@/features/catalog/BannersPage';
 import { CategoriesPage } from '@/features/catalog/CategoriesPage';
 import { ProductFormPage } from '@/features/catalog/ProductFormPage';
 import { ProductsPage } from '@/features/catalog/ProductsPage';
+import { SettingsPage } from '@/features/settings/SettingsPage';
 import { NAV_ITEMS } from '@/navigation';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { SectionPlaceholder } from '@/pages/SectionPlaceholder';
 import { SignInPage } from '@/pages/SignInPage';
 
-const BUILT = new Set(['/categories', '/products', '/banners']);
+const BUILT = new Set(['/categories', '/products', '/banners', '/settings']);
 
 export const routes: RouteObject[] = [
   { path: '/sign-in', element: <SignInPage /> },
@@ -27,6 +28,7 @@ export const routes: RouteObject[] = [
       { path: '/products', element: <ProductsPage /> },
       { path: '/products/new', element: <ProductFormPage /> },
       { path: '/products/:id', element: <ProductFormPage /> },
+      { path: '/settings', element: <SettingsPage /> },
       // Sections still to be built show a placeholder.
       ...NAV_ITEMS.filter((item) => !BUILT.has(item.path)).map((item) => ({
         path: item.path,
