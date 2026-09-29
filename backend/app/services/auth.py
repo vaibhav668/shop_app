@@ -41,6 +41,7 @@ class AuthService:
         self, identity: GoogleIdentity, client: SessionClient, user_agent: str | None
     ) -> AuthResult:
         user, is_new = self._upsert_user(identity)
+        self._apply_admin_list(user, identity)
         try:
             self._assert_can_sign_in(user, client)
         except AppError:
@@ -50,6 +51,15 @@ class AuthService:
             raise
         user.last_login_at = utcnow()
         return self._issue(user, client, user_agent, is_new_user=is_new)
+
+    def _apply_admin_list(self, user: User, identity: GoogleIdentity) -> None:
+        """ADMIN_EMAILS (server config) names the shop's admins, so a fresh database needs no
+        `make-admin` step. Only Google-verified sign-ins count (never the local dev login), and
+        it only ever promotes: removing an email from the list does not demote anyone."""
+        if identity.sub.startswith(DEV_SUB_PREFIX):
+            return
+        if identity.email.lower() in self.settings.admin_email_list:
+            user.role = UserRole.ADMIN
 
     def refresh(self, raw_refresh_token: str) -> AuthResult:
         token_hash = hash_token(raw_refresh_token)

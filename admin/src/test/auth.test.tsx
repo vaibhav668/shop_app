@@ -1,9 +1,10 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useEffect } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { authOk, mockApi, OWNER, renderApp } from './renderApp';
-import { TEST_GOOGLE_CREDENTIAL } from './setup';
+import { googleMocks, TEST_GOOGLE_CREDENTIAL } from './setup';
 
 const expired = {
   status: 401,
@@ -20,6 +21,27 @@ describe('admin sign-in', () => {
     expect(screen.getByRole('button', { name: 'Continue with Google' })).toBeInTheDocument();
     expect(screen.queryByText(/email/i)).toBeNull();
     expect(screen.queryAllByRole('textbox')).toHaveLength(0);
+  });
+
+  it('signs a returning admin in automatically (Google One Tap) and opens the dashboard', async () => {
+    googleMocks.oneTapLogin.mockImplementation(
+      ({ onSuccess }: { onSuccess: (r: { credential: string }) => void }) => {
+        useEffect(() => onSuccess({ credential: TEST_GOOGLE_CREDENTIAL }), [onSuccess]);
+      },
+    );
+    mockApi({
+      '/auth/refresh': expired,
+      '/auth/google': authOk(),
+      '/admin/orders/summary': quietOrders,
+      '/admin/dashboard': { status: 500, body: {} },
+    });
+    const router = renderApp('/');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Dashboard' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/');
+    expect(googleMocks.oneTapLogin).toHaveBeenCalledWith(
+      expect.objectContaining({ auto_select: true }),
+    );
+    googleMocks.oneTapLogin.mockReset();
   });
 
   it('sends signed-out visitors to sign in, then back where they were going', async () => {
@@ -120,5 +142,7 @@ describe('admin sign-in', () => {
     expect(router.state.location.pathname).toBe('/sign-in');
     const logout = fetchMock.mock.calls.find(([url]) => String(url).endsWith('/auth/logout'));
     expect(logout?.[1]).toMatchObject({ credentials: 'include' });
+    // Otherwise Google's automatic sign-in would put them straight back in.
+    expect(googleMocks.googleLogout).toHaveBeenCalled();
   });
 });

@@ -35,6 +35,8 @@ class Settings(BaseSettings):
     refresh_token_ttl_days: int = 60
     google_allowed_client_ids: str = ""
     admin_cookie_secure: bool = False
+    # Comma-separated emails that become shop admins when they sign in with Google.
+    admin_emails: str = ""
     # Local-only shortcut that signs in by email without Google. Never allowed outside local/test.
     dev_login_enabled: bool = False
 
@@ -67,6 +69,10 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return _split_csv(self.cors_origins)
+
+    @property
+    def admin_email_list(self) -> set[str]:
+        return {email.lower() for email in _split_csv(self.admin_emails)}
 
     @property
     def google_client_id_list(self) -> list[str]:

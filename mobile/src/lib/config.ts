@@ -25,3 +25,9 @@ export const API_URL =
     : CONFIGURED_API_URL;
 
 export const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? '';
+
+/** The shop's admin dashboard; admins signing in on the web are sent there. */
+export const ADMIN_URL = (process.env.EXPO_PUBLIC_ADMIN_URL ?? 'http://localhost:5173').replace(
+  /\/$/,
+  '',
+);

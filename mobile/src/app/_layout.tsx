@@ -4,13 +4,14 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { queryClient } from '@/api/queryClient';
 import { ToastProvider } from '@/components/Toast';
 import { ErrorState } from '@/components/ui';
+import { AdminRedirect } from '@/features/auth/AdminRedirect';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
 import { colors } from '@/theme/tokens';
 import { fontAssets } from '@/theme/typography';
@@ -57,6 +58,9 @@ function RootNavigator() {
 
   const signedIn = status === 'signedIn' && user !== null;
   const onboarded = signedIn && !user.needs_onboarding;
+
+  // On the web, the shop's admins belong in the admin dashboard, not the customer shop.
+  if (Platform.OS === 'web' && onboarded && user.role === 'ADMIN') return <AdminRedirect />;
 
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
