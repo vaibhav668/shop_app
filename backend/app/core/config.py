@@ -1,3 +1,4 @@
+import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
@@ -14,7 +15,10 @@ class Settings(BaseSettings):
     """Runtime configuration. Values come from environment variables or backend/.env."""
 
     model_config = SettingsConfigDict(
-        env_file=BACKEND_DIR / ".env", env_file_encoding="utf-8", extra="ignore"
+        # The test suite must not depend on a developer's local .env.
+        env_file=None if os.environ.get("APP_ENV") == "test" else BACKEND_DIR / ".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
     )
 
     app_env: Literal["local", "test", "staging", "production"] = "local"
@@ -34,6 +38,10 @@ class Settings(BaseSettings):
     # Local-only shortcut that signs in by email without Google. Never allowed outside local/test.
     dev_login_enabled: bool = False
 
+    storage_provider: Literal["local", "cloudinary"] = "local"
+    media_dir: Path = BACKEND_DIR / "media"
+    cloudinary_url: str = ""
+
     @model_validator(mode="after")
     def _guard_deployed_environments(self) -> "Settings":
         if self.app_env in ("staging", "production"):
@@ -41,6 +49,10 @@ class Settings(BaseSettings):
                 raise ValueError("JWT_SECRET must be set to a random value of 32+ characters.")
             if self.dev_login_enabled:
                 raise ValueError("DEV_LOGIN_ENABLED is only allowed in local/test.")
+            if self.storage_provider == "local":
+                raise ValueError("Use cloud image storage (STORAGE_PROVIDER) outside local/test.")
+        if self.storage_provider == "cloudinary" and not self.cloudinary_url:
+            raise ValueError("STORAGE_PROVIDER=cloudinary needs CLOUDINARY_URL.")
         return self
 
     @property

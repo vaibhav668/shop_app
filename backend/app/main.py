@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
-from app.routers import admin, auth, health, me
+from app.routers import admin, auth, catalog, health, me
 
 API_PREFIX = "/api/v1"
 
@@ -36,7 +37,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     if settings.dev_login_enabled and settings.app_env in ("local", "test"):
         app.include_router(auth.dev_router, prefix=API_PREFIX)
     app.include_router(me.router, prefix=API_PREFIX)
+    app.include_router(catalog.router, prefix=API_PREFIX)
     app.include_router(admin.router, prefix=API_PREFIX)
+
+    if settings.storage_provider == "local":
+        # Development only (settings refuse local storage in staging/production).
+        settings.media_dir.mkdir(parents=True, exist_ok=True)
+        app.mount("/media", StaticFiles(directory=settings.media_dir), name="media")
     return app
 
 
