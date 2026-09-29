@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
-import { LogOut, Palette } from 'lucide-react-native';
+import { ChevronRight, Heart, LogOut, Palette } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
 import { Button, Screen, ScreenTitle, Text } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -58,6 +58,20 @@ export default function AccountScreen() {
         </View>
       </View>
 
+      <View style={styles.menu}>
+        <Pressable
+          onPress={() => router.push('/favourites')}
+          accessibilityRole="button"
+          style={({ pressed }) => [styles.menuRow, pressed && styles.menuPressed]}
+        >
+          <Heart size={20} strokeWidth={1.75} color={colors.text} />
+          <Text variant="body" style={styles.menuLabel}>
+            Favourites
+          </Text>
+          <ChevronRight size={18} color={colors.textTertiary} />
+        </Pressable>
+      </View>
+
       <View style={styles.actions}>
         <Button title="Sign out" icon={LogOut} variant="secondary" fullWidth onPress={signOut} />
         <Button
@@ -101,5 +115,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   details: { flex: 1, gap: 2 },
+  menu: {
+    marginTop: spacing.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    overflow: 'hidden',
+  },
+  menuRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    minHeight: 52,
+    paddingHorizontal: spacing.md,
+  },
+  menuPressed: { backgroundColor: colors.surfaceMuted },
+  menuLabel: { flex: 1 },
   actions: { gap: spacing.xs, marginTop: spacing.xl },
 });

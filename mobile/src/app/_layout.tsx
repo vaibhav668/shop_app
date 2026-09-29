@@ -9,6 +9,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { queryClient } from '@/api/queryClient';
+import { ToastProvider } from '@/components/Toast';
 import { ErrorState } from '@/components/ui';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
 import { colors } from '@/theme/tokens';
@@ -25,9 +26,11 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <StatusBar style="dark" />
         <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <RootNavigator />
-          </AuthProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <RootNavigator />
+            </AuthProvider>
+          </ToastProvider>
         </QueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

@@ -14,8 +14,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProductImage } from '@/components/product/ProductImage';
-import { ProductCard } from '@/components/product/ProductCard';
+import { ShopProductCard } from '@/components/product/ShopProductCard';
 import { ProductGridSkeleton } from '@/components/product/Skeletons';
+import { CartBar } from '@/components/CartBar';
 import { QueryError } from '@/components/QueryError';
 import { Chip, EmptyState, IconButton, Text } from '@/components/ui';
 import { useCategories, useSearchResults, useSuggestions } from '@/features/catalog/hooks';
@@ -156,12 +157,7 @@ export default function SearchScreen() {
               }
               renderItem={({ item }) => (
                 <View style={styles.cell}>
-                  <ProductCard
-                    product={item}
-                    onPress={() =>
-                      router.push({ pathname: '/product/[id]', params: { id: item.id } })
-                    }
-                  />
+                  <ShopProductCard product={item} />
                 </View>
               )}
             />
@@ -252,6 +248,7 @@ export default function SearchScreen() {
           )}
         </ScrollView>
       )}
+      <CartBar safeBottom />
     </SafeAreaView>
   );
 }

@@ -18,6 +18,9 @@ export const queryClient = new QueryClient({
 export const queryKeys = {
   shop: ['shop'] as const,
   home: ['home'] as const,
+  cart: ['cart'] as const,
+  favouriteIds: ['favourite-ids'] as const,
+  favourites: ['favourites'] as const,
   categories: ['categories'] as const,
   suggest: (q: string) => ['suggest', q] as const,
   search: (q: string, categoryId: string | undefined) => ['search', { q, categoryId }] as const,

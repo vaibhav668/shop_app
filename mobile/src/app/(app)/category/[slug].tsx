@@ -1,18 +1,19 @@
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { PackageOpen } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, FlatList, ScrollView, StyleSheet, View } from 'react-native';
 
 import type { ProductSort } from '@/api/catalog';
-import { ProductCard } from '@/components/product/ProductCard';
+import { ShopProductCard } from '@/components/product/ShopProductCard';
 import { ProductGridSkeleton } from '@/components/product/Skeletons';
+import { CartBar } from '@/components/CartBar';
 import { QueryError } from '@/components/QueryError';
 import { Chip, EmptyState } from '@/components/ui';
 import { useCategory, useProducts } from '@/features/catalog/hooks';
 import { colors, gutter, spacing } from '@/theme/tokens';
 
 const SORTS: { value: ProductSort; label: string }[] = [
-  { value: 'default', label: 'Popular' },
+  { value: 'default', label: 'Recommended' },
   { value: 'price_asc', label: 'Price: low to high' },
   { value: 'price_desc', label: 'Price: high to low' },
 ];
@@ -72,14 +73,12 @@ export default function CategoryScreen() {
           }
           renderItem={({ item }) => (
             <View style={styles.cell}>
-              <ProductCard
-                product={item}
-                onPress={() => router.push({ pathname: '/product/[id]', params: { id: item.id } })}
-              />
+              <ShopProductCard product={item} />
             </View>
           )}
         />
       )}
+      <CartBar safeBottom />
     </View>
   );
 }

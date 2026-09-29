@@ -16,6 +16,8 @@ export default function AppLayout() {
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="search" options={{ headerShown: false, animation: 'fade' }} />
+      <Stack.Screen name="cart" options={{ title: 'Your cart' }} />
+      <Stack.Screen name="favourites" options={{ title: 'Favourites' }} />
       <Stack.Screen name="category/[slug]" options={{ title: '' }} />
       <Stack.Screen name="product/[id]" options={{ title: '' }} />
       <Stack.Screen name="dev/ui" options={{ title: 'UI kit' }} />

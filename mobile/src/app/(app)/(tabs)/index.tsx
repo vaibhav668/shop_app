@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Banner } from '@/api/catalog';
 import { BannerCarousel } from '@/components/BannerCarousel';
 import { CategoryTile } from '@/components/product/CategoryTile';
-import { ProductCard } from '@/components/product/ProductCard';
+import { ShopProductCard } from '@/components/product/ShopProductCard';
 import { CategoryGridSkeleton, ProductCardSkeleton } from '@/components/product/Skeletons';
 import { QueryError } from '@/components/QueryError';
 import { SearchBar } from '@/components/SearchBar';
@@ -112,12 +112,7 @@ export default function HomeScreen() {
                   contentContainerStyle={styles.rail}
                   renderItem={({ item }) => (
                     <View style={styles.railCard}>
-                      <ProductCard
-                        product={item}
-                        onPress={() =>
-                          router.push({ pathname: '/product/[id]', params: { id: item.id } })
-                        }
-                      />
+                      <ShopProductCard product={item} />
                     </View>
                   )}
                 />

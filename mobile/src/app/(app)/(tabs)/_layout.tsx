@@ -1,6 +1,8 @@
 import { Tabs } from 'expo-router';
+import { BottomTabBar } from 'expo-router/js-tabs';
 import { House, LayoutGrid, ReceiptText, UserRound } from 'lucide-react-native';
 
+import { CartBar } from '@/components/CartBar';
 import { colors } from '@/theme/tokens';
 import { fonts } from '@/theme/typography';
 
@@ -9,6 +11,13 @@ const ICON_SIZE = 22;
 export default function TabLayout() {
   return (
     <Tabs
+      // The cart bar rides just above the tabs on every tab screen.
+      tabBar={(props) => (
+        <>
+          <CartBar />
+          <BottomTabBar {...props} />
+        </>
+      )}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.brand,

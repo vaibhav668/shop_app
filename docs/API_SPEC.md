@@ -29,8 +29,8 @@ FastAPI's OpenAPI document (`/api/v1/openapi.json`) is the source of truth. Both
 ProductCard   { id, name, unit_label, price_paise, mrp_paise, discount_percent, image_url, is_available, stock_hint: "IN_STOCK"|"LOW"|"OUT" }
 ProductDetail = ProductCard & { description, category: {id,name,slug}, max_per_order, related: ProductCard[] }
 Category      { id, name, slug, image_url }
-CartLine      { product: ProductCard, quantity, line_total_paise, issue: null|"OUT_OF_STOCK"|"UNAVAILABLE"|"QUANTITY_REDUCED" }
-Cart          { lines: CartLine[], item_count, subtotal_paise, delivery_fee_paise, total_paise, free_delivery_remaining_paise, min_order_remaining_paise }
+CartLine      { product: ProductCard, quantity, available_quantity, line_total_paise, issue: null|"OUT_OF_STOCK"|"UNAVAILABLE"|"QUANTITY_REDUCED" }
+Cart          { lines: CartLine[], item_count, subtotal_paise, delivery_fee_paise, total_paise, free_delivery_remaining_paise, min_order_remaining_paise, has_issues, rules: { delivery_fee_paise, free_delivery_above_paise, min_order_paise } }
 Address       { id, label, recipient_name, phone, line1, line2, landmark, city, state, pincode, is_default, is_serviceable }
 OrderSummary  { id, order_number, status, payment_method, payment_status, total_paise, item_count, placed_at, first_item_images: string[] }
 OrderDetail   = OrderSummary & { items: OrderItem[], subtotal_paise, delivery_fee_paise, delivery_address, timeline: {status, at}[], can_cancel, cancel_reason }
@@ -72,7 +72,7 @@ PaymentSession{ provider, key_id, provider_order_id, amount_paise, currency, pre
 | DELETE | `/cart` | | Empties the cart |
 
 ### Favourites
-`GET /favourites` → `Page<ProductCard>` · `PUT /favourites/{product_id}` → 204 · `DELETE /favourites/{product_id}` → 204
+`GET /favourites` → `Page<ProductCard>` (still-visible products, newest first) · `GET /favourites/ids` → `uuid[]` (for drawing hearts) · `PUT /favourites/{product_id}` → 204 (idempotent) · `DELETE /favourites/{product_id}` → 204
 
 ### Addresses
 `GET /addresses` · `POST /addresses` · `PATCH /addresses/{id}` · `DELETE /addresses/{id}` · `POST /addresses/{id}/default`
