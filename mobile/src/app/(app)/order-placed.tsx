@@ -1,12 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Check } from 'lucide-react-native';
+import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 
 import { ordersApi } from '@/api/orders';
 import { queryKeys } from '@/api/queryClient';
 import { Button, Screen, Text } from '@/components/ui';
+import { askPermissionAndRegister } from '@/features/notifications/push';
 import { formatPaise } from '@/lib/money';
 import { colors, radius, spacing } from '@/theme/tokens';
 
@@ -14,6 +16,13 @@ export default function OrderPlacedScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   // Filled from the place-order response, so this normally shows instantly.
   const order = useQuery({ queryKey: queryKeys.order(id), queryFn: () => ordersApi.get(id) });
+
+  // The moment updates matter: ask for notification permission now (once), not at launch.
+  // A short pause lets the success tick land before the system dialog appears.
+  useEffect(() => {
+    const t = setTimeout(() => void askPermissionAndRegister(), 900);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <Screen edges={['top', 'bottom']}>

@@ -14,6 +14,7 @@ import { ApiError, configureApiSession } from '@/api/client';
 import { queryClient } from '@/api/queryClient';
 import { getGoogleIdToken, signOutOfGoogle } from '@/features/auth/googleSignIn';
 import { tokenStore } from '@/features/auth/tokenStore';
+import { currentPushToken, forgetPushToken } from '@/features/notifications/push';
 
 export type AuthStatus = 'loading' | 'signedOut' | 'signedIn' | 'unreachable';
 
@@ -117,10 +118,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       signOut: async () => {
         try {
-          await authApi.logout();
+          await authApi.logout(currentPushToken());
         } catch {
           // Signing out locally must always work, even offline.
         }
+        forgetPushToken();
         await signOutOfGoogle();
         await endSession();
       },
@@ -129,6 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       deleteAccount: async () => {
         await authApi.deleteMe();
+        forgetPushToken(); // the server dropped this phone's token with the account
         await signOutOfGoogle();
         await endSession();
       },

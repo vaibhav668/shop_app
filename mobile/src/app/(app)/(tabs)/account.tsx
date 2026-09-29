@@ -1,15 +1,17 @@
 import { router } from 'expo-router';
-import { ChevronRight, Heart, LogOut, MapPin, Palette } from 'lucide-react-native';
+import { Bell, ChevronRight, Heart, LogOut, MapPin, Palette } from 'lucide-react-native';
 import { useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
 import { Button, Screen, ScreenTitle, Text } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useUnreadCount } from '@/features/notifications/hooks';
 import { colors, radius, spacing } from '@/theme/tokens';
 
 export default function AccountScreen() {
   const { user, signOut, deleteAccount } = useAuth();
   const [busy, setBusy] = useState(false);
+  const unread = useUnreadCount();
 
   if (!user) return null;
 
@@ -59,6 +61,25 @@ export default function AccountScreen() {
       </View>
 
       <View style={styles.menu}>
+        <Pressable
+          onPress={() => router.push('/notifications')}
+          accessibilityRole="button"
+          style={({ pressed }) => [styles.menuRow, pressed && styles.menuPressed]}
+        >
+          <Bell size={20} strokeWidth={1.75} color={colors.text} />
+          <Text variant="body" style={styles.menuLabel}>
+            Notifications
+          </Text>
+          {unread > 0 ? (
+            <View style={styles.count}>
+              <Text variant="micro" color="onAction">
+                {unread > 9 ? '9+' : String(unread)}
+              </Text>
+            </View>
+          ) : null}
+          <ChevronRight size={18} color={colors.textTertiary} />
+        </Pressable>
+        <View style={styles.menuDivider} />
         <Pressable
           onPress={() => router.push('/favourites')}
           accessibilityRole="button"
@@ -144,6 +165,15 @@ const styles = StyleSheet.create({
   },
   menuPressed: { backgroundColor: colors.surfaceMuted },
   menuDivider: { height: 1, marginLeft: spacing.md, backgroundColor: colors.border },
+  count: {
+    minWidth: 20,
+    height: 20,
+    paddingHorizontal: 6,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.action,
+  },
   menuLabel: { flex: 1 },
   actions: { gap: spacing.xs, marginTop: spacing.xl },
 });

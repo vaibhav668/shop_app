@@ -1,9 +1,19 @@
 import { Stack } from 'expo-router';
 
+import { PushManager } from '@/features/notifications/PushManager';
 import { colors } from '@/theme/tokens';
 import { fonts } from '@/theme/typography';
 
 export default function AppLayout() {
+  return (
+    <>
+      <PushManager />
+      <AppStack />
+    </>
+  );
+}
+
+function AppStack() {
   return (
     <Stack
       screenOptions={{
@@ -23,6 +33,7 @@ export default function AppLayout() {
         options={{ headerShown: false, gestureEnabled: false, animation: 'fade' }}
       />
       <Stack.Screen name="orders/[id]" options={{ title: 'Order' }} />
+      <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
       <Stack.Screen name="addresses" options={{ title: 'Saved addresses' }} />
       <Stack.Screen name="addresses/form" options={{ title: 'Add address' }} />
       <Stack.Screen

@@ -1,14 +1,17 @@
 import { Tabs } from 'expo-router';
 import { BottomTabBar } from 'expo-router/js-tabs';
 import { House, LayoutGrid, ReceiptText, UserRound } from 'lucide-react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { CartBar } from '@/components/CartBar';
-import { colors } from '@/theme/tokens';
+import { useUnreadCount } from '@/features/notifications/hooks';
+import { colors, radius } from '@/theme/tokens';
 import { fonts } from '@/theme/typography';
 
 const ICON_SIZE = 22;
 
 export default function TabLayout() {
+  const unread = useUnreadCount();
   return (
     <Tabs
       // The cart bar rides just above the tabs on every tab screen.
@@ -61,10 +64,30 @@ export default function TabLayout() {
         options={{
           title: 'Account',
           tabBarIcon: ({ color }) => (
-            <UserRound size={ICON_SIZE} color={color} strokeWidth={1.75} />
+            <View>
+              <UserRound size={ICON_SIZE} color={color} strokeWidth={1.75} />
+              {unread > 0 ? (
+                <View style={styles.dot} accessibilityLabel={`${unread} unread notifications`} />
+              ) : null}
+            </View>
           ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  // A small green dot, not a number: "something new about your orders".
+  dot: {
+    position: 'absolute',
+    top: -1,
+    right: -3,
+    width: 9,
+    height: 9,
+    borderRadius: radius.full,
+    backgroundColor: colors.brand,
+    borderWidth: 1.5,
+    borderColor: colors.surface,
+  },
+});

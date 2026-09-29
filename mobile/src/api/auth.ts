@@ -27,7 +27,12 @@ export const authApi = {
       auth: false,
     }),
 
-  logout: () => api<void>('/auth/logout', { method: 'POST', body: {} }),
+  /** Passing this phone's push token makes the server stop sending it pushes. */
+  logout: (deviceToken?: string | null) =>
+    api<void>('/auth/logout', {
+      method: 'POST',
+      body: deviceToken ? { device_token: deviceToken } : {},
+    }),
 
   updateMe: (changes: UpdateMe) => api<User>('/me', { method: 'PATCH', body: changes }),
 
