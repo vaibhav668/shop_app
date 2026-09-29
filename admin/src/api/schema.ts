@@ -286,6 +286,45 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/cart': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Cart */
+    get: operations['get_cart_api_v1_cart_get'];
+    put?: never;
+    post?: never;
+    /** Clear Cart */
+    delete: operations['clear_cart_api_v1_cart_delete'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/cart/items/{product_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Set Item Quantity
+     * @description Sets an absolute quantity (0 removes). Safe to retry: the same call gives the same cart.
+     */
+    put: operations['set_item_quantity_api_v1_cart_items__product_id__put'];
+    post?: never;
+    /** Remove Item */
+    delete: operations['remove_item_api_v1_cart_items__product_id__delete'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/categories': {
     parameters: {
       query?: never;
@@ -315,6 +354,61 @@ export interface paths {
     put?: never;
     post?: never;
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/favourites': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Favourites */
+    get: operations['list_favourites_api_v1_favourites_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/favourites/ids': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Favourite Ids
+     * @description Lightweight: lets the app draw filled hearts without fetching full products.
+     */
+    get: operations['favourite_ids_api_v1_favourites_ids_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/favourites/{product_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Add Favourite */
+    put: operations['add_favourite_api_v1_favourites__product_id__put'];
+    post?: never;
+    /** Remove Favourite */
+    delete: operations['remove_favourite_api_v1_favourites__product_id__delete'];
     options?: never;
     head?: never;
     patch?: never;
@@ -710,6 +804,38 @@ export interface components {
       /** File */
       file: string;
     };
+    /** CartLineOut */
+    CartLineOut: {
+      /** Available Quantity */
+      available_quantity: number;
+      /** Issue */
+      issue: ('UNAVAILABLE' | 'OUT_OF_STOCK' | 'QUANTITY_REDUCED') | null;
+      /** Line Total Paise */
+      line_total_paise: number;
+      product: components['schemas']['ProductCardOut'];
+      /** Quantity */
+      quantity: number;
+    };
+    /** CartOut */
+    CartOut: {
+      /** Delivery Fee Paise */
+      delivery_fee_paise: number;
+      /** Free Delivery Remaining Paise */
+      free_delivery_remaining_paise: number;
+      /** Has Issues */
+      has_issues: boolean;
+      /** Item Count */
+      item_count: number;
+      /** Lines */
+      lines: components['schemas']['CartLineOut'][];
+      /** Min Order Remaining Paise */
+      min_order_remaining_paise: number;
+      rules: components['schemas']['DeliveryRules'];
+      /** Subtotal Paise */
+      subtotal_paise: number;
+      /** Total Paise */
+      total_paise: number;
+    };
     /** CategoryCreate */
     CategoryCreate: {
       /** Image Key */
@@ -761,6 +887,18 @@ export interface components {
        * @default false
        */
       remove_image?: boolean;
+    };
+    /**
+     * DeliveryRules
+     * @description Sent so the app can estimate totals instantly while a change is in flight.
+     */
+    DeliveryRules: {
+      /** Delivery Fee Paise */
+      delivery_fee_paise: number;
+      /** Free Delivery Above Paise */
+      free_delivery_above_paise: number;
+      /** Min Order Paise */
+      min_order_paise: number;
     };
     /** DevSignInRequest */
     DevSignInRequest: {
@@ -996,6 +1134,14 @@ export interface components {
      * @enum {string}
      */
     SessionClient: 'mobile' | 'admin';
+    /** SetQuantityRequest */
+    SetQuantityRequest: {
+      /**
+       * Quantity
+       * @description 0 removes the item
+       */
+      quantity: number;
+    };
     /** ShopOut */
     ShopOut: {
       /** Closed Message */
@@ -1841,6 +1987,112 @@ export interface operations {
       };
     };
   };
+  get_cart_api_v1_cart_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CartOut'];
+        };
+      };
+    };
+  };
+  clear_cart_api_v1_cart_delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CartOut'];
+        };
+      };
+    };
+  };
+  set_item_quantity_api_v1_cart_items__product_id__put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        product_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetQuantityRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CartOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  remove_item_api_v1_cart_items__product_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        product_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CartOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
   list_categories_api_v1_categories_get: {
     parameters: {
       query?: never;
@@ -1880,6 +2132,116 @@ export interface operations {
         content: {
           'application/json': components['schemas']['CategoryOut'];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  list_favourites_api_v1_favourites_get: {
+    parameters: {
+      query?: {
+        limit?: number;
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Page_ProductCardOut_'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  favourite_ids_api_v1_favourites_ids_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': string[];
+        };
+      };
+    };
+  };
+  add_favourite_api_v1_favourites__product_id__put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        product_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  remove_favourite_api_v1_favourites__product_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        product_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Validation Error */
       422: {

@@ -693,6 +693,105 @@
         "title": "Body_upload_image_api_v1_admin_uploads_images_post",
         "type": "object"
       },
+      "CartLineOut": {
+        "properties": {
+          "available_quantity": {
+            "title": "Available Quantity",
+            "type": "integer"
+          },
+          "issue": {
+            "anyOf": [
+              {
+                "enum": [
+                  "UNAVAILABLE",
+                  "OUT_OF_STOCK",
+                  "QUANTITY_REDUCED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issue"
+          },
+          "line_total_paise": {
+            "title": "Line Total Paise",
+            "type": "integer"
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductCardOut"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "product",
+          "quantity",
+          "available_quantity",
+          "line_total_paise",
+          "issue"
+        ],
+        "title": "CartLineOut",
+        "type": "object"
+      },
+      "CartOut": {
+        "properties": {
+          "delivery_fee_paise": {
+            "title": "Delivery Fee Paise",
+            "type": "integer"
+          },
+          "free_delivery_remaining_paise": {
+            "title": "Free Delivery Remaining Paise",
+            "type": "integer"
+          },
+          "has_issues": {
+            "title": "Has Issues",
+            "type": "boolean"
+          },
+          "item_count": {
+            "title": "Item Count",
+            "type": "integer"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/CartLineOut"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "min_order_remaining_paise": {
+            "title": "Min Order Remaining Paise",
+            "type": "integer"
+          },
+          "rules": {
+            "$ref": "#/components/schemas/DeliveryRules"
+          },
+          "subtotal_paise": {
+            "title": "Subtotal Paise",
+            "type": "integer"
+          },
+          "total_paise": {
+            "title": "Total Paise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "lines",
+          "item_count",
+          "subtotal_paise",
+          "delivery_fee_paise",
+          "total_paise",
+          "free_delivery_remaining_paise",
+          "min_order_remaining_paise",
+          "has_issues",
+          "rules"
+        ],
+        "title": "CartOut",
+        "type": "object"
+      },
       "CategoryCreate": {
         "properties": {
           "image_key": {
@@ -830,6 +929,30 @@
           }
         },
         "title": "CategoryUpdate",
+        "type": "object"
+      },
+      "DeliveryRules": {
+        "description": "Sent so the app can estimate totals instantly while a change is in flight.",
+        "properties": {
+          "delivery_fee_paise": {
+            "title": "Delivery Fee Paise",
+            "type": "integer"
+          },
+          "free_delivery_above_paise": {
+            "title": "Free Delivery Above Paise",
+            "type": "integer"
+          },
+          "min_order_paise": {
+            "title": "Min Order Paise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "delivery_fee_paise",
+          "free_delivery_above_paise",
+          "min_order_paise"
+        ],
+        "title": "DeliveryRules",
         "type": "object"
       },
       "DevSignInRequest": {
@@ -1545,6 +1668,22 @@
         ],
         "title": "SessionClient",
         "type": "string"
+      },
+      "SetQuantityRequest": {
+        "properties": {
+          "quantity": {
+            "description": "0 removes the item",
+            "maximum": 50.0,
+            "minimum": 0.0,
+            "title": "Quantity",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "quantity"
+        ],
+        "title": "SetQuantityRequest",
+        "type": "object"
       },
       "ShopOut": {
         "properties": {
@@ -2999,6 +3138,161 @@
         ]
       }
     },
+    "/api/v1/cart": {
+      "delete": {
+        "operationId": "clear_cart_api_v1_cart_delete",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Clear Cart",
+        "tags": [
+          "cart"
+        ]
+      },
+      "get": {
+        "operationId": "get_cart_api_v1_cart_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Cart",
+        "tags": [
+          "cart"
+        ]
+      }
+    },
+    "/api/v1/cart/items/{product_id}": {
+      "delete": {
+        "operationId": "remove_item_api_v1_cart_items__product_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "product_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Product Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Remove Item",
+        "tags": [
+          "cart"
+        ]
+      },
+      "put": {
+        "description": "Sets an absolute quantity (0 removes). Safe to retry: the same call gives the same cart.",
+        "operationId": "set_item_quantity_api_v1_cart_items__product_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "product_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Product Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetQuantityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Set Item Quantity",
+        "tags": [
+          "cart"
+        ]
+      }
+    },
     "/api/v1/categories": {
       "get": {
         "operationId": "list_categories_api_v1_categories_get",
@@ -3063,6 +3357,183 @@
         "summary": "Get Category",
         "tags": [
           "catalog"
+        ]
+      }
+    },
+    "/api/v1/favourites": {
+      "get": {
+        "operationId": "list_favourites_api_v1_favourites_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ProductCardOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Favourites",
+        "tags": [
+          "cart",
+          "favourites"
+        ]
+      }
+    },
+    "/api/v1/favourites/ids": {
+      "get": {
+        "description": "Lightweight: lets the app draw filled hearts without fetching full products.",
+        "operationId": "favourite_ids_api_v1_favourites_ids_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "title": "Response Favourite Ids Api V1 Favourites Ids Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Favourite Ids",
+        "tags": [
+          "cart",
+          "favourites"
+        ]
+      }
+    },
+    "/api/v1/favourites/{product_id}": {
+      "delete": {
+        "operationId": "remove_favourite_api_v1_favourites__product_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "product_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Product Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Remove Favourite",
+        "tags": [
+          "cart",
+          "favourites"
+        ]
+      },
+      "put": {
+        "operationId": "add_favourite_api_v1_favourites__product_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "product_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Product Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Add Favourite",
+        "tags": [
+          "cart",
+          "favourites"
         ]
       }
     },

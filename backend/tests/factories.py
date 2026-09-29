@@ -29,6 +29,8 @@ def make_product(db: Session, category: Category, **overrides: Any) -> Product:
         "stock_quantity": 20,
         "sort_order": n,
     }
+    if "price_paise" in overrides and "mrp_paise" not in overrides:
+        fields["mrp_paise"] = max(fields["mrp_paise"], overrides["price_paise"])
     product = Product(**(fields | overrides))
     db.add(product)
     db.flush()
