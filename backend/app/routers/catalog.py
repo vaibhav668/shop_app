@@ -10,9 +10,17 @@ from app.dependencies.db import get_db
 from app.dependencies.storage import get_storage
 from app.integrations.storage import StorageProvider
 from app.repositories import catalog as repo
-from app.schemas.catalog import CategoryOut, ProductCardOut, ProductDetailOut, ShopOut
+from app.schemas.catalog import (
+    CategoryOut,
+    HomeOut,
+    ProductCardOut,
+    ProductDetailOut,
+    ShopOut,
+    SuggestionOut,
+)
 from app.schemas.common import MAX_PAGE_SIZE, Page
-from app.services.catalog_views import CatalogViews
+from app.services.banners import BannerService
+from app.services.catalog_views import CARD_IMAGE_WIDTH, CatalogViews
 from app.services.shop import get_shop_settings
 
 router = APIRouter(tags=["catalog"])
@@ -40,6 +48,20 @@ def get_shop(db: Session = Depends(get_db)) -> ShopOut:
     )
 
 
+@router.get("/home", response_model=HomeOut)
+def get_home(
+    db: Session = Depends(get_db),
+    storage: StorageProvider = Depends(get_storage),
+    views: CatalogViews = Depends(get_views),
+) -> HomeOut:
+    """Everything the home screen needs in one round trip."""
+    return HomeOut(
+        banners=BannerService(db, storage).live_banners(),
+        categories=[views.category(c) for c in repo.list_active_categories(db)],
+        featured=[views.card(p) for p in repo.list_featured(db)],
+    )
+
+
 @router.get("/categories", response_model=list[CategoryOut])
 def list_categories(
     db: Session = Depends(get_db), views: CatalogViews = Depends(get_views)
@@ -59,6 +81,7 @@ def get_category(
 
 @router.get("/products", response_model=Page[ProductCardOut])
 def list_products(
+    q: str | None = Query(None, max_length=60, description="Search text; ranks by relevance"),
     category_id: uuid.UUID | None = None,
     in_stock_only: bool = False,
     sort: repo.CustomerSort = "default",
@@ -74,8 +97,29 @@ def list_products(
         sort=sort,
         limit=limit,
         offset=offset,
+        q=q,
     )
     return Page(items=[views.card(p) for p in items], total=total, limit=limit, offset=offset)
+
+
+# Declared before /products/{product_id} so "suggest" isn't parsed as a product id.
+@router.get("/products/suggest", response_model=list[SuggestionOut])
+def suggest_products(
+    q: str = Query(min_length=1, max_length=60),
+    db: Session = Depends(get_db),
+    storage: StorageProvider = Depends(get_storage),
+) -> list[SuggestionOut]:
+    return [
+        SuggestionOut(
+            id=p.id,
+            name=p.name,
+            unit_label=p.unit_label,
+            image_url=storage.url(p.image_key, width=CARD_IMAGE_WIDTH // 4)
+            if p.image_key
+            else None,
+        )
+        for p in repo.suggest_products(db, q)
+    ]
 
 
 @router.get("/products/{product_id}", response_model=ProductDetailOut)

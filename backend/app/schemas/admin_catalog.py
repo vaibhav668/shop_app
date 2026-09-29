@@ -143,3 +143,62 @@ class StockOut(BaseModel):
 class UploadOut(BaseModel):
     key: str
     url: str
+
+
+# --- banners ------------------------------------------------------------------------------
+
+BannerTargetType = Literal["NONE", "CATEGORY", "PRODUCT"]
+BannerTitle = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=60)]
+BannerSubtitle = Annotated[str, StringConstraints(strip_whitespace=True, max_length=100)]
+
+
+class AdminBannerOut(BaseModel):
+    id: uuid.UUID
+    title: str
+    subtitle: str | None
+    image_key: str | None
+    image_url: str | None
+    target_type: BannerTargetType
+    target_id: uuid.UUID | None
+    target_label: str | None
+    sort_order: int
+    is_active: bool
+    starts_at: datetime | None
+    ends_at: datetime | None
+    is_live: bool
+
+
+class _BannerRules(BaseModel):
+    @model_validator(mode="after")
+    def _check(self):
+        target_type = getattr(self, "target_type", None)
+        target_id = getattr(self, "target_id", None)
+        if target_type is not None and (target_type == "NONE") != (target_id is None):
+            raise ValueError("Choose what the banner opens, or set it to open nothing.")
+        starts, ends = getattr(self, "starts_at", None), getattr(self, "ends_at", None)
+        if starts and ends and ends <= starts:
+            raise ValueError("The end date must be after the start date.")
+        return self
+
+
+class BannerCreate(_BannerRules):
+    title: BannerTitle
+    subtitle: BannerSubtitle | None = None
+    image_key: ImageKey | None = None
+    target_type: BannerTargetType = "NONE"
+    target_id: uuid.UUID | None = None
+    is_active: bool = True
+    starts_at: datetime | None = None
+    ends_at: datetime | None = None
+
+
+class BannerUpdate(_BannerRules):
+    title: BannerTitle | None = None
+    subtitle: BannerSubtitle | None = None
+    image_key: ImageKey | None = None
+    remove_image: bool = False
+    target_type: BannerTargetType | None = None
+    target_id: uuid.UUID | None = None
+    is_active: bool | None = None
+    starts_at: datetime | None = None
+    ends_at: datetime | None = None

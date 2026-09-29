@@ -52,3 +52,27 @@ class ShopOut(BaseModel):
     min_order_paise: int
     cod_enabled: bool
     online_payment_enabled: bool
+
+
+class SuggestionOut(BaseModel):
+    id: uuid.UUID
+    name: str
+    unit_label: str
+    image_url: str | None
+
+
+class BannerOut(BaseModel):
+    id: uuid.UUID
+    title: str
+    subtitle: str | None
+    image_url: str | None
+    # Where a tap goes. NONE when there is no link or the target is hidden/removed.
+    target_type: Literal["NONE", "CATEGORY", "PRODUCT"]
+    target_id: uuid.UUID | None
+    target_slug: str | None
+
+
+class HomeOut(BaseModel):
+    banners: list[BannerOut]
+    categories: list[CategoryOut]
+    featured: list[ProductCardOut]

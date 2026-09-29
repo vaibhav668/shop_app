@@ -18,6 +18,13 @@ if not config.get_main_option("sqlalchemy.url"):
 
 target_metadata = Base.metadata
 
+# Indexes defined only in migrations (expression indexes the models can't express).
+MIGRATION_ONLY_INDEXES = {"ix_products_search_trgm"}
+
+
+def include_object(obj, name, type_, reflected, compare_to):
+    return not (type_ == "index" and name in MIGRATION_ONLY_INDEXES)
+
 
 def run_migrations_offline() -> None:
     context.configure(
@@ -26,6 +33,7 @@ def run_migrations_offline() -> None:
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
         compare_type=True,
+        include_object=include_object,
     )
     with context.begin_transaction():
         context.run_migrations()
@@ -38,7 +46,12 @@ def run_migrations_online() -> None:
         poolclass=pool.NullPool,
     )
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata, compare_type=True)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            compare_type=True,
+            include_object=include_object,
+        )
         with context.begin_transaction():
             context.run_migrations()
 

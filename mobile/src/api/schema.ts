@@ -4,6 +4,59 @@
  */
 
 export interface paths {
+  '/api/v1/admin/banners': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Banners */
+    get: operations['list_banners_api_v1_admin_banners_get'];
+    put?: never;
+    /** Create Banner */
+    post: operations['create_banner_api_v1_admin_banners_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/banners/reorder': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Reorder Banners */
+    post: operations['reorder_banners_api_v1_admin_banners_reorder_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/banners/{banner_id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete Banner */
+    delete: operations['delete_banner_api_v1_admin_banners__banner_id__delete'];
+    options?: never;
+    head?: never;
+    /** Update Banner */
+    patch: operations['update_banner_api_v1_admin_banners__banner_id__patch'];
+    trace?: never;
+  };
   '/api/v1/admin/categories': {
     parameters: {
       query?: never;
@@ -307,6 +360,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/home': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Home
+     * @description Everything the home screen needs in one round trip.
+     */
+    get: operations['get_home_api_v1_home_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/me': {
     parameters: {
       query?: never;
@@ -377,6 +450,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/products/suggest': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Suggest Products */
+    get: operations['suggest_products_api_v1_products_suggest_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/products/{product_id}': {
     parameters: {
       query?: never;
@@ -415,6 +505,41 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** AdminBannerOut */
+    AdminBannerOut: {
+      /** Ends At */
+      ends_at: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Image Key */
+      image_key: string | null;
+      /** Image Url */
+      image_url: string | null;
+      /** Is Active */
+      is_active: boolean;
+      /** Is Live */
+      is_live: boolean;
+      /** Sort Order */
+      sort_order: number;
+      /** Starts At */
+      starts_at: string | null;
+      /** Subtitle */
+      subtitle: string | null;
+      /** Target Id */
+      target_id: string | null;
+      /** Target Label */
+      target_label: string | null;
+      /**
+       * Target Type
+       * @enum {string}
+       */
+      target_type: 'NONE' | 'CATEGORY' | 'PRODUCT';
+      /** Title */
+      title: string;
+    };
     /** AdminCategoryOut */
     AdminCategoryOut: {
       /**
@@ -506,6 +631,79 @@ export interface components {
        */
       token_type?: 'bearer';
       user: components['schemas']['UserOut'];
+    };
+    /** BannerCreate */
+    BannerCreate: {
+      /** Ends At */
+      ends_at?: string | null;
+      /** Image Key */
+      image_key?: string | null;
+      /**
+       * Is Active
+       * @default true
+       */
+      is_active?: boolean;
+      /** Starts At */
+      starts_at?: string | null;
+      /** Subtitle */
+      subtitle?: string | null;
+      /** Target Id */
+      target_id?: string | null;
+      /**
+       * Target Type
+       * @default NONE
+       * @enum {string}
+       */
+      target_type?: 'NONE' | 'CATEGORY' | 'PRODUCT';
+      /** Title */
+      title: string;
+    };
+    /** BannerOut */
+    BannerOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Image Url */
+      image_url: string | null;
+      /** Subtitle */
+      subtitle: string | null;
+      /** Target Id */
+      target_id: string | null;
+      /** Target Slug */
+      target_slug: string | null;
+      /**
+       * Target Type
+       * @enum {string}
+       */
+      target_type: 'NONE' | 'CATEGORY' | 'PRODUCT';
+      /** Title */
+      title: string;
+    };
+    /** BannerUpdate */
+    BannerUpdate: {
+      /** Ends At */
+      ends_at?: string | null;
+      /** Image Key */
+      image_key?: string | null;
+      /** Is Active */
+      is_active?: boolean | null;
+      /**
+       * Remove Image
+       * @default false
+       */
+      remove_image?: boolean;
+      /** Starts At */
+      starts_at?: string | null;
+      /** Subtitle */
+      subtitle?: string | null;
+      /** Target Id */
+      target_id?: string | null;
+      /** Target Type */
+      target_type?: ('NONE' | 'CATEGORY' | 'PRODUCT') | null;
+      /** Title */
+      title?: string | null;
     };
     /** Body_upload_image_api_v1_admin_uploads_images_post */
     Body_upload_image_api_v1_admin_uploads_images_post: {
@@ -607,6 +805,15 @@ export interface components {
        * @constant
        */
       status?: 'ok';
+    };
+    /** HomeOut */
+    HomeOut: {
+      /** Banners */
+      banners: components['schemas']['BannerOut'][];
+      /** Categories */
+      categories: components['schemas']['CategoryOut'][];
+      /** Featured */
+      featured: components['schemas']['ProductCardOut'][];
     };
     /** LogoutRequest */
     LogoutRequest: {
@@ -834,6 +1041,20 @@ export interface components {
       /** Stock */
       stock: number;
     };
+    /** SuggestionOut */
+    SuggestionOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Image Url */
+      image_url: string | null;
+      /** Name */
+      name: string;
+      /** Unit Label */
+      unit_label: string;
+    };
     /** UpdateMeRequest */
     UpdateMeRequest: {
       /** Name */
@@ -894,6 +1115,154 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+  list_banners_api_v1_admin_banners_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminBannerOut'][];
+        };
+      };
+    };
+  };
+  create_banner_api_v1_admin_banners_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BannerCreate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminBannerOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  reorder_banners_api_v1_admin_banners_reorder_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReorderRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  delete_banner_api_v1_admin_banners__banner_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        banner_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  update_banner_api_v1_admin_banners__banner_id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        banner_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BannerUpdate'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminBannerOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
   list_categories_api_v1_admin_categories_get: {
     parameters: {
       query?: never;
@@ -1563,6 +1932,26 @@ export interface operations {
       };
     };
   };
+  get_home_api_v1_home_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HomeOut'];
+        };
+      };
+    };
+  };
   get_me_api_v1_me_get: {
     parameters: {
       query?: never;
@@ -1697,6 +2086,8 @@ export interface operations {
   list_products_api_v1_products_get: {
     parameters: {
       query?: {
+        /** @description Search text; ranks by relevance */
+        q?: string | null;
         category_id?: string | null;
         in_stock_only?: boolean;
         sort?: 'default' | 'price_asc' | 'price_desc';
@@ -1716,6 +2107,37 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['Page_ProductCardOut_'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  suggest_products_api_v1_products_suggest_get: {
+    parameters: {
+      query: {
+        q: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SuggestionOut'][];
         };
       };
       /** @description Validation Error */
