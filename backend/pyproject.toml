@@ -1,0 +1,26 @@
+[project]
+name = "shop-backend"
+version = "0.1.0"
+description = "FastAPI backend for the local grocery shop platform"
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["alembic/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+# FastAPI's Depends() in argument defaults is the framework idiom
+"app/**" = ["B008"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
+
+[tool.ruff.lint.isort]
+# The local alembic/ migrations folder would otherwise be mistaken for first-party code.
+known-third-party = ["alembic"]
