@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { MapPinPlus, MapPinned } from 'lucide-react-native';
-import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { Address } from '@/api/addresses';
@@ -10,6 +10,7 @@ import { QueryError } from '@/components/QueryError';
 import { useToast } from '@/components/Toast';
 import { Button, EmptyState, Skeleton, Text } from '@/components/ui';
 import { useAddresses, useAddressMutations } from '@/features/addresses/hooks';
+import { confirmAction } from '@/lib/dialogs';
 import { colors, gutter, radius, spacing } from '@/theme/tokens';
 
 export default function AddressesScreen() {
@@ -61,15 +62,16 @@ function AddressRow({ address }: { address: Address }) {
   const fail = (e: unknown) =>
     toast.show(e instanceof ApiError ? e.message : 'Something went wrong. Try again?');
 
-  const confirmDelete = () =>
-    Alert.alert(`Delete "${address.label}"?`, 'You can add it again any time.', [
-      { text: 'Keep', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () => remove.mutate(address.id, { onError: fail }),
-      },
-    ]);
+  const confirmDelete = async () => {
+    const confirmed = await confirmAction({
+      title: `Delete "${address.label}"?`,
+      message: 'You can add it again any time.',
+      confirmLabel: 'Delete',
+      cancelLabel: 'Keep',
+      destructive: true,
+    });
+    if (confirmed) remove.mutate(address.id, { onError: fail });
+  };
 
   return (
     <View style={styles.card}>

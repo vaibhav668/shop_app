@@ -1,11 +1,13 @@
 import { router } from 'expo-router';
 import { Bell, ChevronRight, Heart, LogOut, MapPin, Palette } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
+import { ApiError } from '@/api/client';
 import { Button, Screen, ScreenTitle, Text } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useUnreadCount } from '@/features/notifications/hooks';
+import { confirmAction, showMessage } from '@/lib/dialogs';
 import { colors, radius, spacing } from '@/theme/tokens';
 
 export default function AccountScreen() {
@@ -15,27 +17,29 @@ export default function AccountScreen() {
 
   if (!user) return null;
 
-  const confirmDelete = () =>
-    Alert.alert(
-      'Delete your account?',
-      'Your name, phone number and saved details will be removed. This cannot be undone.',
-      [
-        { text: 'Keep account', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            setBusy(true);
-            try {
-              await deleteAccount();
-            } catch {
-              setBusy(false);
-              Alert.alert("Couldn't delete your account", 'Check your connection and try again.');
-            }
-          },
-        },
-      ],
-    );
+  const confirmDelete = async () => {
+    const confirmed = await confirmAction({
+      title: 'Delete your account?',
+      message: 'Your name, phone number and saved details will be removed. This cannot be undone.',
+      confirmLabel: 'Delete',
+      cancelLabel: 'Keep account',
+      destructive: true,
+    });
+    if (!confirmed) return;
+    setBusy(true);
+    try {
+      await deleteAccount(); // on success the app signs out and shows the welcome screen
+    } catch (e) {
+      setBusy(false);
+      // e.g. "You have an order in progress..." from the server, or a network problem.
+      showMessage(
+        "Couldn't delete your account",
+        e instanceof ApiError && !e.isNetworkError
+          ? e.message
+          : 'Check your connection and try again.',
+      );
+    }
+  };
 
   return (
     <Screen scroll>

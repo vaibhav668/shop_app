@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { PackageX } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ApiError } from '@/api/client';
@@ -21,6 +21,7 @@ import {
   STATUS_TONE,
   type TimelineStep,
 } from '@/features/orders/orderStatus';
+import { confirmAction } from '@/lib/dialogs';
 import { colors, gutter, radius, spacing } from '@/theme/tokens';
 
 const POLL_MS = 20_000;
@@ -171,11 +172,16 @@ function useCancelOrder(order: OrderDetail) {
       toast.show(e instanceof ApiError ? e.message : "Couldn't cancel. Try again?");
     },
   });
-  const confirm = () =>
-    Alert.alert(`Cancel order #${order.order_number}?`, 'This cannot be undone.', [
-      { text: 'Keep order', style: 'cancel' },
-      { text: 'Cancel order', style: 'destructive', onPress: () => mutation.mutate() },
-    ]);
+  const confirm = async () => {
+    const confirmed = await confirmAction({
+      title: `Cancel order #${order.order_number}?`,
+      message: 'This cannot be undone.',
+      confirmLabel: 'Cancel order',
+      cancelLabel: 'Keep order',
+      destructive: true,
+    });
+    if (confirmed) mutation.mutate();
+  };
   return { confirm, isPending: mutation.isPending };
 }
 
