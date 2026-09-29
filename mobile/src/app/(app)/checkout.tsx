@@ -9,7 +9,7 @@ import { type CheckoutQuote, checkoutApi, type PaymentMethod } from '@/api/addre
 import { queryKeys } from '@/api/queryClient';
 import { AddressSummary } from '@/components/AddressCard';
 import { QueryError } from '@/components/QueryError';
-import { Button, EmptyState, Money, Skeleton, Text } from '@/components/ui';
+import { Button, EmptyState, Input, Money, Skeleton, Text } from '@/components/ui';
 import {
   resolveCheckoutAddress,
   useAddresses,
@@ -17,6 +17,7 @@ import {
 } from '@/features/addresses/hooks';
 import { checkoutItems } from '@/features/cart/cartMath';
 import { useCart } from '@/features/cart/hooks';
+import { usePlaceOrder } from '@/features/orders/hooks';
 import { formatPaise } from '@/lib/money';
 import { colors, gutter, radius, spacing } from '@/theme/tokens';
 
@@ -92,7 +93,10 @@ export default function CheckoutScreen() {
           <AddressSummary address={address} showDefault={false} />
         </View>
       }
+      addressId={address.id}
+      items={items}
       quote={quote.data}
+      // Re-pricing (new address or cart change): the old total must not be ordered.
       loading={quote.isPending || (quote.isFetching && quote.isPlaceholderData)}
       error={quote.isError ? quote.error : null}
       onRetry={quote.refetch}
@@ -102,12 +106,16 @@ export default function CheckoutScreen() {
 
 function CheckoutBody({
   addressSection,
+  addressId,
+  items,
   quote,
   loading,
   error,
   onRetry,
 }: {
   addressSection: React.ReactNode;
+  addressId: string;
+  items: { product_id: string; quantity: number }[];
   quote: CheckoutQuote | undefined;
   loading: boolean;
   error: unknown;
@@ -115,8 +123,22 @@ function CheckoutBody({
 }) {
   const insets = useSafeAreaInsets();
   const [picked, setPicked] = useState<PaymentMethod | null>(null);
+  const [note, setNote] = useState('');
+  const placeOrder = usePlaceOrder();
   const methods = quote?.payment_methods ?? [];
   const method = picked && methods.includes(picked) ? picked : (methods[0] ?? null);
+  const canPlace = !!quote?.can_place_order && !!method && !loading;
+
+  const submit = () => {
+    if (!quote || !method) return;
+    placeOrder.mutate({
+      addressId,
+      method,
+      items,
+      expectedTotal: quote.total_paise,
+      note,
+    });
+  };
 
   return (
     <View style={styles.root}>
@@ -211,21 +233,31 @@ function CheckoutBody({
                 <Money paise={quote.total_paise} variant="bodyStrong" />
               </View>
             </View>
+
+            <Input
+              label="Note for the shop (optional)"
+              value={note}
+              onChangeText={setNote}
+              placeholder="e.g. Ring the bell twice"
+              maxLength={300}
+              multiline
+            />
           </>
         )}
       </ScrollView>
 
       <View style={[styles.footer, { paddingBottom: spacing.sm + insets.bottom }]}>
-        {quote?.can_place_order ? (
+        {method === 'COD' && canPlace ? (
           <Text variant="caption" color="textSecondary">
-            Placing orders opens in the next update of the app.
+            Pay {quote ? formatPaise(quote.total_paise) : ''} when your order arrives.
           </Text>
         ) : null}
         <Button
           title={quote ? `Place order · ${formatPaise(quote.total_paise)}` : 'Place order'}
           fullWidth
-          loading={loading}
-          disabled
+          loading={loading || placeOrder.isPending}
+          disabled={!canPlace}
+          onPress={submit}
         />
       </View>
     </View>

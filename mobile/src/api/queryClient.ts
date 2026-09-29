@@ -20,6 +20,9 @@ export const queryKeys = {
   home: ['home'] as const,
   cart: ['cart'] as const,
   addresses: ['addresses'] as const,
+  allOrders: ['orders'] as const,
+  orders: (scope: 'active' | 'past') => ['orders', scope] as const,
+  order: (id: string) => ['order', id] as const,
   checkoutQuote: (addressId: string, items: { product_id: string; quantity: number }[]) =>
     ['checkout-quote', addressId, items] as const,
   favouriteIds: ['favourite-ids'] as const,

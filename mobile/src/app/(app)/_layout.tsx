@@ -18,7 +18,12 @@ export default function AppLayout() {
       <Stack.Screen name="search" options={{ headerShown: false, animation: 'fade' }} />
       <Stack.Screen name="cart" options={{ title: 'Your cart' }} />
       <Stack.Screen name="checkout" options={{ title: 'Checkout' }} />
-      <Stack.Screen name="addresses/index" options={{ title: 'Saved addresses' }} />
+      <Stack.Screen
+        name="order-placed"
+        options={{ headerShown: false, gestureEnabled: false, animation: 'fade' }}
+      />
+      <Stack.Screen name="orders/[id]" options={{ title: 'Order' }} />
+      <Stack.Screen name="addresses" options={{ title: 'Saved addresses' }} />
       <Stack.Screen name="addresses/form" options={{ title: 'Add address' }} />
       <Stack.Screen
         name="addresses/pick"
