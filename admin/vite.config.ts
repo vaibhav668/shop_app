@@ -15,7 +15,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     // Tests must not depend on a developer's local .env files.
-    env: { VITE_GOOGLE_CLIENT_ID: '', VITE_API_URL: 'http://api.test/api/v1' },
+    env: { VITE_GOOGLE_CLIENT_ID: 'test-client', VITE_API_URL: 'http://api.test/api/v1' },
     css: { modules: { classNameStrategy: 'non-scoped' } },
   },
 });

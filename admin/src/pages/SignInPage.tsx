@@ -1,11 +1,10 @@
 import { GoogleLogin } from '@react-oauth/google';
 import { ShoppingBasket } from 'lucide-react';
-import { type FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { Navigate, useLocation } from 'react-router';
 
 import { ApiError } from '@/api/client';
 import { useAuth } from '@/auth/authContext';
-import { Button } from '@/components/Button';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { GOOGLE_CLIENT_ID } from '@/lib/config';
 
@@ -21,11 +20,11 @@ function messageFor(error: unknown): string {
   return "Sign-in didn't work. Try again?";
 }
 
+/** One way in: Continue with Google. New admins then add their name and mobile number. */
 export function SignInPage() {
-  const { status, signInWithGoogle, signInWithDevEmail } = useAuth();
+  const { status, signInWithGoogle } = useAuth();
   const location = useLocation();
   const [error, setError] = useState<string | null>(null);
-  const [devEmail, setDevEmail] = useState('');
   const [busy, setBusy] = useState(false);
 
   if (status === 'loading') return <FullPageSpinner />;
@@ -34,11 +33,11 @@ export function SignInPage() {
     return <Navigate to={from} replace />;
   }
 
-  const run = async (action: () => Promise<void>) => {
+  const onCredential = async (credential: string) => {
     setBusy(true);
     setError(null);
     try {
-      await action();
+      await signInWithGoogle(credential);
     } catch (e) {
       setError(messageFor(e));
     } finally {
@@ -46,14 +45,9 @@ export function SignInPage() {
     }
   };
 
-  const onDevSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    void run(() => signInWithDevEmail(devEmail.trim()));
-  };
-
   return (
     <main className={styles.page}>
-      <section className={styles.card}>
+      <section className={styles.card} aria-busy={busy || undefined}>
         <span className={styles.mark} aria-hidden>
           <ShoppingBasket size={24} strokeWidth={2} />
         </span>
@@ -70,7 +64,7 @@ export function SignInPage() {
           <div className={styles.google}>
             <GoogleLogin
               onSuccess={({ credential }) => {
-                if (credential) void run(() => signInWithGoogle(credential));
+                if (credential) void onCredential(credential);
               }}
               onError={() => setError("Google sign-in didn't open. Try again?")}
               theme="outline"
@@ -84,32 +78,6 @@ export function SignInPage() {
             Google sign-in isn&apos;t configured yet (set <code>VITE_GOOGLE_CLIENT_ID</code>).
           </p>
         )}
-
-        {import.meta.env.DEV ? (
-          <form className={styles.dev} onSubmit={onDevSubmit}>
-            <label className={styles.label} htmlFor="dev-email">
-              Development sign-in
-            </label>
-            <input
-              id="dev-email"
-              className={styles.input}
-              type="email"
-              value={devEmail}
-              onChange={(e) => setDevEmail(e.target.value)}
-              placeholder="owner@example.com"
-              autoComplete="email"
-            />
-            <Button
-              type="submit"
-              variant="secondary"
-              fullWidth
-              loading={busy}
-              disabled={!devEmail.includes('@')}
-            >
-              Continue with email
-            </Button>
-          </form>
-        ) : null}
       </section>
     </main>
   );

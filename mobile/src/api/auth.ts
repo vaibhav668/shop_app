@@ -13,13 +13,6 @@ export const authApi = {
       auth: false,
     }),
 
-  devLogin: (email: string) =>
-    api<AuthResponse>('/auth/dev-login', {
-      method: 'POST',
-      body: { email, client: 'mobile' },
-      auth: false,
-    }),
-
   refresh: (refreshToken: string) =>
     api<AuthResponse>('/auth/refresh', {
       method: 'POST',

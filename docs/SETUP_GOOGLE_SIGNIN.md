@@ -22,7 +22,7 @@ The mobile app asks Google for an ID token *for the web client*. That's why the 
 ## 2. Web client
 1. **Credentials → Create credentials → OAuth client ID → Web application**.
 2. Name: `Bada Bazar web`.
-3. **Authorised JavaScript origins**: `http://localhost:5173` (later also add `https://admin.<your-domain>`).
+3. **Authorised JavaScript origins**: `http://localhost:5173` (admin) and `http://localhost:8081` (the customer app's web preview). Later also add `https://admin.<your-domain>`.
 4. No redirect URIs are needed.
 5. Copy the **Client ID** (it ends in `.apps.googleusercontent.com`).
 
@@ -65,4 +65,5 @@ On a physical phone, the app can't reach `localhost`. Set `EXPO_PUBLIC_API_URL=h
 | `INVALID_GOOGLE_TOKEN` from the API | `GOOGLE_ALLOWED_CLIENT_IDS` doesn't contain the web client ID the app used |
 | `GOOGLE_NOT_CONFIGURED` from the API | `GOOGLE_ALLOWED_CLIENT_IDS` is empty |
 | Admin Google button shows an origin error | `http://localhost:5173` is missing from the web client's JavaScript origins |
+| App web preview's Google button shows an origin error | `http://localhost:8081` is missing from the web client's JavaScript origins |
 | Admin: "isn't a shop admin" | Run `python -m app.cli make-admin <email>` in `backend/` |

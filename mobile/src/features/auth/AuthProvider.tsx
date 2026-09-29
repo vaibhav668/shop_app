@@ -12,7 +12,7 @@ import {
 import { type AuthResponse, authApi, type User } from '@/api/auth';
 import { ApiError, configureApiSession } from '@/api/client';
 import { queryClient } from '@/api/queryClient';
-import { getGoogleIdToken, signOutOfGoogle } from '@/features/auth/googleSignIn';
+import { signOutOfGoogle } from '@/features/auth/googleSignIn';
 import { tokenStore } from '@/features/auth/tokenStore';
 import { currentPushToken, forgetPushToken } from '@/features/notifications/push';
 
@@ -21,9 +21,8 @@ export type AuthStatus = 'loading' | 'signedOut' | 'signedIn' | 'unreachable';
 type AuthContextValue = {
   status: AuthStatus;
   user: User | null;
-  /** Resolves false if the person cancelled the Google picker. */
-  signInWithGoogle: () => Promise<boolean>;
-  signInWithDevEmail: (email: string) => Promise<void>;
+  /** Exchanges a Google ID token for a session. New accounts are created on the server. */
+  signInWithGoogle: (idToken: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (changes: { name?: string; phone?: string }) => Promise<void>;
   deleteAccount: () => Promise<void>;
@@ -107,14 +106,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       status,
       user,
-      signInWithGoogle: async () => {
-        const idToken = await getGoogleIdToken();
-        if (!idToken) return false;
+      signInWithGoogle: async (idToken) => {
         await acceptAuth(await authApi.signInWithGoogle(idToken));
-        return true;
-      },
-      signInWithDevEmail: async (email) => {
-        await acceptAuth(await authApi.devLogin(email));
       },
       signOut: async () => {
         try {

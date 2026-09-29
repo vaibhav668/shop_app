@@ -12,7 +12,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
       <AuthProvider>{children}</AuthProvider>
     </QueryClientProvider>
   );
-  // Without a client ID, skip loading Google's script entirely (dev sign-in still works).
+  // Without a client ID, skip loading Google's script; the sign-in page explains what to set.
   return GOOGLE_CLIENT_ID ? (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>{app}</GoogleOAuthProvider>
   ) : (

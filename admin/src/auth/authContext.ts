@@ -8,7 +8,8 @@ export type AuthContextValue = {
   status: AuthStatus;
   user: User | null;
   signInWithGoogle: (idToken: string) => Promise<void>;
-  signInWithDevEmail: (email: string) => Promise<void>;
+  /** First sign-in: saves the name and mobile number the account is missing. */
+  updateProfile: (changes: { name: string; phone: string }) => Promise<void>;
   signOut: () => Promise<void>;
 };
 

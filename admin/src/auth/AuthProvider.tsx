@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       status,
       user,
       signInWithGoogle: async (idToken) => accept(await authApi.signInWithGoogle(idToken)),
-      signInWithDevEmail: async (email) => accept(await authApi.devLogin(email)),
+      updateProfile: async (changes) => setUser(await authApi.updateMe(changes)),
       signOut: async () => {
         try {
           await authApi.logout();

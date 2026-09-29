@@ -12,15 +12,11 @@ export const authApi = {
       auth: false,
     }),
 
-  devLogin: (email: string) =>
-    api<AuthResponse>('/auth/dev-login', {
-      method: 'POST',
-      body: { email, client: 'admin' },
-      auth: false,
-    }),
-
   // The refresh token travels as an httpOnly cookie; the body is empty on purpose.
   refresh: () => api<AuthResponse>('/auth/refresh', { method: 'POST', auth: false }),
 
   logout: () => api<void>('/auth/logout', { method: 'POST' }),
+
+  updateMe: (changes: { name?: string; phone?: string }) =>
+    api<User>('/me', { method: 'PATCH', body: changes }),
 };

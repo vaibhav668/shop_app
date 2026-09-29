@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { ApiError } from '@/api/client';
 import { BrandMark } from '@/components/BrandMark';
-import { Button, Input, Screen, Text } from '@/components/ui';
+import { Screen, Text } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { GoogleSignInError, isGoogleSignInAvailable } from '@/features/auth/googleSignIn';
+import { GoogleButton } from '@/features/auth/GoogleButton';
+import { GoogleSignInError } from '@/features/auth/googleSignIn';
 import { colors, radius, spacing } from '@/theme/tokens';
 
 function messageFor(error: unknown): string {
@@ -13,27 +14,17 @@ function messageFor(error: unknown): string {
   return "Sign-in didn't work. Try again?";
 }
 
+/**
+ * The one way in: Continue with Google. A first-time customer is then asked for their name and
+ * mobile number (onboarding); a returning one goes straight to Home.
+ */
 export default function WelcomeScreen() {
-  const { signInWithGoogle, signInWithDevEmail } = useAuth();
-  const [busy, setBusy] = useState<'google' | 'dev' | null>(null);
+  const { signInWithGoogle } = useAuth();
   const [error, setError] = useState<string | null>(null);
-  const [devEmail, setDevEmail] = useState('');
-
-  const run = async (kind: 'google' | 'dev', action: () => Promise<unknown>) => {
-    setBusy(kind);
-    setError(null);
-    try {
-      await action();
-    } catch (e) {
-      setError(messageFor(e));
-    } finally {
-      setBusy(null);
-    }
-  };
 
   return (
     <Screen edges={['top', 'bottom']}>
-      <KeyboardAvoidingView behavior="height" style={styles.root}>
+      <View style={styles.root}>
         <View style={styles.hero}>
           <BrandMark size={56} />
           <Text variant="display" style={styles.headline}>
@@ -52,47 +43,18 @@ export default function WelcomeScreen() {
               </Text>
             </View>
           ) : null}
-
-          {isGoogleSignInAvailable ? (
-            <Button
-              title="Continue with Google"
-              fullWidth
-              loading={busy === 'google'}
-              disabled={busy !== null && busy !== 'google'}
-              onPress={() => run('google', signInWithGoogle)}
-            />
-          ) : (
-            <Text variant="caption" color="textSecondary" align="center">
-              Google sign-in works in the installed app build.
-            </Text>
-          )}
-
-          {__DEV__ ? (
-            <View style={styles.dev}>
-              <Text variant="micro" color="textSecondary">
-                DEVELOPMENT SIGN-IN
-              </Text>
-              <Input
-                label="Email"
-                value={devEmail}
-                onChangeText={setDevEmail}
-                autoCapitalize="none"
-                autoComplete="email"
-                keyboardType="email-address"
-                placeholder="you@example.com"
-              />
-              <Button
-                title="Continue with email"
-                variant="secondary"
-                fullWidth
-                loading={busy === 'dev'}
-                disabled={!devEmail.includes('@') || (busy !== null && busy !== 'dev')}
-                onPress={() => run('dev', () => signInWithDevEmail(devEmail.trim()))}
-              />
-            </View>
-          ) : null}
+          <GoogleButton
+            onIdToken={async (idToken) => {
+              setError(null);
+              await signInWithGoogle(idToken);
+            }}
+            onError={(e) => setError(messageFor(e))}
+          />
+          <Text variant="caption" color="textTertiary" align="center">
+            New here? The same button creates your account.
+          </Text>
         </View>
-      </KeyboardAvoidingView>
+      </View>
     </Screen>
   );
 }
@@ -106,12 +68,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dangerTint,
     borderRadius: radius.md,
     padding: spacing.sm,
-  },
-  dev: {
-    gap: spacing.sm,
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
 });

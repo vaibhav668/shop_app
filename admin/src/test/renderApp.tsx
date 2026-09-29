@@ -3,10 +3,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { vi } from 'vitest';
 
+import type { User } from '@/api/auth';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { routes } from '@/routes';
 
-export const OWNER = {
+export const OWNER: User = {
   id: '00000000-0000-0000-0000-000000000001',
   email: 'owner@example.com',
   name: 'Meena Shah',
