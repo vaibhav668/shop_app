@@ -45,6 +45,7 @@ PaymentSession{ provider, key_id, provider_order_id, amount_paise, currency, pre
 |---|---|---|---|---|
 | POST | `/auth/google` **public** | `{ id_token, client: "mobile"\|"admin" }` | `{ access_token, refresh_token?, expires_in, user, is_new_user }` | For admin, the refresh token is set as an httpOnly cookie and not returned in the body. For admin, a non-ADMIN user gets 403. |
 | POST | `/auth/refresh` **public** | `{ refresh_token }` or cookie | same as above | Rotates the token; reuse of an old token revokes the session |
+| POST | `/auth/dev-login` **public, local/test only** | `{ email, name?, client }` | same as `/auth/google` | Only mounted when `DEV_LOGIN_ENABLED=true` in local/test |
 | POST | `/auth/logout` | `{ device_token? }` | 204 | |
 | GET | `/me` | | `User { id, email, name, avatar_url, phone, role, needs_onboarding }` | This is the spec's `/auth/me`; `/me` is the canonical path |
 | PATCH | `/me` | `{ name?, phone? }` | `User` | |

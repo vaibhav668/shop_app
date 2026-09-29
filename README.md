@@ -8,9 +8,9 @@ Start with [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md).
 
 | Folder | What | Status |
 |---|---|---|
-| `backend/` | FastAPI, SQLAlchemy, Alembic | Phase 0 — skeleton, health checks |
-| `mobile/` | Expo SDK 57 + React Native customer app | Phase 1 — design system, tab shell |
-| `admin/` | Vite + React admin dashboard | Phase 1 — layout shell |
+| `backend/` | FastAPI, SQLAlchemy, Alembic | Phase 2 — auth, sessions, profile |
+| `mobile/` | Expo SDK 57 + React Native customer app | Phase 2 — sign-in, onboarding, account |
+| `admin/` | Vite + React admin dashboard | Phase 2 — admin sign-in, layout shell |
 | `docs/` | Plan, architecture, schema, API, UI system | — |
 | `scripts/` | Repo-wide checks (palette guard) | — |
 
@@ -60,6 +60,29 @@ npx expo start --go  # scan the QR code with the Expo Go app (SDK 57) to preview
 In the app, go to **Account → Open UI kit** (development only) to see every design-system component.
 
 From Phase 2, Google Sign-In needs a development build instead of Expo Go: `npx eas-cli@latest build --profile development --platform android`. This requires a free Expo account.
+
+## Signing in locally
+
+Until Google OAuth is set up ([docs/SETUP_GOOGLE_SIGNIN.md](docs/SETUP_GOOGLE_SIGNIN.md)), both apps show a **development email sign-in**. It works only when `DEV_LOGIN_ENABLED=true` and `APP_ENV=local`, and it is never available in production.
+
+1. Open the mobile app (web preview or Expo Go) and sign in with any email, e.g. `you@example.com`. Enter a name and phone number on the onboarding screen.
+2. Make that account a shop admin:
+   ```bash
+   cd backend && python -m app.cli make-admin you@example.com
+   ```
+3. Sign in to the admin dashboard with the same email.
+
+## API types
+
+The frontends' API types are generated from the backend. After changing an endpoint:
+
+```bash
+cd backend && python scripts/export_openapi.py
+cd mobile && npm run gen:api
+cd admin && npm run gen:api
+```
+
+CI fails if these are out of date.
 
 ## Checks
 

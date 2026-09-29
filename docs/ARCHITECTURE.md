@@ -71,10 +71,13 @@ One shop means tens of concurrent users at most. Sync SQLAlchemy with psycopg 3 
 ## 4. Auth details
 
 - Access JWT: HS256, 15 min TTL, claims `sub`, `role`, `sid`, `iat`, `exp`. `get_current_user` loads the user on each request, so disabling an account or changing a role takes effect right away.
-- Refresh token: 32 random bytes (base64url). Only its SHA-256 hash is stored. It is rotated on every refresh.
+- Refresh token: 32 random bytes (base64url). Only its SHA-256 hash is stored. It is rotated on every refresh (the session row is locked `FOR UPDATE`), and the old hash is kept in `previous_token_hash`, so a replayed old token revokes the session.
 - Mobile: tokens live in `expo-secure-store`. The API client serialises refreshes (a single request in flight; other requests wait for it) and retries once after a 401 `TOKEN_EXPIRED`.
 - Admin: the access token is kept in memory; the refresh token is an httpOnly cookie. Refreshing the page triggers a silent `/auth/refresh`.
-- Admin promotion: `python -m app.cli make-admin <email>` (the user must have signed in at least once).
+- Admin promotion: `python -m app.cli make-admin <email>` / `remove-admin <email>` (the user must have signed in at least once).
+- **Dev login** (`POST /auth/dev-login {email}`): signs in by email without Google so the apps can be tried before OAuth is configured. The route is mounted only when `DEV_LOGIN_ENABLED=true` **and** `APP_ENV` is `local`/`test`; settings validation refuses it in staging/production, and a test checks that the route is absent when disabled. Both apps show the dev form only in development builds.
+- Mobile: Google Sign-In is native, so Expo Go and the web preview show only the dev sign-in; the Android dev/production builds show "Continue with Google".
+- Route guards (mobile): the root `Stack` uses `Stack.Protected` — `welcome` when signed out, `onboarding` until a phone number is saved, `(app)` after that. The native splash stays up until the session check finishes.
 
 ## 5. Mobile app structure (Expo Router)
 

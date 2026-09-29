@@ -61,10 +61,11 @@ Refresh-token sessions.
 | id | uuid PK | Also sent in the access token as the `sid` claim |
 | user_id | uuid FK users ON DELETE CASCADE | |
 | refresh_token_hash | text UNIQUE NOT NULL | SHA-256 of the token; the raw token is never stored |
-| client | text NOT NULL | `mobile` \| `admin` |
+| client | session_client enum NOT NULL | `mobile` \| `admin` |
 | expires_at | timestamptz NOT NULL | |
 | revoked_at | timestamptz | |
-| rotated_at | timestamptz | Set when the token is rotated. If a rotated token is presented again, the whole session is revoked. |
+| previous_token_hash | text (indexed) | The hash rotated away on the last refresh. If that old token is presented again, it has leaked, so the session is revoked. |
+| last_used_at | timestamptz | |
 | user_agent | text | |
 
 ### device_tokens
