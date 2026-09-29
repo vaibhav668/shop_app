@@ -120,10 +120,10 @@ Settings ─► delivery fee, free-delivery threshold, minimum order, serviceabl
 
 | Layer | Choice | Notes |
 |---|---|---|
-| Mobile | React Native, **Expo** (latest stable SDK), **Expo Router**, TypeScript | Needs an EAS **development build** because Google Sign-In and Razorpay are native modules. Expo Go will not work. |
+| Mobile | React Native, **Expo** (SDK 57), **Expo Router**, TypeScript | Needs an EAS **development build** because Google Sign-In and Razorpay are native modules. Expo Go will not work. |
 | Mobile data/state | **TanStack Query** + React Context | See §9.3 |
 | Mobile UI | React Native `StyleSheet` + theme tokens, `expo-image`, Reanimated, `lucide-react-native`, Inter via `@expo-google-fonts/inter` | No UI kit, so the design stays our own |
-| Admin | **Vite + React + TypeScript**, React Router, TanStack Query, CSS Modules + CSS variables, Radix primitives (dialog/select/dropdown), `react-hook-form` + `zod` | Web app with no SSR |
+| Admin | **Vite + React + TypeScript**, React Router (v8), TanStack Query, CSS Modules + CSS variables, Radix primitives (dialog/select/dropdown), `react-hook-form` + `zod` | Web app with no SSR |
 | Backend | Python, **FastAPI**, **SQLAlchemy 2.0 (sync, psycopg 3)**, **Alembic**, **Pydantic v2**, `pydantic-settings` | Sync SQLAlchemy is simpler and fast enough for one shop (see ARCHITECTURE §3) |
 | Database | **PostgreSQL 16+** (`pg_trgm` extension for search) | Installed locally (PostgreSQL 18 service), managed in production |
 | Auth | Google ID token → backend verifies with `google-auth` → backend issues its own JWT access token + rotating refresh token | |
@@ -131,7 +131,7 @@ Settings ─► delivery fee, free-delivery threshold, minimum order, serviceabl
 | Images | `StorageProvider` interface; **Cloudinary** first; S3-compatible option; local-disk option for dev | |
 | Push | **Firebase Cloud Messaging** (`firebase-admin` on the server, `expo-notifications` device token on the app) | |
 | Contracts | FastAPI OpenAPI → `openapi-typescript` generates TS types for both frontends | One source of truth for API shapes |
-| Tooling | `ruff`, `pytest`, `tsc`, ESLint, Jest (mobile), Vitest (admin), GitHub Actions | |
+| Tooling | `ruff`, `pytest`, `tsc`, ESLint + Prettier (mobile), oxlint + Prettier (admin), Jest (mobile), Vitest (admin), palette check, GitHub Actions | |
 | Local Python env | Conda env **`yolo_cuda`** (per the user's instruction) | Python 3.10 locally. Code stays 3.10-compatible; production image (Phase 12) pins its own Python |
 
 ## 9. Architecture
@@ -189,8 +189,8 @@ shop_app/
 │   ├── scripts/create_local_db.sql
 │   └── .env.example
 ├── mobile/
-│   ├── app/                       # Expo Router routes (see ARCHITECTURE §5)
 │   ├── src/
+│   │   ├── app/                   # Expo Router routes (see ARCHITECTURE §5)
 │   │   ├── api/                   # client.ts, schema.ts (generated), per-domain hooks
 │   │   ├── features/              # auth, catalog, search, cart, checkout, orders, account
 │   │   ├── components/ui/         # Text, Button, Skeleton, EmptyState, ErrorState, QuantityStepper, ...
@@ -200,7 +200,7 @@ shop_app/
 │   ├── app.config.ts, eas.json
 │   └── .env.example
 ├── admin/
-│   ├── src/{api,features,components,styles,routes}
+│   ├── src/{api,features,components,pages,styles,test}, navigation.ts, routes.tsx
 │   ├── index.html, vite.config.ts
 │   └── .env.example
 ├── docs/                          # this folder
@@ -359,7 +359,7 @@ Full spec: [UI_SYSTEM.md](UI_SYSTEM.md). Summary:
 | Mobile | Jest + React Native Testing Library | cart optimistic update + rollback, checkout price-change flow, auth gate routing, UX states |
 | Admin | Vitest + RTL | Quick Stock editing/conflicts, order status buttons |
 | E2E (Phase 11) | Maestro (Android) with a test-only auth bypass that is compiled out of production builds | browse → cart → COD order → admin delivers → customer sees Delivered |
-| CI | GitHub Actions | ruff, pytest (Postgres service), `tsc --noEmit`, ESLint, Jest, Vitest on every push |
+| CI | GitHub Actions | ruff, pytest (Postgres service), `tsc`, ESLint/oxlint, Prettier, Jest, Vitest, palette check on every push |
 
 SQLite is **not** used for tests, because row locking and CHECK behaviour must match production.
 

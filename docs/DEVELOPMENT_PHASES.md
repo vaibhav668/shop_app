@@ -18,7 +18,7 @@ Each phase is a vertical slice: database → API → UI → tests. Before each p
 Commits: `chore: initialize monorepo and gitignore` · `chore(backend): add local database setup script` · `feat(backend): scaffold fastapi app with config and health checks` · `chore(backend): set up alembic and pytest` · `ci: add backend workflow`
 
 ## Phase 1 — Design system & app shells
-- `mobile/`: `create-expo-app` (TypeScript, Expo Router), path aliases, ESLint/Prettier, Jest + RNTL
+- `mobile/`: `create-expo-app` (SDK 57, TypeScript, Expo Router, routes in `src/app`), path aliases, ESLint/Prettier, Jest + RNTL
 - `src/theme/tokens.ts`, `typography.ts`; Inter fonts; primitives: `Text`, `Button`, `IconButton`, `Input`, `Chip`, `Badge`, `Skeleton`, `EmptyState`, `ErrorState`, `OfflineBanner`, `QuantityStepper`, `Money`, `ProductCard` (with static props), `SectionHeader`, `Screen`
 - A `/dev/ui` screen (development builds only) listing every primitive
 - Tab shell (Home, Categories, Orders, Account) with placeholder screens that use the empty states

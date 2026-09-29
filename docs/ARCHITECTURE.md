@@ -78,8 +78,11 @@ One shop means tens of concurrent users at most. Sync SQLAlchemy with psycopg 3 
 
 ## 5. Mobile app structure (Expo Router)
 
+Routes live in `mobile/src/app/` (the SDK 57 convention); everything else lives in `mobile/src/` outside `app/`.
+Phase 1 ships `(tabs)/` directly under `app/` plus a dev-only `dev/ui.tsx` UI kit; Phase 2 moves the tabs under `(app)/` when the auth guard arrives.
+
 ```
-app/
+src/app/
   _layout.tsx                 Providers: QueryClient, Auth, Fonts, SafeArea, GestureHandler, NetInfo banner
   index.tsx                   Redirects based on auth state
   (auth)/_layout.tsx
@@ -171,6 +174,7 @@ cd mobile && npm i && npx expo start --dev-client   # needs the EAS dev build in
 ## 9. CI (GitHub Actions)
 
 - `backend`: set up Python 3.12 → install → `ruff check` → `ruff format --check` → `alembic upgrade head` on a Postgres service → `pytest`
-- `admin`: `npm ci` → `tsc --noEmit` → `eslint` → `vitest run` → `vite build`
-- `mobile`: `npm ci` → `tsc --noEmit` → `eslint` → `jest`
+- `admin`: `npm ci` → `tsc -b` → `oxlint` → `prettier --check` → `vitest run` → `vite build`
+- `mobile`: `npm ci` → `tsc --noEmit` → `expo lint` → `prettier --check` → `jest`
+- `palette`: `node scripts/check-palette.mjs`
 - `contracts`: regenerate the OpenAPI types and fail if the committed `schema.ts` files differ
