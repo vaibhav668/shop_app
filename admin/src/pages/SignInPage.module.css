@@ -93,3 +93,22 @@
     padding: var(--space-8) var(--space-5);
   }
 }
+
+/* Primary-looking link to the customer shop (for non-admins who signed in here). */
+.shopLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  margin-top: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-action);
+  color: var(--color-on-action);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.shopLink:hover {
+  background: var(--color-action-pressed);
+}

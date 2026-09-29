@@ -1,10 +1,20 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useEffect } from 'react';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { SHOP_REDIRECT_DELAY_MS } from '@/pages/SignInPage';
 
 import { authOk, mockApi, OWNER, renderApp } from './renderApp';
 import { googleMocks, TEST_GOOGLE_CREDENTIAL } from './setup';
+
+const mockGoTo = vi.fn();
+vi.mock('@/lib/navigation', () => ({ goTo: (url: string) => mockGoTo(url) }));
+
+beforeEach(() => {
+  mockGoTo.mockReset();
+  googleMocks.googleLogout.mockReset();
+});
 
 const expired = {
   status: 401,
@@ -65,17 +75,44 @@ describe('admin sign-in', () => {
     expect(sent).toEqual({ id_token: TEST_GOOGLE_CREDENTIAL, client: 'admin' });
   });
 
-  it('explains when the account is not an admin', async () => {
+  it('sends a customer who signs in here on to the shop', async () => {
     mockApi({
       '/auth/refresh': expired,
       '/auth/google': {
         status: 403,
-        body: { error: { code: 'FORBIDDEN', message: "This Google account isn't a shop admin." } },
+        body: { error: { code: 'FORBIDDEN', message: 'Admins only.' } },
       },
     });
     renderApp('/');
     await userEvent.click(await screen.findByRole('button', { name: 'Continue with Google' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent("isn't a shop admin");
+
+    expect(
+      await screen.findByRole('heading', { name: 'Taking you to the shop…' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Go to the shop now' })).toHaveAttribute(
+      'href',
+      'http://localhost:8081',
+    );
+    // Google's auto sign-in must not keep choosing this customer account here.
+    expect(googleMocks.googleLogout).toHaveBeenCalled();
+    await waitFor(() => expect(mockGoTo).toHaveBeenCalledWith('http://localhost:8081'), {
+      timeout: SHOP_REDIRECT_DELAY_MS + 1000,
+    });
+  });
+
+  it('lets the owner go back and pick their admin account instead', async () => {
+    mockApi({
+      '/auth/refresh': expired,
+      '/auth/google': {
+        status: 403,
+        body: { error: { code: 'FORBIDDEN', message: 'Admins only.' } },
+      },
+    });
+    renderApp('/');
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue with Google' }));
+    await userEvent.click(await screen.findByRole('button', { name: /use a different account/ }));
+    expect(screen.getByRole('heading', { name: 'Bada Bazar admin' })).toBeInTheDocument();
+    expect(mockGoTo).not.toHaveBeenCalled();
   });
 
   it('asks a first-time admin for name and mobile, then opens the dashboard', async () => {

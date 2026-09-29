@@ -1,24 +1,23 @@
-import { GoogleLogin, useGoogleOneTapLogin } from '@react-oauth/google';
+import { GoogleLogin, googleLogout, useGoogleOneTapLogin } from '@react-oauth/google';
 import { ShoppingBasket } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router';
 
 import { ApiError } from '@/api/client';
 import { useAuth } from '@/auth/authContext';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
-import { GOOGLE_CLIENT_ID } from '@/lib/config';
+import { GOOGLE_CLIENT_ID, SHOP_URL } from '@/lib/config';
+import { goTo } from '@/lib/navigation';
 
 import styles from './SignInPage.module.css';
 
 function messageFor(error: unknown): string {
-  if (error instanceof ApiError) {
-    if (error.code === 'FORBIDDEN') {
-      return "This Google account isn't a shop admin. Ask the owner to add you.";
-    }
-    return error.message;
-  }
+  if (error instanceof ApiError) return error.message;
   return "Sign-in didn't work. Try again?";
 }
+
+/** How long the "taking you to the shop" note stays before the page moves on. */
+export const SHOP_REDIRECT_DELAY_MS = 1500;
 
 /**
  * Google One Tap with auto-select: someone who already signed in here with Google is signed in
@@ -42,6 +41,14 @@ export function SignInPage() {
   const location = useLocation();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // A customer (not an admin) signed in here: they belong in the shop, so send them there.
+  const [toShop, setToShop] = useState(false);
+
+  useEffect(() => {
+    if (!toShop) return;
+    const t = setTimeout(() => goTo(SHOP_URL), SHOP_REDIRECT_DELAY_MS);
+    return () => clearTimeout(t);
+  }, [toShop]);
 
   const onCredential = async (credential: string) => {
     setBusy(true);
@@ -49,7 +56,13 @@ export function SignInPage() {
     try {
       await signInWithGoogle(credential);
     } catch (e) {
-      setError(messageFor(e));
+      if (e instanceof ApiError && e.code === 'FORBIDDEN') {
+        // Stop Google's auto sign-in picking this account again if they come back as an admin.
+        googleLogout();
+        setToShop(true);
+      } else {
+        setError(messageFor(e));
+      }
     } finally {
       setBusy(false);
     }
@@ -59,6 +72,28 @@ export function SignInPage() {
   if (status === 'signedIn') {
     const from = (location.state as { from?: string } | null)?.from ?? '/';
     return <Navigate to={from} replace />;
+  }
+
+  if (toShop) {
+    return (
+      <main className={styles.page}>
+        <section className={styles.card} role="status">
+          <span className={styles.mark} aria-hidden>
+            <ShoppingBasket size={24} strokeWidth={2} />
+          </span>
+          <h1 className={styles.title}>Taking you to the shop…</h1>
+          <p className={styles.subtitle}>
+            This is the shop owner&apos;s area. Your account is set up for shopping at Bada Bazar.
+          </p>
+          <a className={styles.shopLink} href={SHOP_URL}>
+            Go to the shop now
+          </a>
+          <button type="button" className={styles.secondaryAction} onClick={() => setToShop(false)}>
+            I&apos;m the shop owner, use a different account
+          </button>
+        </section>
+      </main>
+    );
   }
 
   return (
