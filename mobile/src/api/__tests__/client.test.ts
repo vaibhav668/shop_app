@@ -11,7 +11,7 @@ function json(status: number, body: unknown): Promise<Response> {
 }
 
 const fetchMock = jest.fn<typeof fetch>();
-globalThis.fetch = fetchMock;
+globalThis.fetch = fetchMock as unknown as typeof fetch;
 
 function headersOf(init: RequestInit | undefined) {
   return (init?.headers ?? {}) as Record<string, string>;
