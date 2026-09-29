@@ -1,22 +1,19 @@
 /**
- * Push notifications (Android, Firebase Cloud Messaging). Everything here is a no-op on web and
- * in Expo Go, where native FCM isn't available, so the rest of the app never has to check.
+ * Push notifications (Android, Firebase Cloud Messaging). Everything here is a no-op where the
+ * native module is missing (web, Expo Go, older dev builds), so the rest of the app never has
+ * to check.
  *
  * Permission is asked after the first order (when the value is obvious), never at launch.
  */
-import Constants, { ExecutionEnvironment } from 'expo-constants';
-import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
-
 import { notificationsApi } from '@/api/notifications';
 import { colors } from '@/theme/tokens';
+
+import { Notifications } from './native';
 
 /** Must match ANDROID_CHANNEL in the backend's FCM provider. */
 export const ORDERS_CHANNEL = 'orders';
 
-// Android only, and not inside Expo Go (StoreClient), which can't receive FCM pushes.
-export const pushSupported =
-  Platform.OS === 'android' && Constants.executionEnvironment !== ExecutionEnvironment.StoreClient;
+export const pushSupported = Notifications !== null;
 
 let registeredToken: string | null = null;
 
@@ -25,8 +22,8 @@ export function currentPushToken(): string | null {
   return registeredToken;
 }
 
-export async function setUpPushChannel(): Promise<void> {
-  if (!pushSupported) return;
+async function setUpPushChannel(): Promise<void> {
+  if (!Notifications) return;
   await Notifications.setNotificationChannelAsync(ORDERS_CHANNEL, {
     name: 'Order updates',
     description: 'When your order is confirmed, packed, on its way or delivered.',
@@ -38,7 +35,7 @@ export async function setUpPushChannel(): Promise<void> {
 
 /** Registers this phone with the server if the person has already allowed notifications. */
 export async function registerIfPermitted(): Promise<void> {
-  if (!pushSupported) return;
+  if (!Notifications) return;
   const { granted } = await Notifications.getPermissionsAsync();
   if (granted) await register();
 }
@@ -48,19 +45,24 @@ export async function registerIfPermitted(): Promise<void> {
  * default) and registers. Returns whether notifications are on.
  */
 export async function askPermissionAndRegister(): Promise<boolean> {
-  if (!pushSupported) return false;
-  const current = await Notifications.getPermissionsAsync();
-  if (current.granted) {
-    await register();
-    return true;
+  if (!Notifications) return false;
+  try {
+    const current = await Notifications.getPermissionsAsync();
+    if (current.granted) {
+      await register();
+      return true;
+    }
+    if (!current.canAskAgain) return false;
+    const asked = await Notifications.requestPermissionsAsync();
+    if (asked.granted) await register();
+    return asked.granted;
+  } catch {
+    return false;
   }
-  if (!current.canAskAgain) return false;
-  const asked = await Notifications.requestPermissionsAsync();
-  if (asked.granted) await register();
-  return asked.granted;
 }
 
 async function register(): Promise<void> {
+  if (!Notifications) return;
   try {
     await setUpPushChannel();
     const { data } = await Notifications.getDevicePushTokenAsync();
