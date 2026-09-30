@@ -140,8 +140,11 @@ export function OrdersPage() {
           message={tabKey === 'PENDING' && !q ? 'New orders appear here on their own.' : undefined}
         />
       ) : (
-        <div className={table.panel} aria-busy={orders.isFetching || undefined}>
-          <table className={table.table}>
+        <div
+          className={`${table.panel} ${styles.panel}`}
+          aria-busy={orders.isFetching || undefined}
+        >
+          <table className={`${table.table} ${styles.table}`}>
             <thead>
               <tr>
                 <th>Order</th>

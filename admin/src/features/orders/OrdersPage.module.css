@@ -12,20 +12,24 @@
   flex-wrap: wrap;
   gap: var(--space-1);
   padding: 4px;
-  border-radius: var(--radius-md);
-  background: var(--color-surface-muted);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .tab {
-  height: 32px;
-  padding: 0 var(--space-3);
+  height: 36px;
+  padding: 0 var(--space-4);
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   background: transparent;
   color: var(--color-text-secondary);
   font: inherit;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
+  transition:
+    background-color 180ms ease-out,
+    color 180ms ease-out;
 }
 
 .tab:hover {
@@ -36,10 +40,11 @@
   outline: 2px solid var(--color-brand);
 }
 
-.tabActive {
-  background: var(--color-surface);
-  color: var(--color-text);
-  box-shadow: 0 1px 2px rgb(23 23 23 / 0.08);
+.tabActive,
+.tabActive:hover {
+  background: var(--color-forest);
+  color: var(--color-on-action);
+  font-weight: 700;
 }
 
 .search {
@@ -56,7 +61,8 @@
   background: none;
   color: var(--color-text);
   font: inherit;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
 }
@@ -89,5 +95,77 @@
 
   .search {
     width: 100%;
+  }
+
+  /* Phones: each order becomes a card instead of a sideways-scrolling table row. */
+  .panel {
+    overflow: visible;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .table {
+    min-width: 0;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tbody {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'order status'
+      'customer total'
+      'area items';
+    gap: 6px var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .table tbody td {
+    display: block;
+    height: auto;
+    padding: 0 !important;
+    border: none;
+  }
+
+  .table tbody td:nth-child(1) {
+    grid-area: order;
+  }
+  .table tbody td:nth-child(2) {
+    grid-area: customer;
+  }
+  .table tbody td:nth-child(3) {
+    grid-area: area;
+  }
+  .table tbody td:nth-child(4) {
+    grid-area: items;
+    text-align: right;
+  }
+  .table tbody td:nth-child(4)::after {
+    content: ' items';
+    color: var(--color-text-secondary);
+  }
+  .table tbody td:nth-child(5) {
+    grid-area: total;
+    font-family: var(--font-display);
+    font-weight: 800;
+  }
+  .table tbody td:nth-child(6) {
+    grid-area: status;
+    justify-self: end;
+  }
+
+  .table tbody tr[class*='loadingRow'] {
+    display: block;
   }
 }

@@ -1,46 +1,212 @@
+/* The forest hero: greeting, today's takings, the two most used shortcuts. */
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'text actions'
+    'figure actions';
+  gap: var(--space-4) var(--space-6);
+  padding: var(--space-6);
+  margin-bottom: var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--pattern-jaali), var(--gradient-forest);
+  color: var(--color-on-action);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  animation: rise 420ms var(--ease-spring) both;
+}
+
+/* A warm gold glow in the corner. */
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -80px;
+  top: -80px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(251 191 36 / 0.28), transparent 65%);
+  pointer-events: none;
+}
+
+.heroText {
+  grid-area: text;
+}
+
+.heroGreeting {
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.heroDate {
+  color: var(--color-on-forest-muted);
+}
+
+.heroFigure {
+  grid-area: figure;
+  display: flex;
+  flex-direction: column;
+}
+
+.heroLabel {
+  font-size: 13px;
+  color: var(--color-on-forest-muted);
+}
+
+.heroValue {
+  font-family: var(--font-display);
+  font-size: 40px;
+  line-height: 46px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.heroSub {
+  color: var(--color-gold-bright);
+  font-weight: 700;
+}
+
+.heroActions {
+  grid-area: actions;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.goldLink,
+.glassLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  height: 42px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 160ms var(--ease-spring);
+}
+
+.goldLink:active,
+.glassLink:active {
+  transform: scale(0.97);
+}
+
+.goldLink {
+  background: var(--color-gold-bright);
+  color: var(--color-forest-deep);
+}
+
+.glassLink {
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass);
+  color: var(--color-on-action);
+}
+
 .stats {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-3);
   margin-bottom: var(--space-5);
 }
 
 .stat {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'icon value'
+    'icon label';
+  column-gap: var(--space-3);
+  align-items: center;
   padding: var(--space-4);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   color: var(--color-text);
   text-decoration: none;
+  transition:
+    transform 180ms var(--ease-spring),
+    box-shadow 180ms ease-out;
+  animation: rise 420ms var(--ease-spring) both;
 }
 
-.statLink:hover {
-  border-color: var(--color-border-strong);
+.stat:nth-child(2) {
+  animation-delay: 40ms;
+}
+.stat:nth-child(3) {
+  animation-delay: 80ms;
+}
+.stat:nth-child(4) {
+  animation-delay: 120ms;
 }
 
-.statLink:focus-visible {
-  outline: 2px solid var(--color-brand);
+.stat:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
-/* New orders waiting: the one number that asks for action. */
+.stat:focus-visible {
+  outline: 2px solid var(--color-forest);
+}
+
+/* New orders waiting: the one tile that asks for action. It breathes gold. */
 .attention {
-  background: var(--color-offer-tint);
-  border-color: var(--color-offer);
+  background: linear-gradient(140deg, var(--color-gold-soft), var(--tint-peach));
+  box-shadow:
+    0 0 0 1.5px var(--color-gold),
+    0 10px 20px rgb(245 158 11 / 0.25);
+  animation:
+    rise 420ms var(--ease-spring) both,
+    breathe 2.4s ease-in-out 500ms infinite;
 }
 
-.statLabel {
-  font-size: 13px;
-  color: var(--color-text-secondary);
+.statIcon {
+  grid-area: icon;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  color: var(--color-forest);
+}
+
+.tintGold {
+  background: var(--color-gold-bright);
+  color: var(--color-forest-deep);
+}
+.tintMint {
+  background: var(--tint-mint);
+}
+.tintSage {
+  background: var(--tint-sage);
+}
+.tintPeach {
+  background: var(--tint-peach);
 }
 
 .statValue {
-  font-size: 28px;
-  line-height: 34px;
-  font-weight: 600;
+  grid-area: value;
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 30px;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  grid-area: label;
+  font-size: 13px;
+  color: var(--color-text-secondary);
 }
 
 .columns {
@@ -62,17 +228,17 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 800;
 }
 
 .warnIcon {
-  color: var(--color-offer);
+  color: var(--color-gold);
 }
 
 .more {
   color: var(--color-action);
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
 }
 
@@ -86,10 +252,63 @@
   text-align: center;
 }
 
+.orderList,
 .stockList {
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+.orderList li + li,
+.stockList li + li {
+  border-top: 1px solid var(--color-border);
+}
+
+.orderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 60px;
+  padding: var(--space-2) var(--space-4);
+  color: var(--color-text);
+  text-decoration: none;
+  transition: background-color 120ms ease-out;
+}
+
+.orderRow:hover {
+  background: var(--tint-mint);
+}
+
+.orderMain {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.orderMain .secondary,
+.orderMain > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orderNo {
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.orderEnd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.orderTotal {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
 .stockList li {
@@ -97,13 +316,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  min-height: 48px;
+  min-height: 52px;
   padding: var(--space-2) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.stockList li:last-child {
-  border-bottom: none;
 }
 
 .stockName {
@@ -117,19 +331,32 @@
 }
 
 .stockCount {
-  color: var(--color-offer-text);
-  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-gold-soft);
+  color: var(--color-gold-deep);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
 .zero {
+  background: var(--color-danger-tint);
   color: var(--color-danger);
 }
 
-@media (max-width: 1299px) {
-  .stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes breathe {
+  50% {
+    box-shadow:
+      0 0 0 1.5px var(--color-gold),
+      0 12px 28px rgb(245 158 11 / 0.45);
   }
 }
 
@@ -140,6 +367,30 @@
 }
 
 @media (max-width: 767px) {
+  .hero {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'text'
+      'figure'
+      'actions';
+    padding: var(--space-5);
+    margin-bottom: var(--space-4);
+  }
+
+  .heroValue {
+    font-size: 34px;
+    line-height: 40px;
+  }
+
+  .heroActions {
+    flex-direction: row;
+  }
+
+  .goldLink,
+  .glassLink {
+    flex: 1;
+  }
+
   .stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-2);
@@ -148,14 +399,26 @@
 
   .stat {
     padding: var(--space-3);
+    column-gap: var(--space-2);
+  }
+
+  .statIcon {
+    width: 36px;
+    height: 36px;
   }
 
   .statValue {
     font-size: 22px;
-    line-height: 28px;
+    line-height: 26px;
   }
 
   .columns {
     gap: var(--space-4);
+  }
+
+  .orderEnd {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
   }
 }

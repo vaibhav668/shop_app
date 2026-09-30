@@ -7,10 +7,18 @@
   padding: 0 var(--space-4);
   border-radius: var(--radius-md);
   border: 1px solid transparent;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 14px;
   cursor: pointer;
-  transition: background-color 120ms ease-out;
+  transition:
+    background-color 120ms ease-out,
+    transform 160ms var(--ease-spring),
+    box-shadow 160ms ease-out;
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .button:disabled {
@@ -21,8 +29,13 @@
 }
 
 .primary {
-  background: var(--color-action);
+  background: var(--color-forest);
   color: var(--color-on-action);
+  box-shadow: 0 6px 16px rgb(5 46 22 / 0.22);
+}
+
+.primary svg {
+  color: var(--color-gold-bright);
 }
 
 .primary:hover:not(:disabled) {

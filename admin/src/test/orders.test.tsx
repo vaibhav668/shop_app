@@ -210,11 +210,11 @@ describe('dashboard', () => {
     renderApp('/');
 
     expect(await screen.findByText('₹1,840')).toBeInTheDocument();
-    expect(screen.getByText('7')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /New\s*2/ })).toHaveAttribute('href', '/orders');
+    expect(screen.getByText('7 orders today')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /2\s*New/ })).toHaveAttribute('href', '/orders');
     expect(screen.getByText('Out')).toBeInTheDocument();
     expect(screen.getByText('3 left')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '#10042' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /#10042/ })).toHaveAttribute(
       'href',
       '/orders?status=all&order=o1',
     );

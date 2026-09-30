@@ -123,7 +123,10 @@ Signature moves: press scale · ADD → stepper with a rolling digit · fly-to-c
 
 ## 9. Admin specifics
 
-- Same tokens as CSS variables in `admin/src/styles/tokens.css`.
+- Same tokens as CSS variables in `admin/src/styles/tokens.css`, including `--gradient-forest`, `--gradient-foil` and `--pattern-jaali`. Headings and figures use Plus Jakarta Sans.
+- The sidebar and the phone top bar are forest with the gold jaali; the active link is white with a gold icon and a gold edge.
+- The dashboard opens with a forest hero (greeting, money collected today, Open orders / Quick stock) and status tiles; "New" breathes gold while orders wait.
+- On phones the orders list is a stack of cards (number, status, customer, total, area, items), not a sideways-scrolling table.
 - Dense but calm: table rows 44 px tall, 14 px text, sticky table header on `surface-muted`, zebra striping off, row hover `#FAFAF7`.
 - Numbers are right-aligned with tabular figures. Low stock shows an amber dot + number; zero stock shows a red "0" in bold.
 - The one primary action per page sits top-right. Destructive actions always ask for confirmation.

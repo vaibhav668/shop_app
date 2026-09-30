@@ -38,10 +38,11 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    height: 56px;
+    height: 60px;
     padding: 0 var(--space-2);
-    background: var(--color-surface);
-    border-bottom: 1px solid var(--color-border);
+    background: var(--pattern-jaali), var(--gradient-forest);
+    color: var(--color-on-action);
+    box-shadow: var(--shadow-md);
   }
 
   .menuButton {
@@ -52,20 +53,22 @@
     border: none;
     border-radius: var(--radius-md);
     background: transparent;
-    color: var(--color-text);
+    color: var(--color-on-action);
     cursor: pointer;
   }
 
   .menuButton:hover {
-    background: var(--color-surface-muted);
+    background: var(--color-glass);
   }
 
   .brand {
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    font-weight: 700;
-    font-size: 16px;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 17px;
+    letter-spacing: -0.02em;
   }
 
   .mark {
@@ -73,9 +76,9 @@
     place-items: center;
     width: 28px;
     height: 28px;
-    border-radius: var(--radius-sm);
-    background: var(--color-brand);
-    color: var(--color-on-action);
+    border-radius: 10px;
+    background: var(--gradient-foil);
+    color: var(--color-forest-deep);
   }
 
   /* Amber fill, dark text: the same "waiting orders" look as the sidebar count. */
@@ -84,10 +87,10 @@
     margin-right: var(--space-2);
     padding: 4px 10px;
     border-radius: var(--radius-full);
-    background: var(--color-offer);
-    color: var(--color-text);
+    background: var(--color-gold-bright);
+    color: var(--color-forest-deep);
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 800;
     text-decoration: none;
   }
 

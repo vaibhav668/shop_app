@@ -1,25 +1,48 @@
 /*
- * "Fresh Market" tokens. The ONLY file in admin/src allowed to contain hex colours
- * (enforced by scripts/check-palette.mjs). Spec: docs/UI_SYSTEM.md.
+ * "Emerald Royal" tokens: forest emerald and gold on warm cream. The ONLY file in admin/src
+ * allowed to contain hex colours (enforced by scripts/check-palette.mjs). Spec: docs/UI_SYSTEM.md.
  */
 :root {
+  /* Greens */
   --color-brand: #16a34a;
-  --color-action: #15803d;
-  --color-action-pressed: #166534;
+  --color-action: #14532d; /* forest: buttons, links, active states */
+  --color-action-pressed: #052e16;
+  --color-forest: #14532d;
+  --color-forest-deep: #052e16;
+  --color-forest-mid: #166534;
+  --color-leaf: #86efac;
   --color-brand-tint: #dcfce7;
 
+  /* Gold */
+  --color-gold: #f59e0b;
+  --color-gold-bright: #fbbf24;
+  --color-gold-pale: #fde68a;
+  --color-gold-soft: #fef3c7;
+  --color-gold-deep: #92400e;
+  --color-crust: #b45309;
+
+  /* Neutrals */
   --color-bg: #fafaf7;
   --color-surface: #ffffff;
   --color-surface-muted: #f5f5f4;
-
   --color-text: #171717;
   --color-text-secondary: #737373;
   --color-text-tertiary: #a3a3a3;
   --color-on-action: #ffffff;
-
+  --color-on-forest-muted: rgb(255 255 255 / 0.72);
+  --color-glass: rgb(255 255 255 / 0.1);
   --color-border: #e7e5e4;
   --color-border-strong: #d6d3d1;
 
+  /* Soft tints */
+  --tint-mint: #e3f7e8;
+  --tint-sage: #e8efe2;
+  --tint-butter: #fef6d8;
+  --tint-peach: #ffeedc;
+  --tint-sand: #f3ede2;
+  --tint-lime: #eef7d6;
+
+  /* Legacy names */
   --color-offer: #f59e0b;
   --color-offer-tint: #fef3c7;
   --color-offer-text: #92400e;
@@ -27,7 +50,21 @@
   --color-danger: #dc2626;
   --color-danger-tint: #fee2e2;
 
+  --gradient-forest: linear-gradient(150deg, #14532d 0%, #052e16 100%);
+  --gradient-foil: linear-gradient(
+    115deg,
+    #fde68a 0%,
+    #f59e0b 38%,
+    #b45309 55%,
+    #fbbf24 72%,
+    #fef3c7 100%
+  );
+  /* The gold jaali lattice, for forest surfaces. */
+  --pattern-jaali: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cg fill='none' stroke='rgb(251,191,36)' stroke-width='0.9' opacity='0.2'%3E%3Ccircle r='18'/%3E%3Ccircle cx='36' r='18'/%3E%3Ccircle cy='36' r='18'/%3E%3Ccircle cx='36' cy='36' r='18'/%3E%3Ccircle cx='18' cy='18' r='18'/%3E%3Ccircle cx='18' cy='18' r='4'/%3E%3C/g%3E%3C/svg%3E");
+
   --font-sans: 'Inter Variable', system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans Variable', 'Inter Variable', system-ui, sans-serif;
+  --font-devanagari: 'Tiro Devanagari Hindi', serif;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -39,13 +76,18 @@
   --space-10: 40px;
 
   --radius-sm: 8px;
-  --radius-md: 10px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
   --radius-full: 999px;
 
-  --shadow-float: 0 4px 12px rgb(23 23 23 / 0.08);
+  /* Forest-tinted shadows, never grey-black. */
+  --shadow-sm: 0 1px 2px rgb(5 46 22 / 0.06), 0 2px 8px rgb(5 46 22 / 0.05);
+  --shadow-md: 0 8px 22px rgb(5 46 22 / 0.1), 0 2px 4px rgb(5 46 22 / 0.05);
+  --shadow-float: 0 18px 40px rgb(5 46 22 / 0.22);
 
-  --sidebar-width: 232px;
-  --sidebar-width-collapsed: 68px;
+  --ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --sidebar-width: 240px;
+  --sidebar-width-collapsed: 72px;
 }

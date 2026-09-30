@@ -1,11 +1,11 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  height: 22px;
-  padding: 0 var(--space-2);
-  border-radius: 6px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: var(--radius-full);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -20,8 +20,8 @@
 }
 
 .warning {
-  background: var(--color-offer-tint);
-  color: var(--color-offer-text);
+  background: var(--color-gold-soft);
+  color: var(--color-gold-deep);
 }
 
 .danger {

@@ -28,6 +28,13 @@ p {
   margin: 0;
 }
 
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
 a {
   color: var(--color-action);
 }
@@ -43,7 +50,7 @@ button {
 }
 
 ::selection {
-  background: var(--color-brand-tint);
+  background: var(--color-gold-pale);
   color: var(--color-text);
 }
 

@@ -1,8 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
-import { AlertTriangle, LayoutDashboard } from 'lucide-react';
+import {
+  AlertTriangle,
+  Bell,
+  Boxes,
+  ChevronRight,
+  CircleCheck,
+  LayoutDashboard,
+  PackageOpen,
+  Truck,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 
 import { type OrderStatus, ordersApi, ordersKeys } from '@/api/orders';
+import { useAuth } from '@/auth/authContext';
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
@@ -14,14 +26,27 @@ import { formatPaise } from '@/lib/money';
 
 import styles from './DashboardPage.module.css';
 
-const PIPELINE: OrderStatus[] = ['PENDING', 'CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY'];
+const PIPELINE: { status: OrderStatus; icon: LucideIcon; tint: string }[] = [
+  { status: 'PENDING', icon: Bell, tint: styles.tintGold },
+  { status: 'CONFIRMED', icon: CircleCheck, tint: styles.tintMint },
+  { status: 'PREPARING', icon: PackageOpen, tint: styles.tintSage },
+  { status: 'OUT_FOR_DELIVERY', icon: Truck, tint: styles.tintPeach },
+];
+
+function greeting(date: Date): string {
+  const h = date.getHours();
+  return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+}
 
 export function DashboardPage() {
+  const { user } = useAuth();
   const board = useQuery({
     queryKey: ordersKeys.dashboard,
     queryFn: ordersApi.dashboard,
     refetchInterval: POLL_MS,
   });
+  const [today] = useState(() => new Date());
+  const firstName = user?.name.trim().split(' ')[0];
 
   return (
     <>
@@ -39,29 +64,60 @@ export function DashboardPage() {
         />
       ) : (
         <>
-          <section className={styles.stats} aria-busy={board.isPending || undefined}>
-            <Stat label="Orders today" value={board.data ? String(board.data.today_orders) : '–'} />
-            <Stat
-              label="Collected today"
-              value={board.data ? formatPaise(board.data.today_revenue_paise) : '–'}
-              hint="Paid online, or cash from delivered orders"
-            />
-            {PIPELINE.map((status) => (
-              <Link
-                key={status}
-                to={status === 'PENDING' ? '/orders' : `/orders?status=${status}`}
-                className={`${styles.stat} ${styles.statLink} ${
-                  status === 'PENDING' && (board.data?.status_counts.PENDING ?? 0) > 0
-                    ? styles.attention
-                    : ''
-                }`}
-              >
-                <span className={styles.statLabel}>{STATUS_LABEL[status]}</span>
-                <span className={styles.statValue}>
-                  {board.data ? (board.data.status_counts[status] ?? 0) : '–'}
-                </span>
+          <section className={styles.hero} aria-busy={board.isPending || undefined}>
+            <div className={styles.heroText}>
+              <p className={styles.heroGreeting}>
+                {greeting(today)}
+                {firstName ? `, ${firstName}` : ''}
+              </p>
+              <p className={styles.heroDate}>
+                {today.toLocaleDateString('en-IN', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                })}
+              </p>
+            </div>
+            <div className={styles.heroFigure} title="Paid online, or cash from delivered orders">
+              <span className={styles.heroLabel}>Collected today</span>
+              <span className={styles.heroValue}>
+                {board.data ? formatPaise(board.data.today_revenue_paise) : '–'}
+              </span>
+              <span className={styles.heroSub}>
+                {board.data
+                  ? `${board.data.today_orders} ${board.data.today_orders === 1 ? 'order' : 'orders'} today`
+                  : ' '}
+              </span>
+            </div>
+            <div className={styles.heroActions}>
+              <Link to="/orders" className={styles.goldLink}>
+                Open orders <ChevronRight size={16} aria-hidden />
               </Link>
-            ))}
+              <Link to="/inventory/quick" className={styles.glassLink}>
+                <Boxes size={16} aria-hidden /> Quick stock
+              </Link>
+            </div>
+          </section>
+
+          <section className={styles.stats} aria-label="Orders by status">
+            {PIPELINE.map(({ status, icon: Icon, tint }) => {
+              const count = board.data?.status_counts[status] ?? 0;
+              return (
+                <Link
+                  key={status}
+                  to={status === 'PENDING' ? '/orders' : `/orders?status=${status}`}
+                  className={`${styles.stat} ${
+                    status === 'PENDING' && count > 0 ? styles.attention : ''
+                  }`}
+                >
+                  <span className={`${styles.statIcon} ${tint}`} aria-hidden>
+                    <Icon size={18} strokeWidth={2} />
+                  </span>
+                  <span className={styles.statValue}>{board.data ? count : '–'}</span>
+                  <span className={styles.statLabel}>{STATUS_LABEL[status]}</span>
+                </Link>
+              );
+            })}
           </section>
 
           <div className={styles.columns}>
@@ -73,28 +129,26 @@ export function DashboardPage() {
                 </Link>
               </header>
               {board.data && board.data.recent_orders.length === 0 ? (
-                <p className={styles.empty}>No orders yet. They'll show up here.</p>
+                <p className={styles.empty}>No orders yet. They&apos;ll show up here.</p>
               ) : (
-                <table className={table.table}>
-                  <tbody>
-                    {board.data?.recent_orders.map((o) => (
-                      <tr key={o.id}>
-                        <td>
-                          <Link to={`/orders?status=all&order=${o.id}`} className={table.primary}>
-                            #{o.order_number}
-                          </Link>
-                          <br />
-                          <span className={table.secondary}>{formatDateTime(o.placed_at)}</span>
-                        </td>
-                        <td>{o.customer_name}</td>
-                        <td className={table.num}>{formatPaise(o.total_paise)}</td>
-                        <td>
+                <ul className={styles.orderList}>
+                  {board.data?.recent_orders.map((o) => (
+                    <li key={o.id}>
+                      <Link to={`/orders?status=all&order=${o.id}`} className={styles.orderRow}>
+                        <span className={styles.orderMain}>
+                          <span className={styles.orderNo}>#{o.order_number}</span>
+                          <span className={table.secondary}>
+                            {o.customer_name} · {formatDateTime(o.placed_at)}
+                          </span>
+                        </span>
+                        <span className={styles.orderEnd}>
+                          <span className={styles.orderTotal}>{formatPaise(o.total_paise)}</span>
                           <Badge tone={STATUS_TONE[o.status]}>{STATUS_LABEL[o.status]}</Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               )}
             </section>
 
@@ -131,14 +185,5 @@ export function DashboardPage() {
         </>
       )}
     </>
-  );
-}
-
-function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className={styles.stat} title={hint}>
-      <span className={styles.statLabel}>{label}</span>
-      <span className={styles.statValue}>{value}</span>
-    </div>
   );
 }

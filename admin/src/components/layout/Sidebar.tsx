@@ -28,7 +28,9 @@ export function Sidebar({
         </span>
         <span className={styles.brandText}>
           <span className={styles.shopName}>Bada Bazar</span>
-          <span className={styles.caption}>Shop admin</span>
+          <span className={styles.deva} aria-hidden>
+            बड़ा बाज़ार
+          </span>
         </span>
       </div>
 

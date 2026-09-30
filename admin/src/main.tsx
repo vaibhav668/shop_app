@@ -1,4 +1,6 @@
 import '@fontsource-variable/inter';
+import '@fontsource-variable/plus-jakarta-sans';
+import '@fontsource/tiro-devanagari-hindi';
 import '@/styles/tokens.css';
 import '@/styles/globals.css';
 
