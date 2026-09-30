@@ -1,5 +1,6 @@
 export { Badge, type BadgeTone } from './Badge';
 export { Button } from './Button';
+export { Card } from './Card';
 export { Chip } from './Chip';
 export { EmptyState } from './EmptyState';
 export { ErrorState } from './ErrorState';
@@ -7,6 +8,7 @@ export { IconButton } from './IconButton';
 export { Input } from './Input';
 export { Money } from './Money';
 export { OfflineBanner } from './OfflineBanner';
+export { PressableScale } from './PressableScale';
 export { QuantityStepper } from './QuantityStepper';
 export { Screen } from './Screen';
 export { ScreenTitle } from './ScreenTitle';

@@ -1,9 +1,9 @@
 import { Minus, Plus } from 'lucide-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 
 import { Text } from '@/components/ui/Text';
-import { colors, motion, radius } from '@/theme/tokens';
+import { colors, motion, radius, shadow } from '@/theme/tokens';
 
 export type QuantityStepperProps = {
   value: number;
@@ -15,6 +15,7 @@ export type QuantityStepperProps = {
   itemName?: string;
 };
 
+/** Forest squircle with gold − and +; the digit rolls in from above on every change. */
 export function QuantityStepper({
   value,
   onIncrement,
@@ -24,22 +25,23 @@ export function QuantityStepper({
   itemName,
 }: QuantityStepperProps) {
   const atMax = max !== undefined && value >= max;
-  const height = size === 'sm' ? 32 : 40;
+  const height = size === 'sm' ? 34 : 44;
+  const side = size === 'sm' ? 30 : 40;
   const suffix = itemName ? ` ${itemName}` : ' quantity';
 
   return (
-    <View style={[styles.container, { height }]}>
+    <Animated.View entering={ZoomIn.duration(motion.base)} style={[styles.container, { height }]}>
       <Pressable
         onPress={onDecrement}
         accessibilityRole="button"
         accessibilityLabel={`Decrease${suffix}`}
-        style={({ pressed }) => [styles.side, pressed && styles.pressed]}
+        style={({ pressed }) => [styles.side, { width: side }, pressed && styles.pressed]}
       >
-        <Minus size={16} strokeWidth={2.5} color={colors.onAction} />
+        <Minus size={16} strokeWidth={2.6} color={colors.goldBright} />
       </Pressable>
       <View style={styles.valueBox}>
-        <Animated.View key={value} entering={FadeInDown.duration(motion.fast)}>
-          <Text variant="bodyStrong" color="onAction" tabular accessibilityLabel={`${value}`}>
+        <Animated.View key={value} entering={FadeInDown.duration(motion.base)}>
+          <Text variant="price" color="onAction" tabular accessibilityLabel={`${value}`}>
             {value}
           </Text>
         </Animated.View>
@@ -50,24 +52,30 @@ export function QuantityStepper({
         accessibilityRole="button"
         accessibilityLabel={`Increase${suffix}`}
         accessibilityState={{ disabled: atMax }}
-        style={({ pressed }) => [styles.side, pressed && styles.pressed, atMax && styles.atMax]}
+        style={({ pressed }) => [
+          styles.side,
+          { width: side },
+          pressed && styles.pressed,
+          atMax && styles.atMax,
+        ]}
       >
-        <Plus size={16} strokeWidth={2.5} color={colors.onAction} />
+        <Plus size={16} strokeWidth={2.6} color={colors.goldBright} />
       </Pressable>
-    </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    ...shadow.md,
+    shadowOpacity: 0.25,
     flexDirection: 'row',
     alignItems: 'stretch',
-    borderRadius: radius.full,
-    backgroundColor: colors.action,
-    overflow: 'hidden',
+    borderRadius: radius.md - 2,
+    backgroundColor: colors.forest,
   },
-  side: { width: 32, alignItems: 'center', justifyContent: 'center' },
-  pressed: { backgroundColor: colors.actionPressed },
-  atMax: { opacity: 0.45 },
-  valueBox: { minWidth: 24, alignItems: 'center', justifyContent: 'center' },
+  side: { alignItems: 'center', justifyContent: 'center', borderRadius: radius.md - 2 },
+  pressed: { backgroundColor: colors.forestDeep },
+  atMax: { opacity: 0.4 },
+  valueBox: { minWidth: 20, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
 });

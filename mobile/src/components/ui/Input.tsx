@@ -13,7 +13,7 @@ export type InputProps = TextInputProps & {
 
 export function Input({ label, error, hint, style, onFocus, onBlur, ...rest }: InputProps) {
   const [focused, setFocused] = useState(false);
-  const borderColor = error ? colors.danger : focused ? colors.brand : colors.border;
+  const borderColor = error ? colors.danger : focused ? colors.forest : colors.border;
 
   return (
     <View style={styles.wrapper}>

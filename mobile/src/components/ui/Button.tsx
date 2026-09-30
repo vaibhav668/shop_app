@@ -1,11 +1,11 @@
 import type { LucideIcon } from 'lucide-react-native';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
+import { PressableScale } from '@/components/ui/PressableScale';
 import { Text } from '@/components/ui/Text';
-import { type ColorName, colors, radius, spacing } from '@/theme/tokens';
-import { fonts } from '@/theme/typography';
+import { type ColorName, colors, radius, shadow, spacing } from '@/theme/tokens';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type Variant = 'primary' | 'gold' | 'secondary' | 'ghost' | 'danger';
 type Size = 'md' | 'sm';
 
 export type ButtonProps = {
@@ -21,11 +21,27 @@ export type ButtonProps = {
   testID?: string;
 };
 
-const palette: Record<
-  Variant,
-  { bg: ColorName | null; pressedBg: ColorName; fg: ColorName; border: ColorName | null }
-> = {
-  primary: { bg: 'action', pressedBg: 'actionPressed', fg: 'onAction', border: null },
+type Look = {
+  bg: ColorName | null;
+  pressedBg: ColorName;
+  fg: ColorName;
+  iconColor?: ColorName;
+  border: ColorName | null;
+  raised?: boolean;
+};
+
+const palette: Record<Variant, Look> = {
+  // Forest with a gold icon: the one "do it" button on a screen.
+  primary: {
+    bg: 'forest',
+    pressedBg: 'forestDeep',
+    fg: 'onAction',
+    iconColor: 'goldBright',
+    border: null,
+    raised: true,
+  },
+  // Gold, for buttons on forest surfaces (headers, hero cards).
+  gold: { bg: 'goldBright', pressedBg: 'gold', fg: 'forestDeep', border: null, raised: true },
   secondary: { bg: 'surface', pressedBg: 'surfaceMuted', fg: 'text', border: 'border' },
   ghost: { bg: null, pressedBg: 'brandTint', fg: 'action', border: null },
   danger: { bg: 'surface', pressedBg: 'dangerTint', fg: 'danger', border: 'border' },
@@ -46,9 +62,10 @@ export function Button({
   const p = palette[variant];
   const inactive = disabled || loading;
   const fg: ColorName = disabled ? 'textTertiary' : p.fg;
+  const iconColor: ColorName = disabled ? 'textTertiary' : (p.iconColor ?? p.fg);
 
   return (
-    <Pressable
+    <PressableScale
       testID={testID}
       onPress={onPress}
       disabled={inactive}
@@ -61,6 +78,7 @@ export function Button({
         fullWidth && styles.fullWidth,
         p.border && { borderWidth: 1, borderColor: colors[p.border] },
         { backgroundColor: p.bg ? colors[p.bg] : 'transparent' },
+        p.raised && !disabled && styles.raised,
         pressed && { backgroundColor: colors[p.pressedBg] },
         disabled && styles.disabled,
       ]}
@@ -69,13 +87,15 @@ export function Button({
         <ActivityIndicator color={colors[fg]} />
       ) : (
         <View style={styles.content}>
-          {Icon ? <Icon size={size === 'sm' ? 16 : 18} color={colors[fg]} strokeWidth={2} /> : null}
-          <Text variant="bodyStrong" color={fg} style={size === 'sm' && styles.smLabel}>
+          {Icon ? (
+            <Icon size={size === 'sm' ? 16 : 18} color={colors[iconColor]} strokeWidth={2.2} />
+          ) : null}
+          <Text variant="button" color={fg} style={size === 'sm' && styles.smLabel}>
             {title}
           </Text>
         </View>
       )}
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -83,13 +103,14 @@ const styles = StyleSheet.create({
   base: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: radius.md,
+    borderRadius: radius.md + 2,
     alignSelf: 'flex-start',
   },
-  md: { minHeight: 48, paddingHorizontal: spacing.lg },
-  sm: { minHeight: 36, paddingHorizontal: 14 },
+  md: { minHeight: 52, paddingHorizontal: spacing.xl },
+  sm: { minHeight: 38, paddingHorizontal: 14, borderRadius: radius.md - 2 },
   fullWidth: { alignSelf: 'stretch' },
+  raised: { ...shadow.md, shadowOpacity: 0.22 },
   disabled: { backgroundColor: colors.surfaceMuted, borderColor: colors.surfaceMuted },
   content: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  smLabel: { fontFamily: fonts.semibold, fontSize: 14, lineHeight: 20 },
+  smLabel: { fontSize: 13, lineHeight: 18 },
 });

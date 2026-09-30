@@ -20,7 +20,7 @@ function AppStack() {
         headerStyle: { backgroundColor: colors.bg },
         headerShadowVisible: false,
         headerTintColor: colors.text,
-        headerTitleStyle: { fontFamily: fonts.semibold, fontSize: 18 },
+        headerTitleStyle: { fontFamily: fonts.displayHeavy, fontSize: 18 },
         contentStyle: { backgroundColor: colors.bg },
       }}
     >
@@ -43,7 +43,7 @@ function AppStack() {
           headerShown: false,
           sheetAllowedDetents: [0.6, 0.95],
           sheetGrabberVisible: true,
-          sheetCornerRadius: 16,
+          sheetCornerRadius: 28,
           contentStyle: { backgroundColor: colors.surface },
         }}
       />

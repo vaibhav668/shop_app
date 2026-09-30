@@ -1,14 +1,18 @@
 import { StyleSheet, View } from 'react-native';
 
+import { Foil } from '@/components/decor';
 import { Text } from '@/components/ui/Text';
 import { type ColorName, colors, radius } from '@/theme/tokens';
 
-export type BadgeTone = 'offer' | 'warning' | 'success' | 'successSolid' | 'danger' | 'neutral';
+export type BadgeTone =
+  'foil' | 'offer' | 'warning' | 'success' | 'successSolid' | 'danger' | 'neutral';
 
-const tones: Record<BadgeTone, { bg: ColorName; fg: ColorName }> = {
-  offer: { bg: 'offer', fg: 'text' },
-  warning: { bg: 'offerTint', fg: 'offerText' },
-  success: { bg: 'brandTint', fg: 'action' },
+/** A null background means gold foil. */
+const tones: Record<BadgeTone, { bg: ColorName | null; fg: ColorName }> = {
+  foil: { bg: null, fg: 'forestDeep' },
+  offer: { bg: null, fg: 'forestDeep' },
+  warning: { bg: 'goldSoft', fg: 'goldDeep' },
+  success: { bg: 'brandTint', fg: 'forest' },
   successSolid: { bg: 'brand', fg: 'onAction' },
   danger: { bg: 'dangerTint', fg: 'danger' },
   neutral: { bg: 'surfaceMuted', fg: 'textSecondary' },
@@ -17,8 +21,9 @@ const tones: Record<BadgeTone, { bg: ColorName; fg: ColorName }> = {
 export function Badge({ label, tone = 'neutral' }: { label: string; tone?: BadgeTone }) {
   const t = tones[tone];
   return (
-    <View style={[styles.base, { backgroundColor: colors[t.bg] }]}>
-      <Text variant="micro" color={t.fg}>
+    <View style={[styles.base, t.bg ? { backgroundColor: colors[t.bg] } : styles.clip]}>
+      {t.bg ? null : <Foil borderRadius={radius.sm - 1} />}
+      <Text variant="tag" color={t.fg}>
         {label}
       </Text>
     </View>
@@ -28,8 +33,9 @@ export function Badge({ label, tone = 'neutral' }: { label: string; tone?: Badge
 const styles = StyleSheet.create({
   base: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: radius.sm - 2,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: radius.sm - 1,
   },
+  clip: { overflow: 'hidden' },
 });

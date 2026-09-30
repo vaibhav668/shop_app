@@ -1,87 +1,97 @@
-# UI System — "Fresh Market"
+# UI System — "Emerald Royal"
 
-The goal is for the product to look like it was designed by a person for a neighbourhood shop: warm, clear, fast. It should never look like a generic AI-generated SaaS template.
+Bada Bazar should feel like a neighbourhood bazaar dressed like royalty: deep forest emerald, real gold, warm cream, and produce you could almost pick up. It must never look like a generic template.
+
+The approved design board (live mockups of every screen and the motion system): https://claude.ai/artifact/HfHMC5GnY55aishijRnn54
 
 ## 1. Hard rules
 
-- **No purple, violet, indigo, navy, dark blue or blue gradients.** This includes links, focus rings, charts, placeholder art and default library styles. Always override library defaults (e.g. the browser's blue focus outline, Android's ripple colour).
-- No glassmorphism, blur backdrops, neon, 3D blobs, AI illustrations, or decorative gradients.
-- No emoji in the UI chrome. Real product photos do the visual work.
-- Only chips, badges and the quantity stepper use pill shapes. Cards are not pills.
-- Borders come before shadows. A shadow is used only for elements that float over content (the bottom cart bar, bottom sheets, toasts).
-- CI runs a grep check that fails the build if any hex colour outside the token file appears in `mobile/src` or `admin/src`.
+- **No purple, violet, indigo, navy, dark blue or blue gradients**, anywhere, including library defaults (focus rings, Android ripples, chart colours).
+- Colours come only from `mobile/src/theme/tokens.ts` (and `admin/src/styles/tokens.css`). CI (`scripts/check-palette.mjs`) fails on any other hex, or on a hex outside the token files.
+- Gradients are allowed only for: the **forest** header/hero fill, the **gold foil**, and the skeleton/cart sheen. No rainbow or decorative blobs.
+- Shadows are soft and tinted with deep forest (`shadow.sm/md/float`), never grey-black.
+- No emoji in UI chrome. Products are shown by photos (or shaded art) on soft tints.
+- Every animation has a reduce-motion fallback (instant or static).
 
 ## 2. Colour tokens
 
 | Token | Hex | Use |
 |---|---|---|
-| `green-600` brand | `#16A34A` | Brand mark, active tab icon, completed timeline steps, selected chips, checkboxes, large surfaces |
-| `green-700` action | `#15803D` | **Filled primary buttons, green text, links** (white-on-colour contrast 5.1:1, passes AA) |
-| `green-800` pressed | `#166534` | Pressed state of primary buttons |
-| `green-100` tint | `#DCFCE7` | Selected backgrounds, "Delivered" badge background, success banners |
-| `bg` | `#FAFAF7` | App and page background (warm off-white) |
-| `surface` | `#FFFFFF` | Cards, sheets, inputs |
-| `surface-muted` | `#F5F5F4` | Product image wells, skeletons, table header |
-| `text` | `#171717` | Primary text |
-| `text-secondary` | `#737373` | Secondary text, units, captions (4.5:1 on `bg`; never used below 13 px) |
-| `text-tertiary` | `#A3A3A3` | Disabled text and placeholders only |
-| `border` | `#E7E5E4` | Card, input and divider borders |
-| `border-strong` | `#D6D3D1` | Input hover, table grid |
-| `amber-500` offer | `#F59E0B` | Offer badges and discount tags **as a fill with `#171717` text**, promo accents |
-| `amber-100` | `#FEF3C7` | Promo banner background |
-| `amber-800` | `#92400E` | Text on the amber tint |
-| `red-600` danger | `#DC2626` | Errors, "Out of stock", cancel actions |
-| `red-100` | `#FEE2E2` | Error banner background, "Cancelled" badge background |
+| `forest` (`action`) | `#14532D` | Primary buttons, ADD, stepper, cart pill, active tab, headers. White text on it is 10:1. |
+| `forestDeep` | `#052E16` | Pressed states, gradient end, text on gold |
+| `forestMid` | `#166534` | Secondary forest surfaces |
+| `brand` | `#16A34A` | Icons, completed timeline, success accents |
+| `leaf` / `brandTint` | `#86EFAC` / `#DCFCE7` | Highlights on forest / success backgrounds |
+| `gold` | `#F59E0B` | Accents, the notification dot, foil mid-tone |
+| `goldBright` | `#FBBF24` | **Text and icons on forest** (stepper, "View cart", active tab icon) |
+| `goldPale` · `goldSoft` | `#FDE68A` · `#FEF3C7` | Foil highlights, promo tints |
+| `goldDeep` · `crust` | `#92400E` · `#B45309` | Text on gold tints, breadcrumbs, the Devanagari name on light |
+| `bg` | `#FAFAF7` | Warm cream page background |
+| `surface` / `surfaceMuted` | `#FFFFFF` / `#F5F5F4` | Cards, sheets / quiet wells |
+| `text` · `textSecondary` · `textTertiary` | `#171717` · `#737373` · `#A3A3A3` | Ink, secondary, disabled |
+| `border` · `borderStrong` | `#E7E5E4` · `#D6D3D1` | Dividers, inputs |
+| Tints: `tintMint` `tintSage` `tintButter` `tintPeach` `tintSand` `tintLime` | `#E3F7E8` `#E8EFE2` `#FEF6D8` `#FFEEDC` `#F3EDE2` `#EEF7D6` | Behind product art. `tintFor(id)` gives each product a stable tint. |
+| `danger` / `dangerTint` | `#DC2626` / `#FEE2E2` | Errors, out of stock, cancel |
 
-**Why the adjustment:** white text on `#16A34A` has a contrast ratio of 3.3:1, which fails WCAG AA for button labels. `#16A34A` stays the recognisable brand green. `#15803D` (which is already the brief's secondary green) carries text.
+**Foil** = `#FDE68A → #F59E0B → #B45309 → #FBBF24 → #FEF3C7` at 25°. Used on discount ribbons (`Badge tone="foil"`), the brand mark, the order seal and savings banners, always with `forestDeep` text.
 
-Status badge colours: Awaiting payment / Pending use amber-100 + amber-800; Confirmed / Preparing / Out for delivery use green-100 + green-700; Delivered uses green-600 + white (bold); Cancelled uses red-100 + red-600.
+Contrast rules: on forest use only white, `goldBright` or `leaf`; body text is always ink on cream/white.
 
 ## 3. Typography
 
-Inter (mobile: `@expo-google-fonts/inter`; admin: `@fontsource-variable/inter`). Prices use `fontVariant: ['tabular-nums']`.
+- **Plus Jakarta Sans** (600/700/800) for headings, prices and buttons.
+- **Inter** (400–700) for body text and labels.
+- **Tiro Devanagari Hindi** for the name बड़ा बाज़ार in the brand lockup.
 
-| Style | Size / line height | Weight | Use |
-|---|---|---|---|
-| `display` | 28 / 34 | 700 | Home greeting, order success |
-| `title` | 22 / 28 | 700 | Screen titles |
-| `heading` | 18 / 24 | 600 | Section headers ("Fresh picks") |
-| `body` | 16 / 22 | 400 | Body, inputs |
-| `body-strong` | 16 / 22 | 600 | Prices, button labels |
-| `label` | 14 / 20 | 500 | Product names in cards, list rows |
-| `caption` | 13 / 18 | 400 | Units, metadata |
-| `micro` | 12 / 16 | 600 | Badges (e.g. "12% OFF") |
+| Variant | Font / size / line | Use |
+|---|---|---|
+| `hero` | Jakarta 800 · 32/36 | Home greeting, onboarding |
+| `display` | Jakarta 800 · 26/31 | Order success |
+| `title` | Jakarta 800 · 22/28 | Screen titles, empty states |
+| `heading` | Jakarta 800 · 17/23 | Section headers |
+| `button` | Jakarta 800 · 15/20 | Buttons, the cart pill, the active tab |
+| `price` / `priceLg` | Jakarta 800 · 16/20 · 24/30 | Prices (tabular) |
+| `body` / `bodyStrong` | Inter 400/600 · 16/22 | Text, inputs |
+| `label` | Inter 500 · 14/20 | Product names, list rows |
+| `caption` | Inter 400 · 13/18 | Units, metadata |
+| `micro` | Inter 600 · 12/16 | Small status text |
+| `tag` | Jakarta 800 · 11/14 | Ribbons ("12% OFF"), ADD |
+| `devanagari` | Tiro · 20/30 | बड़ा बाज़ार |
 
-Respect Android font scaling up to 1.3× without the layout breaking. Test at 1.3×.
+Text scales with the system up to 1.3×; test at 1.3×.
 
 ## 4. Space, radius, elevation
 
-- Spacing scale (4-pt): `4, 8, 12, 16, 20, 24, 32, 40`. The screen side gutter is 16.
-- Radius: `sm 8` (badges, image corners inside cards) · `md 10` (inputs, buttons) · `lg 12` (cards) · `xl 16` (bottom sheets, banners) · `full` (chips, stepper only).
-- Elevation: `none` (default; a 1 px `border` separates elements) · `float` (`0 4 12 rgba(23,23,23,0.08)`, Android `elevation: 4`), used only for the cart bar, sheets and toasts.
-- Touch targets are at least 44×44 dp.
+- Spacing (4-pt): `4, 8, 12, 16, 20, 24, 32, 40`; screen gutter 16.
+- Radius: `sm 8` badges · `md 14` buttons, inputs, stepper · `lg 20` cards and tiles · `xl 24` banners · `xxl 28` sheets and header corners · `full` chips, tab bar.
+- Elevation: `shadow.sm` cards · `shadow.md` raised buttons, tab bar · `shadow.float` cart pill, sheets, toasts.
+- Touch targets ≥ 44×44 dp.
 
 ## 5. Key components
 
-**ProductCard** (2-column grid, ~164 dp wide)
-- A square image well on `surface-muted` with the photo contained and 8 px padding. A discount tag sits in the top-left corner (amber fill, dark text, `micro`).
-- Name (`label`, 2 lines max) → unit (`caption`, secondary) → the price row: price (`body-strong`) + MRP with strikethrough (`caption`, tertiary), and the **ADD** button on the right.
-- **ADD** is an outlined `green-700` button, 32 dp tall. After tapping it becomes a filled **stepper** `− 1 +` (green-700, white), with a 180 ms width/opacity transition.
-- Out of stock: the image is shown at 50% opacity, a red "Out of stock" label appears, and the ADD button is replaced by nothing (no disabled grey button).
+**Decor** (`components/decor`): `Gradient`, `ForestFill`, `Foil` (SVG gradients that sit behind content) and `Jaali`, the gold lattice of a palace window screen, drawn behind forest headers at low opacity.
 
-**CartBar**: a full-width bar 16 dp from the screen edges, above the tabs, in `green-700`: "3 items · ₹245" on the left and "View cart ›" on the right. It slides up (220 ms) when the first item is added. It carries the one `float` shadow on the screen.
+**PressableScale**: every tappable surface sinks to ~0.96 under the finger and springs back (`springs.press`).
 
-**QuantityStepper**: the pill shape; the number changes with a short vertical tick (120 ms). Reaching the maximum disables `+` and shows a caption such as "Max 5 per order".
+**Button**: `primary` forest with a gold icon and a soft raised shadow · `gold` for forest surfaces · `secondary` white + border · `ghost` · `danger`. 52 dp tall (38 small).
 
-**Order timeline**: vertical steps. Completed steps show a filled `green-600` dot with a line, and the time on the right. The current step has a pulsing ring (once every 2 s; no pulse under reduce-motion). Future steps show a `border-strong` hollow dot and `text-tertiary` label. A cancelled order shows one red step with the reason.
+**ProductCard**: white card, `shadow.sm`, radius 20, a tinted image well (`tintFor(product.id)`), a foil discount ribbon, the price in Jakarta 800, and a forest **ADD** with gold text that becomes the forest stepper.
 
-**Buttons**: primary (green-700 fill), secondary (white + border), ghost (text green-700), danger (text red-600, or a filled red only inside confirm dialogs). All are 48 dp tall on mobile and 40 px in admin.
+**QuantityStepper**: forest squircle with gold − / +; the digit rolls in from above; `+` dims at the maximum.
 
-**Inputs**: white, 1 px `border`, radius 10. The focus ring is 2 px `green-600`. Errors show a red border and a red caption below.
+**CartBar (cart pill)**: forest, radius 20, `shadow.float`, up to three overlapping product thumbnails, "3 items · ₹245", the amount left for free delivery, and a gold "View cart ›". It springs in, bounces when the count changes, and a gold sheen passes every few seconds.
 
-**Skeletons**: `surface-muted` blocks shaped like the real content, with a subtle opacity pulse between 0.6 and 1 (no shimmer gradient).
+**FloatingTabBar**: a white floating pill; the active tab grows into a labelled forest pill with a gold icon (labels never clip). The Account icon carries a gold dot for unread notifications.
 
-**Empty / error states**: a simple line icon (lucide, 40 px, `text-tertiary`), one sentence, and one action.
+**Chip**: white with a border; selected turns solid ink with white text.
+
+**Skeleton**: a warm grey block with a light sweeping across it (static under reduce-motion).
+
+**Empty / error states**: the icon in a mint medallion on a sage halo, a Jakarta title, one sentence, one primary action.
+
+**BrandMark / BrandLockup**: a gold-foil squircle with a forest basket; the lockup adds "Bada Bazar" and बड़ा बाज़ार.
+
+**Order timeline**: completed steps filled `brand`, the current step pulses gold, future steps hollow.
 
 ## 6. Copy
 
@@ -101,12 +111,13 @@ Tone: short, plain, warm and local. Money is formatted with `Intl.NumberFormat('
 
 ## 7. Motion
 
-Built with Reanimated. Durations are 120–250 ms with a standard ease-out. When the system's reduce-motion setting is on, animations become instant.
-Animated (and nothing else): the ADD → stepper morph, stepper number tick, cart bar entrance and total change, a small scale bounce (1 → 1.04 → 1) on the cart bar when an item is added, screen transitions (the native stack default), timeline step fill, the order-success checkmark (a single 600 ms draw), and skeleton pulse.
+Built with Reanimated 4 on the UI thread. Presses and layout use springs (`springs.press`, `springs.layout`, `springs.bouncy` in tokens); timed fades use 120–400 ms. With reduce-motion on, animations are instant and loops (sheen, shimmer, pulses) are off.
+
+Signature moves: press scale · ADD → stepper with a rolling digit · fly-to-cart into the cart pill · cart pill bounce and sheen · tab pill growing · collapsing Home header · big-word category tabs · offer carousel · product image parallax · swipe-to-remove in the cart · the order seal (pop, check draw, confetti, count-up) · the rider moving along the tracking route. The design board lists timings for each.
 
 ## 8. Iconography & imagery
 
-- One icon set: **Lucide** (`lucide-react-native`, `lucide-react`), 1.75 px stroke, 20/24 px.
+- One icon set: **Lucide** (`lucide-react-native`, `lucide-react`), 1.9–2 px stroke, 20/24 px.
 - Product photos on white or transparent backgrounds, square, at least 800 px. They are delivered through Cloudinary at 2× display size in WebP/AVIF. A blurhash placeholder is shown while loading.
 - Banners: real photography of produce or of the shop, 16:7, with text drawn by the app (not baked into the image) so it stays sharp and editable.
 

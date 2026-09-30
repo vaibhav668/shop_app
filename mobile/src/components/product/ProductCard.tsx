@@ -6,7 +6,7 @@ import type { ProductCard as ProductCardData } from '@/api/catalog';
 import { ProductImage } from '@/components/product/ProductImage';
 import { Badge, Money, QuantityStepper, Text } from '@/components/ui';
 import { formatPaise } from '@/lib/money';
-import { colors, motion, radius, spacing } from '@/theme/tokens';
+import { colors, motion, radius, shadow, spacing, tintFor } from '@/theme/tokens';
 
 export type { ProductCardData };
 
@@ -51,11 +51,14 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
       ) : null}
 
       {/* Decorative for assistive tech: the open button above already announces all of this. */}
-      <View style={[styles.imageWell, styles.passThrough]} aria-hidden>
+      <View
+        style={[styles.imageWell, { backgroundColor: tintFor(product.id) }, styles.passThrough]}
+        aria-hidden
+      >
         <ProductImage uri={product.image_url} faded={outOfStock} iconSize={40} />
         {discount > 0 && !outOfStock ? (
           <View style={styles.tag}>
-            <Badge label={`${discount}% OFF`} tone="offer" />
+            <Badge label={`${discount}% OFF`} tone="foil" />
           </View>
         ) : null}
       </View>
@@ -77,7 +80,7 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
 
         <View style={[styles.footer, styles.passChildren]}>
           <View style={styles.passThrough} aria-hidden>
-            <Money paise={product.price_paise} variant="bodyStrong" />
+            <Money paise={product.price_paise} variant="price" />
             {discount > 0 ? (
               <Money paise={product.mrp_paise} variant="caption" color="textTertiary" strike />
             ) : null}
@@ -106,7 +109,7 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
                   accessibilityLabel={`Add ${product.name} to cart`}
                   style={({ pressed }) => [styles.add, pressed && styles.addPressed]}
                 >
-                  <Text variant="micro" color="action" style={styles.addLabel}>
+                  <Text variant="tag" color="goldBright" style={styles.addLabel}>
                     ADD
                   </Text>
                 </Pressable>
@@ -123,14 +126,13 @@ export const ProductCard = memo(ProductCardBase);
 
 const styles = StyleSheet.create({
   card: {
+    ...shadow.sm,
     flex: 1,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: radius.lg,
-    padding: spacing.xs,
+    padding: 6,
   },
-  pressed: { borderColor: colors.borderStrong },
+  pressed: { transform: [{ scale: 0.98 }] },
   openLayer: {
     position: 'absolute',
     top: 0,
@@ -146,12 +148,11 @@ const styles = StyleSheet.create({
   text: { gap: 2 },
   imageWell: {
     aspectRatio: 1,
-    borderRadius: radius.sm,
-    backgroundColor: colors.surfaceMuted,
-    padding: spacing.xs,
+    borderRadius: radius.lg - 4,
+    padding: spacing.sm,
   },
-  tag: { position: 'absolute', top: 6, left: 6 },
-  body: { paddingTop: spacing.xs, paddingHorizontal: 2, gap: 2, flex: 1 },
+  tag: { position: 'absolute', top: 8, left: 8 },
+  body: { paddingTop: spacing.xs, paddingHorizontal: 4, paddingBottom: 2, gap: 2, flex: 1 },
   name: { minHeight: 40 },
   footer: {
     marginTop: 'auto',
@@ -162,16 +163,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   add: {
-    height: 32,
-    minWidth: 64,
+    ...shadow.md,
+    shadowOpacity: 0.25,
+    height: 34,
+    minWidth: 60,
     paddingHorizontal: spacing.sm,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.action,
-    backgroundColor: colors.surface,
+    borderRadius: radius.md - 2,
+    backgroundColor: colors.forest,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  addPressed: { backgroundColor: colors.brandTint },
-  addLabel: { fontSize: 13, letterSpacing: 0.5 },
+  addPressed: { backgroundColor: colors.forestDeep },
+  addLabel: { fontSize: 12, letterSpacing: 0.8 },
 });

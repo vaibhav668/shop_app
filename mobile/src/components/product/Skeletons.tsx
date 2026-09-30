@@ -1,12 +1,12 @@
 import { StyleSheet, View } from 'react-native';
 
 import { Skeleton } from '@/components/ui';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { colors, radius, shadow, spacing } from '@/theme/tokens';
 
 export function ProductCardSkeleton() {
   return (
     <View style={styles.card}>
-      <Skeleton height={140} radius={radius.sm} />
+      <Skeleton height={140} radius={radius.lg - 4} />
       <Skeleton height={14} width="85%" />
       <Skeleton height={12} width="40%" />
       <Skeleton height={18} width="35%" />
@@ -43,9 +43,8 @@ const styles = StyleSheet.create({
   card: {
     gap: spacing.xs,
     padding: spacing.xs,
+    ...shadow.sm,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: radius.lg,
   },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },

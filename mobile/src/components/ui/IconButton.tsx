@@ -1,7 +1,8 @@
 import type { LucideIcon } from 'lucide-react-native';
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-import { type ColorName, colors, hitSlop, radius } from '@/theme/tokens';
+import { PressableScale } from '@/components/ui/PressableScale';
+import { type ColorName, colors, hitSlop, radius, shadow } from '@/theme/tokens';
 
 export type IconButtonProps = {
   icon: LucideIcon;
@@ -9,7 +10,10 @@ export type IconButtonProps = {
   accessibilityLabel: string;
   onPress?: () => void;
   color?: ColorName;
+  /** A raised white squircle, for buttons that sit on tints or photos. */
   outlined?: boolean;
+  /** Frosted glass, for buttons on forest headers. */
+  glass?: boolean;
   disabled?: boolean;
   testID?: string;
 };
@@ -18,24 +22,32 @@ export function IconButton({
   icon: Icon,
   accessibilityLabel,
   onPress,
-  color = 'text',
+  color,
   outlined = false,
+  glass = false,
   disabled = false,
   testID,
 }: IconButtonProps) {
+  const tint: ColorName = disabled ? 'textTertiary' : (color ?? (glass ? 'onAction' : 'text'));
   return (
-    <Pressable
+    <PressableScale
       testID={testID}
       onPress={onPress}
       disabled={disabled}
       hitSlop={hitSlop}
+      scaleTo={0.9}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ disabled }}
-      style={({ pressed }) => [styles.base, outlined && styles.outlined, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.base,
+        outlined && styles.outlined,
+        glass && styles.glass,
+        pressed && !glass && styles.pressed,
+      ]}
     >
-      <Icon size={22} strokeWidth={1.75} color={colors[disabled ? 'textTertiary' : color]} />
-    </Pressable>
+      <Icon size={21} strokeWidth={1.9} color={colors[tint]} />
+    </PressableScale>
   );
 }
 
@@ -47,6 +59,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: radius.md,
   },
-  outlined: { borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
+  outlined: { ...shadow.sm, backgroundColor: colors.surface },
+  glass: { backgroundColor: colors.glass, borderWidth: 1, borderColor: colors.glass },
   pressed: { backgroundColor: colors.surfaceMuted },
 });
