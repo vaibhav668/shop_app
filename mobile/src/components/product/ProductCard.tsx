@@ -67,7 +67,12 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
       >
         {/* Decorative for assistive tech: the open button above already announces all of this. */}
         <View style={[styles.imageBox, styles.passThrough]} aria-hidden>
-          <ProductImage uri={product.image_url} faded={outOfStock} iconSize={40} />
+          <ProductImage
+            uri={product.image_url}
+            name={product.name}
+            faded={outOfStock}
+            iconSize={40}
+          />
         </View>
         {discount > 0 && !outOfStock ? (
           <View style={[styles.tag, styles.passThrough]} aria-hidden>
@@ -128,7 +133,7 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
             Only a few left
           </Text>
         ) : discount > 0 && saving > 0 ? (
-          <Text variant="micro" color="brand">
+          <Text variant="micro" color="forestMid">
             Save {formatPaise(saving)}
           </Text>
         ) : null}

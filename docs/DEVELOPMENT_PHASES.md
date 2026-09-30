@@ -104,6 +104,15 @@ Commits: `feat(backend): add users and sessions models` · `feat(backend): add g
 - Mobile: notifications list, tap → deep link to the order, unread dot on Account
 - Tests: a notification row is created per transition, the push is sent after commit (not when the transaction rolls back), invalid tokens are pruned
 
+## Phase 10b — "Emerald Royal" redesign (done)
+Design board: https://claude.ai/artifact/HfHMC5GnY55aishijRnn54 · spec: `docs/UI_SYSTEM.md`
+- D1 Foundation: tokens (forest, gold, foil, tints), Plus Jakarta Sans + Tiro Devanagari, SVG gradient/foil/jaali, press-scale kit, shimmer skeletons, floating pill tab bar, forest cart pill
+- D2 Shop: jaali Home header with the delivery-time promise (`shop_settings.delivery_eta_minutes`, editable in admin), collapsing search, category bubbles, auto-advancing offers, promise tiles, new product card with fly-to-cart, big-word category tabs
+- D3 Discover: royal welcome, first-launch intro slides, parallax product page with a buy bar that becomes a stepper, restyled search
+- D4 Checkout and after: savings banner, free-delivery bar, swipe-to-remove, the order seal with confetti and count-up, journey card (scooter follows the order's status, not a live location), orders and account
+- D5 Shop owner: forest sidebar with jaali, dashboard hero and status tiles, orders as cards on phones
+- D6 Imagery and polish: produce art chosen from the product name wherever there is no photo; small green text moved to the darker forest-mid for contrast. Real product photos come from the shopkeeper before launch; haptics wait for the next dev build (`expo-haptics`).
+
 ## Phase 11 — Hardening
 - Security checklist: authorization sweep, rate limits (`slowapi`), CORS, headers, upload validation, log scrubbing, dependency audit (`pip-audit`, `npm audit`)
 - Audit every screen for loading/empty/error/offline states; accessibility (labels, contrast, 1.3× font scaling)

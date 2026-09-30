@@ -4,6 +4,7 @@ import { LayoutGrid } from 'lucide-react-native';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import type { Category } from '@/api/catalog';
+import { artForName, ProduceArt } from '@/components/art/Produce';
 import { PressableScale, Text } from '@/components/ui';
 import { colors, gutter, spacing, tintFor } from '@/theme/tokens';
 
@@ -34,6 +35,8 @@ export function CategoryBubbles({ categories }: { categories: Category[] }) {
                 contentFit="contain"
                 cachePolicy="memory-disk"
               />
+            ) : artForName(c.name) ? (
+              <ProduceArt kind={artForName(c.name)!} size={44} />
             ) : (
               <LayoutGrid size={24} strokeWidth={1.8} color={colors.forest} />
             )}

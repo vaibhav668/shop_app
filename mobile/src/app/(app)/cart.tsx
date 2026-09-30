@@ -177,7 +177,12 @@ function CartLineRow({ line }: { line: CartLine }) {
             accessibilityLabel={`Open ${product.name}`}
             style={[styles.thumb, { backgroundColor: tintFor(product.id) }]}
           >
-            <ProductImage uri={product.image_url} faded={blocked} iconSize={24} />
+            <ProductImage
+              uri={product.image_url}
+              name={product.name}
+              faded={blocked}
+              iconSize={24}
+            />
           </Pressable>
 
           <View style={styles.lineInfo}>
@@ -242,7 +247,7 @@ function BillDetails({ cart, savings }: { cart: Cart; savings: number }) {
         <Row
           label="You save"
           value={
-            <Text variant="label" color="brand">
+            <Text variant="label" color="forestMid">
               −{formatPaise(savings)}
             </Text>
           }
@@ -252,7 +257,7 @@ function BillDetails({ cart, savings }: { cart: Cart; savings: number }) {
         label="Delivery fee"
         value={
           cart.delivery_fee_paise === 0 ? (
-            <Text variant="label" color="brand">
+            <Text variant="label" color="forestMid">
               FREE
             </Text>
           ) : (

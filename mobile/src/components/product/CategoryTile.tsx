@@ -4,6 +4,7 @@ import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import type { Category } from '@/api/catalog';
+import { artForName, ProduceArt } from '@/components/art/Produce';
 import { PressableScale, Text } from '@/components/ui';
 import { colors, radius, shadow, spacing, tintFor } from '@/theme/tokens';
 import { fonts } from '@/theme/typography';
@@ -26,6 +27,8 @@ function CategoryTileBase({ category, onPress }: { category: Category; onPress: 
             contentFit="contain"
             cachePolicy="memory-disk"
           />
+        ) : artForName(category.name) ? (
+          <ProduceArt kind={artForName(category.name)!} size={64} />
         ) : (
           <LayoutGrid size={28} strokeWidth={1.8} color={colors.forest} />
         )}
@@ -34,10 +37,10 @@ function CategoryTileBase({ category, onPress }: { category: Category; onPress: 
         {category.name}
       </Text>
       <View style={styles.shop} aria-hidden>
-        <Text variant="tag" color="brand">
+        <Text variant="tag" color="forestMid">
           Shop
         </Text>
-        <ChevronRight size={12} strokeWidth={2.6} color={colors.brand} />
+        <ChevronRight size={12} strokeWidth={2.6} color={colors.forestMid} />
       </View>
     </PressableScale>
   );

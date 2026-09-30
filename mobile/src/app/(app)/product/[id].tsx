@@ -109,7 +109,12 @@ function ProductView({ product }: { product: ProductDetail }) {
           <View style={styles.halo} />
           <View style={styles.ring} />
           <Animated.View style={[styles.heroImage, heroStyle]}>
-            <ProductImage uri={product.image_url} faded={outOfStock} iconSize={84} />
+            <ProductImage
+              uri={product.image_url}
+              name={product.name}
+              faded={outOfStock}
+              iconSize={84}
+            />
           </Animated.View>
         </View>
 
@@ -147,7 +152,7 @@ function ProductView({ product }: { product: ProductDetail }) {
             ) : null}
           </View>
           {saving > 0 ? (
-            <Text variant="label" color="brand">
+            <Text variant="label" color="forestMid">
               You save {formatPaise(saving)}
             </Text>
           ) : null}

@@ -110,7 +110,7 @@ function OrderView({ order }: { order: OrderDetail }) {
           {order.items.map((item) => (
             <View key={item.product_id} style={styles.item}>
               <View style={[styles.thumb, { backgroundColor: tintFor(item.product_id) }]}>
-                <ProductImage uri={item.image_url} iconSize={18} />
+                <ProductImage uri={item.image_url} name={item.name} iconSize={18} />
               </View>
               <View style={styles.flex}>
                 <Text variant="label" numberOfLines={2}>
@@ -297,7 +297,7 @@ function Row({ label, paise, free = false }: { label: string; paise: number; fre
         {label}
       </Text>
       {free && paise === 0 ? (
-        <Text variant="label" color="brand">
+        <Text variant="label" color="forestMid">
           FREE
         </Text>
       ) : (

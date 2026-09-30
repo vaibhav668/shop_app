@@ -1,4 +1,3 @@
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { ChevronRight, ShoppingBasket } from 'lucide-react-native';
 import { useEffect, useId, useRef, useState } from 'react';
@@ -19,6 +18,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { Gradient } from '@/components/decor';
+import { ProductImage } from '@/components/product/ProductImage';
 import { Money, PressableScale, Text } from '@/components/ui';
 import { useFlyToCart } from '@/features/cart/FlyToCart';
 import { useCart } from '@/features/cart/hooks';
@@ -109,16 +109,11 @@ export function CartBar({ safeBottom = false }: { safeBottom?: boolean }) {
                     i > 0 && styles.overlap,
                   ]}
                 >
-                  {line.product.image_url ? (
-                    <Image
-                      source={line.product.image_url}
-                      style={styles.thumbImage}
-                      contentFit="contain"
-                      cachePolicy="memory-disk"
-                    />
-                  ) : (
-                    <ShoppingBasket size={16} strokeWidth={2} color={colors.forest} />
-                  )}
+                  <ProductImage
+                    uri={line.product.image_url}
+                    name={line.product.name}
+                    iconSize={16}
+                  />
                 </View>
               ))
             ) : (
@@ -179,9 +174,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    padding: 3,
   },
   overlap: { marginLeft: -12 },
-  thumbImage: { width: '82%', height: '82%' },
   meta: { flex: 1, minWidth: 0 },
   go: { flexDirection: 'row', alignItems: 'center', gap: 2 },
 });

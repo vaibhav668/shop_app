@@ -206,6 +206,134 @@ const SHAPES = {
       />
     </G>
   ),
+  paneer: () => (
+    <G>
+      <Path d="M10 26l22-10 22 10-22 10z" fill={c.surface} stroke={c.border} strokeWidth={1.2} />
+      <Path d="M10 26v18l22 10V36z" fill={c.bg} stroke={c.border} strokeWidth={1.2} />
+      <Path d="M54 26v18L32 54V36z" fill={c.border} />
+      <Path d="M16 36l4 2M22 42l3 1.5M40 42l4-2" stroke={c.textTertiary} strokeWidth={1} />
+    </G>
+  ),
+  /** A cloth sack: atta, rice, dal, sugar, salt. */
+  sack: (g: Ids) => (
+    <G>
+      <Path
+        d="M16 12h32l4 42a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4z"
+        fill={c.tintSand}
+        stroke={c.border}
+        strokeWidth={1.2}
+      />
+      <Path d="M16 12c4 4 28 4 32 0" stroke={c.crust} strokeWidth={2} fill="none" />
+      <Rect x={15} y={27} width={34} height={18} rx={2} fill={url(g.basket)} />
+      <Path
+        d="M32 30v12M28 33l4 3 4-3M28 37l4 3 4-3"
+        stroke={c.goldBright}
+        strokeWidth={1.8}
+        fill="none"
+        strokeLinecap="round"
+      />
+    </G>
+  ),
+  /** A bottle: oil, juice, drinks. */
+  bottle: (g: Ids) => (
+    <G>
+      <Rect x={27} y={3} width={10} height={7} rx={2} fill={c.forest} />
+      <Path d="M26 10h12v7l6 8v29a5 5 0 0 1-5 5H25a5 5 0 0 1-5-5V25l6-8z" fill={url(g.banana)} />
+      <Rect x={20} y={31} width={24} height={13} fill={c.forest} />
+      <Path d="M32 34c-3 3-3 6 0 6s3-3 0-6z" fill={c.goldBright} />
+      <Rect x={23} y={46} width={3} height={8} rx={1.5} fill={c.surface} opacity={0.6} />
+    </G>
+  ),
+  /** A foil packet: chips, namkeen, biscuits, tea, coffee. */
+  packet: (g: Ids) => (
+    <G>
+      <Path d="M16 8h32l-3 6 3 6v28l-3 6 3 6H16l3-6-3-6V20l3-6z" fill={url(g.foil)} />
+      <Ellipse cx={32} cy={35} rx={11} ry={9} fill={c.goldSoft} />
+      <Path
+        d="M26 35l4 3 8-6"
+        stroke={c.crust}
+        strokeWidth={2.4}
+        fill="none"
+        strokeLinecap="round"
+      />
+      <Rect x={20} y={15} width={24} height={5} rx={2} fill={c.forest} />
+    </G>
+  ),
+  potato: () => (
+    <G>
+      <Ellipse cx={30} cy={38} rx={22} ry={15} fill={c.crust} transform="rotate(-12 30 38)" />
+      <Ellipse
+        cx={30}
+        cy={36}
+        rx={20}
+        ry={13}
+        fill={c.gold}
+        opacity={0.55}
+        transform="rotate(-12 30 36)"
+      />
+      <Circle cx={22} cy={34} r={1.6} fill={c.goldDeep} />
+      <Circle cx={34} cy={40} r={1.6} fill={c.goldDeep} />
+      <Circle cx={40} cy={32} r={1.4} fill={c.goldDeep} />
+      <Ellipse cx={22} cy={30} rx={5} ry={2.5} fill={c.surface} opacity={0.3} />
+    </G>
+  ),
+  onion: () => (
+    <G>
+      <Path d="M32 12c-3 6-2 8 0 10 2-2 3-4 0-10z" fill={c.forestMid} />
+      <Path
+        d="M32 20c14 4 20 14 18 24-2 9-10 14-18 14s-16-5-18-14c-2-10 4-20 18-24z"
+        fill={a.carrot}
+      />
+      <Path
+        d="M32 22c8 6 10 20 0 34M32 22c-8 6-10 20 0 34"
+        stroke={c.crust}
+        strokeWidth={1.5}
+        fill="none"
+      />
+      <Ellipse cx={24} cy={34} rx={3} ry={6} fill={c.surface} opacity={0.3} />
+    </G>
+  ),
+  chilli: (g: Ids) => (
+    <G>
+      <Path
+        d="M18 16c14 4 30 18 32 38 0 3-3 3-4 1-6-14-18-26-30-32-3-2-1-8 2-7z"
+        fill={url(g.leafDeep)}
+      />
+      <Path
+        d="M17 16c-2-6 2-10 6-10"
+        stroke={c.forestMid}
+        strokeWidth={3}
+        fill="none"
+        strokeLinecap="round"
+      />
+      <Path
+        d="M24 22c8 5 16 13 20 24"
+        stroke={c.leaf}
+        strokeWidth={1.5}
+        fill="none"
+        opacity={0.6}
+      />
+    </G>
+  ),
+  /** A wrapped bar: butter, soap, dishwash bar. */
+  bar: () => (
+    <G>
+      <Rect x={8} y={22} width={48} height={24} rx={6} fill={c.goldPale} />
+      <Rect
+        x={8}
+        y={22}
+        width={48}
+        height={24}
+        rx={6}
+        fill="none"
+        stroke={c.gold}
+        strokeWidth={1.5}
+      />
+      <Rect x={22} y={22} width={20} height={24} fill={c.forest} />
+      <Path d="M28 34h8" stroke={c.goldBright} strokeWidth={2.4} strokeLinecap="round" />
+      <Rect x={12} y={26} width={6} height={3} rx={1.5} fill={c.surface} opacity={0.6} />
+    </G>
+  ),
   orange: (g: Ids) => (
     <G>
       <Circle cx={32} cy={36} r={20} fill={url(g.orange)} />
@@ -271,6 +399,35 @@ const SHAPES = {
 } satisfies Record<string, (g: Ids) => ReactNode>;
 
 export type ProduceKind = keyof typeof SHAPES;
+
+// First match wins, so more specific words come before general ones.
+const KEYWORDS: [RegExp, ProduceKind][] = [
+  [/paneer|cheese|tofu/, 'paneer'],
+  [/butter(?!milk)|makhan|soap|sabun|dishwash/, 'bar'],
+  [/dairy|milk|doodh|curd|dahi|yogurt|lassi|chaas/, 'milk'],
+  [/\beggs?\b|anda/, 'eggs'],
+  // Packaged things before the produce they're made from ("potato chips", "tea leaves").
+  [/chips|wafer|bhujia|namkeen|biscuit|cookie|\btea\b|chai|coffee/, 'packet'],
+  [/drink|juice|sharbat|\boil\b|\btel\b|ghee|water|beverage/, 'bottle'],
+  [/tomato|tamatar/, 'tomato'],
+  [/potato|\baloo\b/, 'potato'],
+  [/onion|pyaz|kanda/, 'onion'],
+  [/chilli|chili|mirch|capsicum/, 'chilli'],
+  [/banana|kela/, 'banana'],
+  [/carrot|gajar|radish|mooli/, 'carrot'],
+  [/orange|santra|mango|apple|fruit|lemon|nimbu/, 'orange'],
+  [/coriander|dhaniya|spinach|palak|methi|pudina|leaves|greens|vegetable/, 'greens'],
+  [/bread|\bpav\b|\bbuns?\b|rusk|toast|bakery|cake/, 'bread'],
+  [/atta|flour|rice|chawal|\bdal\b|lentil|sugar|cheeni|salt|namak|besan|suji|staple|grain/, 'sack'],
+  [/snack|masala|spice/, 'packet'],
+];
+
+/** Picks art for a product or category by its name (and optional extra words). */
+export function artForName(...words: (string | null | undefined)[]): ProduceKind | null {
+  const text = words.filter(Boolean).join(' ').toLowerCase();
+  for (const [pattern, kind] of KEYWORDS) if (pattern.test(text)) return kind;
+  return null;
+}
 
 export function ProduceArt({ kind, size = 64 }: { kind: ProduceKind; size?: number }) {
   const ids = useIds();

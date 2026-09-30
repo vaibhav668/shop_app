@@ -231,7 +231,7 @@ export default function SearchScreen() {
               style={({ pressed }) => [styles.row2, pressed && styles.pressed]}
             >
               <View style={[styles.thumb, { backgroundColor: tintFor(item.id) }]}>
-                <ProductImage uri={item.image_url} iconSize={20} />
+                <ProductImage uri={item.image_url} name={item.name} iconSize={20} />
               </View>
               <View style={styles.flex}>
                 <Highlighted text={item.name} match={typed} />
