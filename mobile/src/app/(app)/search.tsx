@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { ArrowLeft, Clock, SearchX, X } from 'lucide-react-native';
+import { ArrowLeft, History, LayoutGrid, Search, SearchX, X } from 'lucide-react-native';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -26,8 +26,29 @@ import {
   withRecent,
 } from '@/features/search/recentSearches';
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
-import { colors, gutter, hitSlop, radius, spacing } from '@/theme/tokens';
+import { colors, gutter, hitSlop, radius, shadow, spacing, tintFor } from '@/theme/tokens';
 import { textVariants } from '@/theme/typography';
+
+/** The product name with the typed part marked in gold. */
+function Highlighted({ text, match }: { text: string; match: string }) {
+  const at = match ? text.toLowerCase().indexOf(match.toLowerCase()) : -1;
+  if (at < 0) {
+    return (
+      <Text variant="label" numberOfLines={1}>
+        {text}
+      </Text>
+    );
+  }
+  return (
+    <Text variant="label" numberOfLines={1}>
+      {text.slice(0, at)}
+      <Text variant="label" style={styles.hit}>
+        {text.slice(at, at + match.length)}
+      </Text>
+      {text.slice(at + match.length)}
+    </Text>
+  );
+}
 
 export default function SearchScreen() {
   const input = useRef<TextInput>(null);
@@ -70,6 +91,7 @@ export default function SearchScreen() {
       <View style={styles.header}>
         <IconButton icon={ArrowLeft} accessibilityLabel="Back" onPress={() => router.back()} />
         <View style={styles.inputWrap}>
+          <Search size={18} strokeWidth={2.2} color={colors.forest} />
           <TextInput
             ref={input}
             value={text}
@@ -80,8 +102,8 @@ export default function SearchScreen() {
             onSubmitEditing={() => submit(text)}
             placeholder="Search for milk, atta, dal…"
             placeholderTextColor={colors.textTertiary}
-            selectionColor={colors.brand}
-            cursorColor={colors.brand}
+            selectionColor={colors.forest}
+            cursorColor={colors.forest}
             returnKeyType="search"
             autoFocus
             autoCorrect={false}
@@ -99,7 +121,9 @@ export default function SearchScreen() {
               accessibilityRole="button"
               accessibilityLabel="Clear search"
             >
-              <X size={18} color={colors.textSecondary} />
+              <View style={styles.clear}>
+                <X size={14} strokeWidth={2.6} color={colors.textSecondary} />
+              </View>
             </Pressable>
           ) : null}
         </View>
@@ -175,6 +199,9 @@ export default function SearchScreen() {
               accessibilityRole="button"
               style={({ pressed }) => [styles.row2, pressed && styles.pressed]}
             >
+              <View style={styles.seeAll}>
+                <Search size={16} strokeWidth={2.4} color={colors.goldBright} />
+              </View>
               <Text variant="label" color="action">
                 See all results for “{text.trim()}”
               </Text>
@@ -203,13 +230,11 @@ export default function SearchScreen() {
               accessibilityLabel={`${item.name}, ${item.unit_label}`}
               style={({ pressed }) => [styles.row2, pressed && styles.pressed]}
             >
-              <View style={styles.thumb}>
+              <View style={[styles.thumb, { backgroundColor: tintFor(item.id) }]}>
                 <ProductImage uri={item.image_url} iconSize={20} />
               </View>
-              <View style={{ flex: 1 }}>
-                <Text variant="label" numberOfLines={1}>
-                  {item.name}
-                </Text>
+              <View style={styles.flex}>
+                <Highlighted text={item.name} match={typed} />
                 <Text variant="caption" color="textSecondary">
                   {item.unit_label}
                 </Text>
@@ -220,32 +245,58 @@ export default function SearchScreen() {
       ) : (
         <ScrollView contentContainerStyle={styles.recent} keyboardShouldPersistTaps="handled">
           {recent.length > 0 ? (
-            <>
-              <View style={styles.recentHeader}>
-                <Text variant="heading">Recent searches</Text>
+            <View style={styles.group}>
+              <View style={styles.groupHeader}>
+                <Text variant="heading">Recent</Text>
                 <Pressable onPress={clearRecent} hitSlop={hitSlop} accessibilityRole="button">
                   <Text variant="label" color="action">
                     Clear
                   </Text>
                 </Pressable>
               </View>
-              {recent.map((term) => (
-                <Pressable
-                  key={term}
-                  onPress={() => submit(term)}
-                  accessibilityRole="button"
-                  style={({ pressed }) => [styles.row2, pressed && styles.pressed]}
-                >
-                  <Clock size={18} strokeWidth={1.75} color={colors.textTertiary} />
-                  <Text variant="body">{term}</Text>
-                </Pressable>
-              ))}
-            </>
-          ) : (
-            <Text variant="body" color="textSecondary" align="center" style={styles.hint}>
-              Search by name or local name, like “doodh” or “aloo”.
-            </Text>
-          )}
+              <View style={styles.pills}>
+                {recent.map((term) => (
+                  <Pressable
+                    key={term}
+                    onPress={() => submit(term)}
+                    accessibilityRole="button"
+                    style={({ pressed }) => [styles.pill, pressed && styles.pressed]}
+                  >
+                    <History size={14} strokeWidth={2} color={colors.textSecondary} />
+                    <Text variant="label">{term}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          ) : null}
+          {categories.data && categories.data.length > 0 ? (
+            <View style={styles.group}>
+              <Text variant="heading">Browse aisles</Text>
+              <View style={styles.pills}>
+                {categories.data.slice(0, 12).map((c) => (
+                  <Pressable
+                    key={c.id}
+                    onPress={() =>
+                      router.push({ pathname: '/category/[slug]', params: { slug: c.slug } })
+                    }
+                    accessibilityRole="button"
+                    style={({ pressed }) => [
+                      styles.pill,
+                      styles.aisle,
+                      { backgroundColor: tintFor(c.id) },
+                      pressed && styles.aislePressed,
+                    ]}
+                  >
+                    <LayoutGrid size={14} strokeWidth={2} color={colors.forest} />
+                    <Text variant="label">{c.name}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          ) : null}
+          <Text variant="caption" color="textSecondary" align="center" style={styles.hint}>
+            Tip: search by local names too, like “doodh” or “aloo”.
+          </Text>
         </ScrollView>
       )}
       <CartBar safeBottom />
@@ -263,17 +314,36 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   inputWrap: {
+    ...shadow.sm,
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    height: 44,
+    height: 50,
     paddingHorizontal: spacing.sm,
     marginRight: spacing.xs,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderRadius: radius.lg - 4,
+    borderWidth: 2,
+    borderColor: colors.forest,
     backgroundColor: colors.surface,
+  },
+  clear: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.surfaceMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  flex: { flex: 1 },
+  hit: { backgroundColor: colors.goldPale, color: colors.text },
+  seeAll: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md - 2,
+    backgroundColor: colors.forest,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   input: { ...textVariants.body, flex: 1, color: colors.text, paddingVertical: 0 },
   chips: { paddingHorizontal: gutter, paddingVertical: spacing.xs },
@@ -294,17 +364,24 @@ const styles = StyleSheet.create({
   thumb: {
     width: 40,
     height: 40,
-    padding: 4,
-    borderRadius: radius.sm,
-    backgroundColor: colors.surfaceMuted,
+    padding: 5,
+    borderRadius: radius.md - 2,
   },
-  recent: { paddingVertical: spacing.sm },
-  recentHeader: {
+  recent: { paddingVertical: spacing.sm, paddingHorizontal: gutter, gap: spacing.lg },
+  group: { gap: spacing.sm },
+  groupHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  pills: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
+  pill: {
+    ...shadow.sm,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: gutter,
-    paddingBottom: spacing.xs,
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: radius.full,
+    backgroundColor: colors.surface,
   },
-  hint: { paddingHorizontal: spacing.xxl, paddingTop: spacing.xxl },
+  aisle: { shadowOpacity: 0, elevation: 0 },
+  aislePressed: { opacity: 0.75 },
+  hint: { paddingHorizontal: spacing.xl, paddingTop: spacing.md },
 });

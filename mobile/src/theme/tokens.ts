@@ -54,6 +54,15 @@ export const colors = {
   scrim: 'rgba(23, 23, 23, 0.4)',
 } as const;
 
+/** Extra colours used only inside the produce illustrations (components/art). */
+export const artColors = {
+  tomato: '#EF4444',
+  tomatoDeep: '#991B1B',
+  carrot: '#F97316',
+  leafBright: '#4ADE80',
+  shell: '#FDF6E7',
+} as const;
+
 /** Foil: the gold gradient used on ribbons, the brand mark, the seal and savings banners. */
 export const foil = ['#FDE68A', '#F59E0B', '#B45309', '#FBBF24', '#FEF3C7'] as const;
 export const foilStops = [0, 0.38, 0.55, 0.72, 1] as const;

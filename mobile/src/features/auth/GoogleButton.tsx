@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { Button, Text } from '@/components/ui';
+import { PressableScale, Text } from '@/components/ui';
+import { colors, radius, shadow, spacing } from '@/theme/tokens';
 
 import { getGoogleIdToken, isGoogleSignInAvailable } from './googleSignIn';
 
@@ -17,7 +19,7 @@ export function GoogleButton({ onIdToken, onError }: GoogleButtonProps) {
   if (!isGoogleSignInAvailable) {
     // Only in Expo Go, which doesn't include Google's native sign-in (a development-only case).
     return (
-      <Text variant="caption" color="textSecondary" align="center">
+      <Text variant="caption" color="onForestMuted" align="center">
         Google sign-in doesn&apos;t work in Expo Go. Open the Bada Bazar development build instead,
         or use the web preview.
       </Text>
@@ -25,10 +27,11 @@ export function GoogleButton({ onIdToken, onError }: GoogleButtonProps) {
   }
 
   return (
-    <Button
-      title="Continue with Google"
-      fullWidth
-      loading={busy}
+    <PressableScale
+      disabled={busy}
+      accessibilityRole="button"
+      accessibilityLabel="Continue with Google"
+      accessibilityState={{ busy, disabled: busy }}
       onPress={async () => {
         setBusy(true);
         try {
@@ -40,6 +43,41 @@ export function GoogleButton({ onIdToken, onError }: GoogleButtonProps) {
           setBusy(false);
         }
       }}
-    />
+      style={styles.button}
+    >
+      {busy ? (
+        <ActivityIndicator color={colors.forest} />
+      ) : (
+        <>
+          <View style={styles.mark}>
+            <Text variant="button" color="goldBright">
+              G
+            </Text>
+          </View>
+          <Text variant="button">Continue with Google</Text>
+        </>
+      )}
+    </PressableScale>
   );
 }
+
+const styles = StyleSheet.create({
+  button: {
+    ...shadow.float,
+    height: 56,
+    borderRadius: radius.lg - 2,
+    backgroundColor: colors.surface,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+  },
+  mark: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.forest,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

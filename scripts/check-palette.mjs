@@ -26,6 +26,8 @@ const PALETTE = new Set(
     '#E3F7E8', '#E8EFE2', '#FEF6D8', '#FFEEDC', '#F3EDE2', '#EEF7D6',
     // Danger
     '#DC2626', '#FEE2E2',
+    // Produce illustrations only (components/art)
+    '#EF4444', '#991B1B', '#F97316', '#4ADE80', '#FDF6E7',
   ].map((c) => c.toLowerCase()),
 );
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
 
 import { ApiError } from '@/api/client';
+import { BasketArt } from '@/components/art/Produce';
 import { Button, Input, Screen, Text } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { isValidIndianMobile, normalisePhoneInput } from '@/lib/validation';
@@ -39,7 +40,10 @@ export default function OnboardingScreen() {
       <KeyboardAvoidingView behavior="height" style={styles.root}>
         <View style={styles.form}>
           <View style={styles.header}>
-            <Text variant="title" accessibilityRole="header">
+            <View style={styles.art}>
+              <BasketArt size={120} />
+            </View>
+            <Text variant="display" accessibilityRole="header">
               Almost there
             </Text>
             <Text variant="body" color="textSecondary">
@@ -84,6 +88,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1, justifyContent: 'space-between', paddingBottom: spacing.lg },
   form: { gap: spacing.md },
-  header: { gap: spacing.xs, paddingTop: spacing.xl, paddingBottom: spacing.xs },
+  header: { gap: spacing.xs, paddingTop: spacing.lg, paddingBottom: spacing.xs },
+  art: { alignItems: 'center', marginBottom: spacing.sm },
   footer: { gap: spacing.xs },
 });

@@ -13,6 +13,7 @@ import { ToastProvider } from '@/components/Toast';
 import { ErrorState } from '@/components/ui';
 import { AdminRedirect } from '@/features/auth/AdminRedirect';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
+import { useIntroState } from '@/features/intro/introSeen';
 import { colors } from '@/theme/tokens';
 import { fontAssets } from '@/theme/typography';
 
@@ -40,13 +41,15 @@ export default function RootLayout() {
 
 function RootNavigator() {
   const { status, user, retry } = useAuth();
+  const intro = useIntroState();
+  const ready = status !== 'loading' && intro !== 'loading';
 
   // Keep the native splash up until we know where to send the person.
   useEffect(() => {
-    if (status !== 'loading') SplashScreen.hideAsync();
-  }, [status]);
+    if (ready) SplashScreen.hideAsync();
+  }, [ready]);
 
-  if (status === 'loading') return null;
+  if (!ready) return null;
 
   if (status === 'unreachable') {
     return (
@@ -64,8 +67,12 @@ function RootNavigator() {
 
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
+      {/* First launch only: three slides, then sign-in. */}
+      <Stack.Protected guard={!signedIn && intro === 'unseen'}>
+        <Stack.Screen name="intro" />
+      </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
-        <Stack.Screen name="welcome" />
+        <Stack.Screen name="welcome" options={{ animation: 'fade' }} />
       </Stack.Protected>
       <Stack.Protected guard={signedIn && !onboarded}>
         <Stack.Screen name="onboarding" />

@@ -13,7 +13,7 @@ import type { GoogleButtonProps } from './GoogleButton';
 export function GoogleButton({ onIdToken, onError }: GoogleButtonProps) {
   if (!GOOGLE_WEB_CLIENT_ID) {
     return (
-      <Text variant="caption" color="textSecondary" align="center">
+      <Text variant="caption" color="onForestMuted" align="center">
         Google sign-in isn&apos;t configured (set EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID).
       </Text>
     );
@@ -28,7 +28,7 @@ export function GoogleButton({ onIdToken, onError }: GoogleButtonProps) {
           onError={() => onError(new Error("Google sign-in didn't open. Try again?"))}
           theme="outline"
           size="large"
-          shape="rectangular"
+          shape="pill"
           text="continue_with"
           width="320"
         />
