@@ -1,8 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { PackageX } from 'lucide-react-native';
-import { useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Check, MapPin, PackageX, Phone, X } from 'lucide-react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Linking, ScrollView, StyleSheet, View } from 'react-native';
+import Animated, {
+  FadeInUp,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ApiError } from '@/api/client';
@@ -11,18 +19,17 @@ import { queryKeys } from '@/api/queryClient';
 import { ProductImage } from '@/components/product/ProductImage';
 import { QueryError } from '@/components/QueryError';
 import { useToast } from '@/components/Toast';
-import { Badge, Button, EmptyState, Money, Skeleton, Text } from '@/components/ui';
+import { Button, EmptyState, Money, Skeleton, Text } from '@/components/ui';
+import { useShop } from '@/features/catalog/hooks';
+import { JourneyCard } from '@/features/orders/JourneyCard';
 import {
   buildTimeline,
   FINISHED,
   formatOrderTime,
-  STATUS_LABEL,
-  STATUS_MESSAGE,
-  STATUS_TONE,
   type TimelineStep,
 } from '@/features/orders/orderStatus';
 import { confirmAction } from '@/lib/dialogs';
-import { colors, gutter, radius, spacing } from '@/theme/tokens';
+import { colors, gutter, radius, shadow, spacing, tintFor } from '@/theme/tokens';
 
 const POLL_MS = 20_000;
 
@@ -49,12 +56,14 @@ export default function OrderScreen() {
   if (order.isError) {
     if (order.error instanceof ApiError && order.error.status === 404) {
       return (
-        <EmptyState
-          icon={PackageX}
-          title="Order not found"
-          actionLabel="Go back"
-          onAction={() => router.back()}
-        />
+        <View style={styles.center}>
+          <EmptyState
+            icon={PackageX}
+            title="Order not found"
+            actionLabel="Go back"
+            onAction={() => router.back()}
+          />
+        </View>
       );
     }
     return <QueryError error={order.error} onRetry={order.refetch} />;
@@ -65,39 +74,46 @@ export default function OrderScreen() {
 function OrderView({ order }: { order: OrderDetail }) {
   const insets = useSafeAreaInsets();
   const cancel = useCancelOrder(order);
+  const shop = useShop();
   const a = order.delivery_address;
+  const shopPhone = shop.data?.phone;
 
   return (
     <View style={styles.root}>
       <Stack.Screen options={{ title: `Order #${order.order_number}` }} />
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.card}>
-          <View style={styles.statusRow}>
-            <Badge label={STATUS_LABEL[order.status]} tone={STATUS_TONE[order.status]} />
-            <Text variant="caption" color="textSecondary">
-              Placed {formatOrderTime(order.placed_at)}
-            </Text>
-          </View>
-          <Text variant="bodyStrong">{STATUS_MESSAGE[order.status]}</Text>
-          {order.cancel_reason ? (
-            <Text variant="body" color="textSecondary">
+        <Animated.View entering={FadeInUp.duration(320)}>
+          <JourneyCard
+            status={order.status}
+            placedLabel={`Placed ${formatOrderTime(order.placed_at)}`}
+            etaMinutes={shop.data?.delivery_eta_minutes}
+          />
+        </Animated.View>
+
+        {order.cancel_reason ? (
+          <View style={[styles.card, styles.cancelNote]}>
+            <Text variant="label" color="danger">
               Reason: {order.cancel_reason}
             </Text>
-          ) : null}
+          </View>
+        ) : null}
+
+        <View style={styles.card}>
+          <Text variant="heading">Progress</Text>
           <Timeline steps={buildTimeline(order)} />
         </View>
 
         <View style={styles.card}>
-          <Text variant="label" color="textSecondary">
-            {order.item_count} {order.item_count === 1 ? 'ITEM' : 'ITEMS'}
+          <Text variant="heading">
+            {order.item_count} {order.item_count === 1 ? 'item' : 'items'}
           </Text>
           {order.items.map((item) => (
             <View key={item.product_id} style={styles.item}>
-              <View style={styles.thumb}>
+              <View style={[styles.thumb, { backgroundColor: tintFor(item.product_id) }]}>
                 <ProductImage uri={item.image_url} iconSize={18} />
               </View>
               <View style={styles.flex}>
-                <Text variant="body" numberOfLines={2}>
+                <Text variant="label" numberOfLines={2}>
                   {item.name}
                 </Text>
                 <Text variant="caption" color="textSecondary" tabular>
@@ -105,27 +121,30 @@ function OrderView({ order }: { order: OrderDetail }) {
                   <Money paise={item.unit_price_paise} variant="caption" color="textSecondary" />
                 </Text>
               </View>
-              <Money paise={item.line_total_paise} />
+              <Money paise={item.line_total_paise} variant="price" />
             </View>
           ))}
           <View style={styles.divider} />
           <Row label="Items total" paise={order.subtotal_paise} />
           <Row label="Delivery fee" paise={order.delivery_fee_paise} free />
           <View style={styles.row}>
-            <Text variant="bodyStrong">
+            <Text variant="heading">
               {order.payment_status === 'PAID' ? 'Paid' : 'To pay on delivery'}
             </Text>
-            <Money paise={order.total_paise} variant="bodyStrong" />
+            <Money paise={order.total_paise} variant="priceLg" />
           </View>
           <Text variant="caption" color="textSecondary">
-            {order.payment_method === 'COD' ? 'Cash on delivery' : 'Paid online'}
+            {order.payment_method === 'COD' ? 'Cash or UPI at your door' : 'Paid online'}
           </Text>
         </View>
 
         <View style={styles.card}>
-          <Text variant="label" color="textSecondary">
-            DELIVERY ADDRESS
-          </Text>
+          <View style={styles.addressHead}>
+            <View style={styles.addressIcon}>
+              <MapPin size={16} strokeWidth={2.2} color={colors.forest} />
+            </View>
+            <Text variant="heading">Delivering to</Text>
+          </View>
           <Text variant="bodyStrong">{a.name}</Text>
           <Text variant="body" color="textSecondary">
             {[a.line1, a.line2, a.landmark, `${a.city} ${a.pincode}`].filter(Boolean).join(', ')}
@@ -139,6 +158,16 @@ function OrderView({ order }: { order: OrderDetail }) {
             </Text>
           ) : null}
         </View>
+
+        {shopPhone && !FINISHED.has(order.status) ? (
+          <Button
+            title="Call the shop"
+            icon={Phone}
+            variant="secondary"
+            fullWidth
+            onPress={() => void Linking.openURL(`tel:${shopPhone.replace(/\s/g, '')}`)}
+          />
+        ) : null}
       </ScrollView>
 
       {order.can_cancel ? (
@@ -185,39 +214,66 @@ function useCancelOrder(order: OrderDetail) {
   return { confirm, isPending: mutation.isPending };
 }
 
+/** The current step's dot breathes gold; done steps are filled green with a check. */
+function PulsingDot() {
+  const reduceMotion = useReducedMotion();
+  const pulse = useSharedValue(0);
+  useEffect(() => {
+    if (reduceMotion) return;
+    pulse.value = withRepeat(withTiming(1, { duration: 1600 }), -1, false);
+  }, [pulse, reduceMotion]);
+  const ring = useAnimatedStyle(() => ({
+    opacity: 0.5 * (1 - pulse.value),
+    transform: [{ scale: 1 + pulse.value * 0.9 }],
+  }));
+  return (
+    <View style={[styles.dot, styles.dotCurrent]}>
+      <Animated.View style={[styles.ring, ring]} />
+    </View>
+  );
+}
+
 function Timeline({ steps }: { steps: TimelineStep[] }) {
   return (
     <View style={styles.timeline} accessibilityRole="list">
       {steps.map((step, i) => {
         const last = i === steps.length - 1;
-        const reached = step.state !== 'upcoming';
-        const dotColor =
-          step.state === 'cancelled' ? colors.danger : reached ? colors.brand : colors.borderStrong;
+        const nextReached = !last && steps[i + 1].state !== 'upcoming';
         return (
           <View key={step.status} style={styles.step} accessibilityLabel={step.label}>
             <View style={styles.rail}>
-              <View
-                style={[
-                  styles.dot,
-                  { backgroundColor: reached ? dotColor : colors.surface, borderColor: dotColor },
-                ]}
-              />
+              {step.state === 'current' ? (
+                <PulsingDot />
+              ) : step.state === 'done' ? (
+                <View style={[styles.dot, styles.dotDone]}>
+                  <Check size={12} strokeWidth={3} color={colors.onAction} />
+                </View>
+              ) : step.state === 'cancelled' ? (
+                <View style={[styles.dot, styles.dotCancelled]}>
+                  <X size={12} strokeWidth={3} color={colors.onAction} />
+                </View>
+              ) : (
+                <View style={[styles.dot, styles.dotUpcoming]} />
+              )}
               {!last ? (
                 <View
                   style={[
                     styles.line,
-                    {
-                      backgroundColor:
-                        steps[i + 1].state !== 'upcoming' ? colors.brand : colors.border,
-                    },
+                    { backgroundColor: nextReached ? colors.brand : colors.border },
                   ]}
                 />
               ) : null}
             </View>
             <View style={styles.stepText}>
               <Text
-                variant={step.state === 'current' ? 'bodyStrong' : 'body'}
-                color={step.state === 'cancelled' ? 'danger' : reached ? 'text' : 'textTertiary'}
+                variant={step.state === 'current' ? 'heading' : 'label'}
+                color={
+                  step.state === 'cancelled'
+                    ? 'danger'
+                    : step.state === 'upcoming'
+                      ? 'textTertiary'
+                      : 'text'
+                }
               >
                 {step.label}
               </Text>
@@ -241,7 +297,7 @@ function Row({ label, paise, free = false }: { label: string; paise: number; fre
         {label}
       </Text>
       {free && paise === 0 ? (
-        <Text variant="label" color="action">
+        <Text variant="label" color="brand">
           FREE
         </Text>
       ) : (
@@ -254,46 +310,77 @@ function Row({ label, paise, free = false }: { label: string; paise: number; fre
 function OrderSkeleton() {
   return (
     <View style={[styles.root, styles.content]} accessibilityLabel="Loading order">
+      <Skeleton height={220} radius={radius.xl} />
       <Skeleton height={240} radius={radius.lg} />
       <Skeleton height={180} radius={radius.lg} />
     </View>
   );
 }
 
+const DOT = 24;
+
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
+  center: { flex: 1, justifyContent: 'center', backgroundColor: colors.bg },
   flex: { flex: 1, gap: 2 },
   content: { padding: gutter, gap: spacing.sm, paddingBottom: spacing.xl },
   card: {
+    ...shadow.sm,
     padding: spacing.md,
     gap: spacing.sm,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: radius.lg,
   },
-  statusRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  cancelNote: { backgroundColor: colors.dangerTint, shadowOpacity: 0, elevation: 0 },
   item: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  thumb: {
-    width: 44,
-    height: 44,
-    padding: 3,
-    borderRadius: radius.sm,
-    backgroundColor: colors.surfaceMuted,
+  thumb: { width: 48, height: 48, padding: 5, borderRadius: radius.md - 2 },
+  divider: {
+    borderTopWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: colors.borderStrong,
+    marginVertical: 2,
   },
-  divider: { height: 1, backgroundColor: colors.border },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  addressHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  addressIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: radius.sm + 2,
+    backgroundColor: colors.tintMint,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   timeline: { marginTop: spacing.xs },
-  step: { flexDirection: 'row', gap: spacing.sm, minHeight: 44 },
-  rail: { alignItems: 'center', width: 14 },
-  dot: { width: 14, height: 14, borderRadius: radius.full, borderWidth: 2, marginTop: 3 },
-  line: { flex: 1, width: 2, marginVertical: 2 },
-  stepText: { flex: 1, paddingBottom: spacing.sm },
+  step: { flexDirection: 'row', gap: spacing.sm, minHeight: 52 },
+  rail: { alignItems: 'center', width: DOT },
+  dot: {
+    width: DOT,
+    height: DOT,
+    borderRadius: DOT / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dotDone: { backgroundColor: colors.brand },
+  dotCurrent: { backgroundColor: colors.gold },
+  dotCancelled: { backgroundColor: colors.danger },
+  dotUpcoming: {
+    borderWidth: 2,
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.surface,
+  },
+  ring: {
+    position: 'absolute',
+    width: DOT,
+    height: DOT,
+    borderRadius: DOT / 2,
+    backgroundColor: colors.gold,
+  },
+  line: { flex: 1, width: 2, marginVertical: 3 },
+  stepText: { flex: 1, paddingBottom: spacing.sm, paddingTop: 2 },
   footer: {
+    ...shadow.md,
     paddingHorizontal: gutter,
     paddingTop: spacing.sm,
     backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
 });

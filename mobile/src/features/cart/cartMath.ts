@@ -8,6 +8,14 @@ import type { ProductCard } from '@/api/catalog';
 
 export const MAX_LINE_QUANTITY = 50;
 
+/** What the customer saves against MRP across the whole cart (display only). */
+export function cartSavings(cart: Pick<Cart, 'lines'>): number {
+  return cart.lines.reduce(
+    (sum, l) => sum + Math.max(0, l.product.mrp_paise - l.product.price_paise) * l.quantity,
+    0,
+  );
+}
+
 export function emptyCart(rules: DeliveryRules): Cart {
   return withTotals([], rules);
 }

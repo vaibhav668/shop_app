@@ -1,14 +1,33 @@
 import { router } from 'expo-router';
-import { Bell, ChevronRight, Heart, LogOut, MapPin, Palette } from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
+import {
+  Bell,
+  ChevronRight,
+  Heart,
+  LogOut,
+  MapPin,
+  Palette,
+  ReceiptText,
+} from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ApiError } from '@/api/client';
-import { Button, Screen, ScreenTitle, Text } from '@/components/ui';
+import { ForestFill, Foil, Jaali } from '@/components/decor';
+import { Button, Text } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useUnreadCount } from '@/features/notifications/hooks';
 import { confirmAction, showMessage } from '@/lib/dialogs';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { colors, gutter, radius, shadow, spacing } from '@/theme/tokens';
+
+type MenuItem = {
+  label: string;
+  icon: LucideIcon;
+  tint: string;
+  href: '/orders' | '/favourites' | '/addresses' | '/notifications';
+  badge?: number;
+};
 
 export default function AccountScreen() {
   const { user, signOut, deleteAccount } = useAuth();
@@ -41,142 +60,174 @@ export default function AccountScreen() {
     }
   };
 
+  const menu: MenuItem[] = [
+    { label: 'My orders', icon: ReceiptText, tint: colors.tintMint, href: '/orders' },
+    {
+      label: 'Notifications',
+      icon: Bell,
+      tint: colors.tintButter,
+      href: '/notifications',
+      badge: unread,
+    },
+    { label: 'Favourites', icon: Heart, tint: colors.tintPeach, href: '/favourites' },
+    { label: 'Saved addresses', icon: MapPin, tint: colors.tintSand, href: '/addresses' },
+  ];
+
   return (
-    <Screen scroll>
-      <ScreenTitle>Account</ScreenTitle>
+    <SafeAreaView style={styles.root} edges={['top']}>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text variant="display" accessibilityRole="header" style={styles.title}>
+          Account
+        </Text>
 
-      <View style={styles.profile}>
-        <View style={styles.avatar}>
-          <Text variant="title" color="action">
-            {user.name.trim().charAt(0).toUpperCase()}
-          </Text>
-        </View>
-        <View style={styles.details}>
-          <Text variant="bodyStrong">{user.name}</Text>
-          <Text variant="caption" color="textSecondary">
-            {user.email}
-          </Text>
-          {user.phone ? (
-            <Text variant="caption" color="textSecondary" tabular>
-              +91 {user.phone}
-            </Text>
-          ) : null}
-        </View>
-      </View>
-
-      <View style={styles.menu}>
-        <Pressable
-          onPress={() => router.push('/notifications')}
-          accessibilityRole="button"
-          style={({ pressed }) => [styles.menuRow, pressed && styles.menuPressed]}
-        >
-          <Bell size={20} strokeWidth={1.75} color={colors.text} />
-          <Text variant="body" style={styles.menuLabel}>
-            Notifications
-          </Text>
-          {unread > 0 ? (
-            <View style={styles.count}>
-              <Text variant="micro" color="onAction">
-                {unread > 9 ? '9+' : String(unread)}
+        <View style={styles.profile}>
+          <ForestFill borderRadius={radius.xl} />
+          <Jaali opacity={0.18} />
+          <View style={styles.profileRow}>
+            <View style={styles.avatar}>
+              <Text variant="title" color="forest">
+                {user.name.trim().charAt(0).toUpperCase()}
               </Text>
             </View>
-          ) : null}
-          <ChevronRight size={18} color={colors.textTertiary} />
-        </Pressable>
-        <View style={styles.menuDivider} />
-        <Pressable
-          onPress={() => router.push('/favourites')}
-          accessibilityRole="button"
-          style={({ pressed }) => [styles.menuRow, pressed && styles.menuPressed]}
-        >
-          <Heart size={20} strokeWidth={1.75} color={colors.text} />
-          <Text variant="body" style={styles.menuLabel}>
-            Favourites
-          </Text>
-          <ChevronRight size={18} color={colors.textTertiary} />
-        </Pressable>
-        <View style={styles.menuDivider} />
-        <Pressable
-          onPress={() => router.push('/addresses')}
-          accessibilityRole="button"
-          style={({ pressed }) => [styles.menuRow, pressed && styles.menuPressed]}
-        >
-          <MapPin size={20} strokeWidth={1.75} color={colors.text} />
-          <Text variant="body" style={styles.menuLabel}>
-            Saved addresses
-          </Text>
-          <ChevronRight size={18} color={colors.textTertiary} />
-        </Pressable>
-      </View>
+            <View style={styles.details}>
+              <Text variant="heading" color="onAction" numberOfLines={1}>
+                {user.name}
+              </Text>
+              <Text variant="caption" color="onForestMuted" numberOfLines={1}>
+                {user.email}
+              </Text>
+              {user.phone ? (
+                <Text variant="caption" color="onForestMuted" tabular>
+                  +91 {user.phone}
+                </Text>
+              ) : null}
+            </View>
+          </View>
+          <View style={styles.member}>
+            <Foil borderRadius={radius.full} />
+            <Text variant="tag" color="forestDeep">
+              BADA BAZAR MEMBER
+            </Text>
+          </View>
+        </View>
 
-      <View style={styles.actions}>
-        <Button title="Sign out" icon={LogOut} variant="secondary" fullWidth onPress={signOut} />
-        <Button
-          title="Delete account"
-          variant="danger"
-          fullWidth
-          loading={busy}
-          onPress={confirmDelete}
-        />
-        {__DEV__ ? (
+        <View style={styles.menu}>
+          {menu.map((item, i) => (
+            <View key={item.label}>
+              {i > 0 ? <View style={styles.menuDivider} /> : null}
+              <Pressable
+                onPress={() => router.push(item.href)}
+                accessibilityRole="button"
+                accessibilityLabel={item.badge ? `${item.label}, ${item.badge} unread` : item.label}
+                style={({ pressed }) => [styles.menuRow, pressed && styles.menuPressed]}
+              >
+                <View style={[styles.menuIcon, { backgroundColor: item.tint }]}>
+                  <item.icon size={18} strokeWidth={2} color={colors.forest} />
+                </View>
+                <Text variant="label" style={styles.menuLabel}>
+                  {item.label}
+                </Text>
+                {item.badge ? (
+                  <View style={styles.count}>
+                    <Text variant="tag" color="forestDeep">
+                      {item.badge > 9 ? '9+' : String(item.badge)}
+                    </Text>
+                  </View>
+                ) : null}
+                <ChevronRight size={18} strokeWidth={2} color={colors.textTertiary} />
+              </Pressable>
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.actions}>
+          <Button title="Sign out" icon={LogOut} variant="secondary" fullWidth onPress={signOut} />
           <Button
-            title="Open UI kit"
-            icon={Palette}
+            title="Delete account"
             variant="ghost"
             fullWidth
-            onPress={() => router.push('/dev/ui')}
+            loading={busy}
+            onPress={confirmDelete}
+            accessibilityLabel="Delete account"
           />
-        ) : null}
-      </View>
-    </Screen>
+          {__DEV__ ? (
+            <Button
+              title="Open UI kit"
+              icon={Palette}
+              variant="ghost"
+              fullWidth
+              onPress={() => router.push('/dev/ui')}
+            />
+          ) : null}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: colors.bg },
+  content: { paddingHorizontal: gutter, paddingBottom: spacing.xxxl },
+  title: { paddingTop: spacing.sm, paddingBottom: spacing.md },
   profile: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    ...shadow.md,
+    borderRadius: radius.xl,
+    overflow: 'hidden',
+    padding: spacing.lg,
     gap: spacing.md,
-    padding: spacing.md,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.lg,
+    backgroundColor: colors.forest,
   },
+  profileRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.full,
-    backgroundColor: colors.brandTint,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: colors.goldSoft,
+    borderWidth: 2.5,
+    borderColor: colors.goldBright,
     alignItems: 'center',
     justifyContent: 'center',
   },
   details: { flex: 1, gap: 2 },
+  member: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: radius.full,
+    overflow: 'hidden',
+  },
   menu: {
+    ...shadow.sm,
     marginTop: spacing.lg,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: radius.lg,
-    overflow: 'hidden',
+    padding: 4,
   },
   menuRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    minHeight: 52,
-    paddingHorizontal: spacing.md,
+    minHeight: 56,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.md,
   },
   menuPressed: { backgroundColor: colors.surfaceMuted },
-  menuDivider: { height: 1, marginLeft: spacing.md, backgroundColor: colors.border },
+  menuIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.md - 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuDivider: { height: 1, marginLeft: 60, backgroundColor: colors.border },
   count: {
-    minWidth: 20,
-    height: 20,
+    minWidth: 22,
+    height: 22,
     paddingHorizontal: 6,
     borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.action,
+    backgroundColor: colors.goldBright,
   },
   menuLabel: { flex: 1 },
   actions: { gap: spacing.xs, marginTop: spacing.xl },

@@ -19,7 +19,7 @@ import { checkoutItems } from '@/features/cart/cartMath';
 import { useCart } from '@/features/cart/hooks';
 import { usePlaceOrder } from '@/features/orders/hooks';
 import { formatPaise } from '@/lib/money';
-import { colors, gutter, radius, spacing } from '@/theme/tokens';
+import { colors, gutter, radius, shadow, spacing } from '@/theme/tokens';
 
 const METHOD_COPY: Record<PaymentMethod, { title: string; detail: string; icon: typeof Banknote }> =
   {
@@ -186,16 +186,14 @@ function CheckoutBody({
                       × {line.available_quantity}
                     </Text>
                   </Text>
-                  <Money paise={line.line_total_paise} />
+                  <Money paise={line.line_total_paise} variant="label" />
                 </View>
               ))}
             </View>
 
             {methods.length > 0 ? (
               <View style={styles.card} accessibilityRole="radiogroup">
-                <Text variant="label" color="textSecondary">
-                  PAYMENT
-                </Text>
+                <Text variant="heading">How you&apos;ll pay</Text>
                 {methods.map((m) => {
                   const copy = METHOD_COPY[m];
                   const selected = m === method;
@@ -207,7 +205,9 @@ function CheckoutBody({
                       accessibilityState={{ selected }}
                       style={[styles.method, selected && styles.methodSelected]}
                     >
-                      <copy.icon size={20} strokeWidth={1.75} color={colors.brand} />
+                      <View style={styles.methodIcon}>
+                        <copy.icon size={18} strokeWidth={2} color={colors.forest} />
+                      </View>
                       <View style={styles.flex}>
                         <Text variant="bodyStrong">{copy.title}</Text>
                         <Text variant="caption" color="textSecondary">
@@ -229,8 +229,8 @@ function CheckoutBody({
               <BillRow label="Delivery fee" paise={quote.delivery_fee_paise} free />
               <View style={styles.divider} />
               <View style={styles.billRow}>
-                <Text variant="bodyStrong">To pay</Text>
-                <Money paise={quote.total_paise} variant="bodyStrong" />
+                <Text variant="heading">To pay</Text>
+                <Money paise={quote.total_paise} variant="priceLg" />
               </View>
             </View>
 
@@ -296,11 +296,10 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   content: { padding: gutter, gap: spacing.sm, paddingBottom: spacing.xl },
   card: {
+    ...shadow.sm,
     padding: spacing.md,
     gap: spacing.sm,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: radius.lg,
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -318,11 +317,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
     padding: spacing.sm,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: radius.md,
   },
-  methodSelected: { borderColor: colors.brand, backgroundColor: colors.brandTint },
+  methodSelected: { borderColor: colors.forest, backgroundColor: colors.tintMint },
+  methodIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.md - 2,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   radio: {
     width: 20,
     height: 20,
@@ -332,16 +339,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  radioOn: { borderColor: colors.brand },
-  radioDot: { width: 10, height: 10, borderRadius: radius.full, backgroundColor: colors.brand },
+  radioOn: { borderColor: colors.forest },
+  radioDot: { width: 10, height: 10, borderRadius: radius.full, backgroundColor: colors.forest },
   billRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  divider: { height: 1, backgroundColor: colors.border },
+  divider: {
+    borderTopWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: colors.borderStrong,
+    marginVertical: 2,
+  },
   footer: {
+    ...shadow.md,
     gap: spacing.xs,
     paddingHorizontal: gutter,
     paddingTop: spacing.sm,
     backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
 });

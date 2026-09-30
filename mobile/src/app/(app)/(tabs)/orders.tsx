@@ -2,15 +2,22 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { router, useFocusEffect } from 'expo-router';
 import { ReceiptText } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { type OrderScope, ordersApi } from '@/api/orders';
 import { queryKeys } from '@/api/queryClient';
 import { OrderCard } from '@/components/OrderCard';
 import { QueryError } from '@/components/QueryError';
-import { Chip, EmptyState, ScreenTitle, Skeleton } from '@/components/ui';
-import { colors, gutter, radius, spacing } from '@/theme/tokens';
+import { EmptyState, Skeleton, Text } from '@/components/ui';
+import { colors, gutter, radius, shadow, spacing } from '@/theme/tokens';
 
 export default function OrdersScreen() {
   const [scope, setScope] = useState<OrderScope>('active');
@@ -18,10 +25,23 @@ export default function OrdersScreen() {
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
       <View style={styles.header}>
-        <ScreenTitle>Orders</ScreenTitle>
-        <View style={styles.tabs} accessibilityRole="tablist">
-          <Chip label="Active" selected={scope === 'active'} onPress={() => setScope('active')} />
-          <Chip label="Past" selected={scope === 'past'} onPress={() => setScope('past')} />
+        <Text variant="display" accessibilityRole="header">
+          Orders
+        </Text>
+        <View style={styles.segment} accessibilityRole="tablist">
+          {(['active', 'past'] as const).map((s) => (
+            <Pressable
+              key={s}
+              onPress={() => setScope(s)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: scope === s }}
+              style={[styles.segmentItem, scope === s && styles.segmentOn]}
+            >
+              <Text variant="button" color={scope === s ? 'onAction' : 'textSecondary'}>
+                {s === 'active' ? 'On the way' : 'Past orders'}
+              </Text>
+            </Pressable>
+          ))}
         </View>
       </View>
       <OrderList key={scope} scope={scope} />
@@ -73,8 +93,8 @@ function OrderList({ scope }: { scope: OrderScope }) {
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
-          colors={[colors.brand]}
-          tintColor={colors.brand}
+          colors={[colors.forest]}
+          tintColor={colors.forest}
           onRefresh={async () => {
             setRefreshing(true);
             await orders.refetch();
@@ -97,7 +117,7 @@ function OrderList({ scope }: { scope: OrderScope }) {
       }
       ListFooterComponent={
         orders.isFetchingNextPage ? (
-          <ActivityIndicator color={colors.brand} style={styles.footer} />
+          <ActivityIndicator color={colors.forest} style={styles.footer} />
         ) : null
       }
     />
@@ -106,8 +126,22 @@ function OrderList({ scope }: { scope: OrderScope }) {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
-  header: { paddingHorizontal: gutter, paddingTop: spacing.xs, gap: spacing.sm },
-  tabs: { flexDirection: 'row', gap: spacing.xs, paddingBottom: spacing.xs },
+  header: { paddingHorizontal: gutter, paddingTop: spacing.sm, gap: spacing.md },
+  segment: {
+    ...shadow.sm,
+    flexDirection: 'row',
+    padding: 4,
+    borderRadius: radius.full,
+    backgroundColor: colors.surface,
+  },
+  segmentItem: {
+    flex: 1,
+    height: 40,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  segmentOn: { backgroundColor: colors.forest },
   list: { padding: gutter, gap: spacing.sm, paddingBottom: spacing.xxxl },
   empty: { flexGrow: 1, justifyContent: 'center' },
   footer: { paddingVertical: spacing.lg },
