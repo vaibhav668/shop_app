@@ -1,11 +1,12 @@
 import { router } from 'expo-router';
-import { LayoutGrid } from 'lucide-react-native';
+import { LayoutGrid, Search } from 'lucide-react-native';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 
 import { CategoryTile } from '@/components/product/CategoryTile';
 import { CategoryGridSkeleton } from '@/components/product/Skeletons';
 import { QueryError } from '@/components/QueryError';
-import { EmptyState, Screen, ScreenTitle } from '@/components/ui';
+import { EmptyState, IconButton, Screen, Text } from '@/components/ui';
 import { useCategories } from '@/features/catalog/hooks';
 import { colors, gutter, spacing } from '@/theme/tokens';
 
@@ -17,7 +18,20 @@ export default function CategoriesScreen() {
   return (
     <Screen padded={false}>
       <View style={styles.header}>
-        <ScreenTitle>Categories</ScreenTitle>
+        <View style={styles.titles}>
+          <Text variant="display" accessibilityRole="header">
+            Categories
+          </Text>
+          <Text variant="caption" color="textSecondary">
+            Everything the shop stocks, aisle by aisle
+          </Text>
+        </View>
+        <IconButton
+          icon={Search}
+          accessibilityLabel="Search"
+          outlined
+          onPress={() => router.push('/search')}
+        />
       </View>
       {isPending ? (
         <View style={styles.pad}>
@@ -36,20 +50,23 @@ export default function CategoriesScreen() {
             <RefreshControl
               refreshing={isRefetching}
               onRefresh={refetch}
-              colors={[colors.brand]}
-              tintColor={colors.brand}
+              colors={[colors.forest]}
+              tintColor={colors.forest}
             />
           }
           ListEmptyComponent={<EmptyState icon={LayoutGrid} title="Nothing here yet." />}
-          renderItem={({ item }) => (
-            <View style={styles.cell}>
+          renderItem={({ item, index }) => (
+            <Animated.View
+              entering={FadeInUp.delay(Math.min(index, 12) * 30).duration(280)}
+              style={styles.cell}
+            >
               <CategoryTile
                 category={item}
                 onPress={() =>
                   router.push({ pathname: '/category/[slug]', params: { slug: item.slug } })
                 }
               />
-            </View>
+            </Animated.View>
           )}
         />
       )}
@@ -58,9 +75,17 @@ export default function CategoriesScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { paddingHorizontal: gutter },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: gutter,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.md,
+  },
+  titles: { flex: 1 },
   pad: { paddingHorizontal: gutter },
-  list: { paddingHorizontal: gutter, paddingBottom: spacing.xxxl, gap: spacing.md },
+  list: { paddingHorizontal: gutter, paddingBottom: spacing.xxxl, gap: spacing.sm },
   row: { gap: spacing.sm },
   cell: { flex: 1 / COLUMNS },
 });

@@ -1,22 +1,34 @@
-import { router } from 'expo-router';
-import { ShoppingBasket } from 'lucide-react-native';
-import { FlatList, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { router, useFocusEffect } from 'expo-router';
+import { setStatusBarStyle } from 'expo-status-bar';
+import { Moon, ShoppingBasket, Sparkles } from 'lucide-react-native';
+import { useCallback, useState } from 'react';
+import {
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 
 import type { Banner } from '@/api/catalog';
 import { BannerCarousel } from '@/components/BannerCarousel';
-import { CategoryTile } from '@/components/product/CategoryTile';
 import { ShopProductCard } from '@/components/product/ShopProductCard';
-import { CategoryGridSkeleton, ProductCardSkeleton } from '@/components/product/Skeletons';
+import { ProductCardSkeleton } from '@/components/product/Skeletons';
 import { QueryError } from '@/components/QueryError';
-import { SearchBar } from '@/components/SearchBar';
-import { EmptyState, SectionHeader, Skeleton, Text } from '@/components/ui';
+import { EmptyState, Skeleton, Text } from '@/components/ui';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useHome } from '@/features/catalog/hooks';
-import { greetingFor } from '@/lib/greeting';
+import { useHome, useShop } from '@/features/catalog/hooks';
+import { CategoryBubbles } from '@/features/home/CategoryBubbles';
+import { HomeHeader } from '@/features/home/HomeHeader';
+import { HomeSearch, MiniHeader } from '@/features/home/HomeSearch';
+import { PromiseTiles } from '@/features/home/PromiseTiles';
+import { useUnreadCount } from '@/features/notifications/hooks';
 import { colors, gutter, radius, spacing } from '@/theme/tokens';
 
-const COLUMNS = 4;
+// Past this point the big header is gone and the slim search bar slides in.
+const COLLAPSE_AT = 150;
 
 function openBanner(banner: Banner) {
   if (banner.target_type === 'CATEGORY' && banner.target_slug) {
@@ -29,34 +41,55 @@ function openBanner(banner: Banner) {
 export default function HomeScreen() {
   const { user } = useAuth();
   const home = useHome();
-  const firstName = user?.name.split(' ')[0];
+  const shop = useShop();
+  const unread = useUnreadCount();
+  const [collapsed, setCollapsed] = useState(false);
+  const eta = shop.data?.delivery_eta_minutes;
+
+  // The header is forest green: light status-bar icons while Home is on screen.
+  useFocusEffect(
+    useCallback(() => {
+      setStatusBarStyle('light');
+      return () => setStatusBarStyle('dark');
+    }, []),
+  );
+
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) =>
+    setCollapsed(e.nativeEvent.contentOffset.y > COLLAPSE_AT);
+
+  const refresh = () => {
+    void home.refetch();
+    void shop.refetch();
+  };
 
   return (
-    <SafeAreaView style={styles.root} edges={['top']}>
+    <View style={styles.root}>
+      {collapsed ? <MiniHeader etaMinutes={eta} /> : null}
       <ScrollView
         contentContainerStyle={styles.content}
+        onScroll={onScroll}
+        scrollEventThrottle={32}
         refreshControl={
           <RefreshControl
             refreshing={home.isRefetching}
-            onRefresh={home.refetch}
-            colors={[colors.brand]}
-            tintColor={colors.brand}
+            onRefresh={refresh}
+            colors={[colors.forest]}
+            tintColor={colors.goldBright}
+            progressBackgroundColor={colors.surface}
           />
         }
       >
-        <View style={styles.header}>
-          <Text variant="title">
-            {greetingFor(new Date())}
-            {firstName ? `, ${firstName}` : ''}
-          </Text>
-          <Text variant="caption" color="textSecondary">
-            Fresh groceries from Bada Bazar
-          </Text>
-        </View>
+        <HomeHeader name={user?.name} unread={unread} etaMinutes={eta} />
+        <HomeSearch />
 
-        <View style={styles.pad}>
-          <SearchBar onPress={() => router.push('/search')} />
-        </View>
+        {shop.data && !shop.data.is_accepting_orders ? (
+          <View style={styles.closed} accessibilityRole="alert">
+            <Moon size={18} strokeWidth={2} color={colors.goldDeep} />
+            <Text variant="label" color="goldDeep" style={styles.closedText}>
+              {shop.data.closed_message}
+            </Text>
+          </View>
+        ) : null}
 
         {home.isPending ? (
           <HomeSkeleton />
@@ -69,72 +102,62 @@ export default function HomeScreen() {
             message="Products will show up here once the shop adds them."
           />
         ) : (
-          <>
+          <Animated.View entering={FadeInUp.duration(320)}>
+            <CategoryBubbles categories={home.data.categories} />
+
             {home.data.banners.length > 0 ? (
               <View style={styles.section}>
                 <BannerCarousel banners={home.data.banners} onOpen={openBanner} />
               </View>
             ) : null}
 
-            <View style={[styles.section, styles.pad]}>
-              <SectionHeader
-                title="Shop by category"
-                actionLabel="See all"
-                onAction={() => router.push('/categories')}
-              />
-              <View style={styles.grid}>
-                {home.data.categories.slice(0, 8).map((category) => (
-                  <View key={category.id} style={styles.cell}>
-                    <CategoryTile
-                      category={category}
-                      onPress={() =>
-                        router.push({
-                          pathname: '/category/[slug]',
-                          params: { slug: category.slug },
-                        })
-                      }
-                    />
-                  </View>
-                ))}
-              </View>
-            </View>
+            {shop.data ? <PromiseTiles shop={shop.data} /> : null}
 
             {home.data.featured.length > 0 ? (
-              <View style={styles.section}>
-                <View style={styles.pad}>
-                  <SectionHeader title="Fresh picks" />
+              <View style={[styles.section, styles.pad]}>
+                <View style={styles.picksHead}>
+                  <View style={styles.picksIcon}>
+                    <Sparkles size={16} strokeWidth={2.2} color={colors.goldBright} />
+                  </View>
+                  <View>
+                    <Text variant="title" accessibilityRole="header">
+                      Fresh picks
+                    </Text>
+                    <Text variant="caption" color="textSecondary">
+                      Chosen by the shop today
+                    </Text>
+                  </View>
                 </View>
-                <FlatList
-                  horizontal
-                  data={home.data.featured}
-                  keyExtractor={(p) => p.id}
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.rail}
-                  renderItem={({ item }) => (
-                    <View style={styles.railCard}>
-                      <ShopProductCard product={item} />
+                <View style={styles.grid}>
+                  {home.data.featured.slice(0, 10).map((product) => (
+                    <View key={product.id} style={styles.cell}>
+                      <ShopProductCard product={product} />
                     </View>
-                  )}
-                />
+                  ))}
+                </View>
               </View>
             ) : null}
-          </>
+          </Animated.View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 function HomeSkeleton() {
   return (
-    <View style={[styles.section, styles.pad, { gap: spacing.xl }]} accessibilityLabel="Loading">
-      <Skeleton height={148} radius={radius.xl} />
-      <CategoryGridSkeleton count={8} />
-      <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-        <View style={{ width: 156 }}>
+    <View style={[styles.pad, styles.skeleton]} accessibilityLabel="Loading">
+      <View style={styles.skeletonRow}>
+        {Array.from({ length: 5 }, (_, i) => (
+          <Skeleton key={i} width={64} height={64} radius={32} />
+        ))}
+      </View>
+      <Skeleton height={156} radius={radius.xl} />
+      <View style={styles.grid}>
+        <View style={styles.cell}>
           <ProductCardSkeleton />
         </View>
-        <View style={{ width: 156 }}>
+        <View style={styles.cell}>
           <ProductCardSkeleton />
         </View>
       </View>
@@ -144,12 +167,31 @@ function HomeSkeleton() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
-  content: { paddingBottom: spacing.xxxl },
+  content: { paddingBottom: spacing.xl },
   pad: { paddingHorizontal: gutter },
-  header: { paddingHorizontal: gutter, paddingTop: spacing.sm, paddingBottom: spacing.md },
-  section: { marginTop: spacing.xl },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: spacing.md, columnGap: spacing.sm },
-  cell: { width: `${(100 - 3 * 3) / COLUMNS}%` },
-  rail: { paddingHorizontal: gutter, gap: spacing.sm },
-  railCard: { width: 156 },
+  section: { marginTop: spacing.lg },
+  closed: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginHorizontal: gutter,
+    marginTop: spacing.md,
+    padding: spacing.md,
+    borderRadius: radius.lg - 4,
+    backgroundColor: colors.goldSoft,
+  },
+  closedText: { flex: 1 },
+  picksHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: 14 },
+  picksIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.md - 2,
+    backgroundColor: colors.forest,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  cell: { width: '48.4%' },
+  skeleton: { marginTop: spacing.lg, gap: spacing.lg },
+  skeletonRow: { flexDirection: 'row', gap: spacing.sm },
 });

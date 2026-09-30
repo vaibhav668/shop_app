@@ -1296,6 +1296,8 @@ export interface components {
       cod_enabled: boolean;
       /** Default Low Stock Threshold */
       default_low_stock_threshold: number;
+      /** Delivery Eta Minutes */
+      delivery_eta_minutes: number;
       /** Delivery Fee Paise */
       delivery_fee_paise: number;
       /** Empty Pincodes Accept All */
@@ -1332,6 +1334,8 @@ export interface components {
       cod_enabled?: boolean | null;
       /** Default Low Stock Threshold */
       default_low_stock_threshold?: number | null;
+      /** Delivery Eta Minutes */
+      delivery_eta_minutes?: number | null;
       /** Delivery Fee Paise */
       delivery_fee_paise?: number | null;
       /** Free Delivery Above Paise */
@@ -2311,6 +2315,8 @@ export interface components {
       closed_message: string;
       /** Cod Enabled */
       cod_enabled: boolean;
+      /** Delivery Eta Minutes */
+      delivery_eta_minutes: number;
       /** Delivery Fee Paise */
       delivery_fee_paise: number;
       /** Free Delivery Above Paise */

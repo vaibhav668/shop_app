@@ -25,6 +25,7 @@ class AdminSettingsOut(BaseModel):
     delivery_fee_paise: int
     free_delivery_above_paise: int
     min_order_paise: int
+    delivery_eta_minutes: int
     serviceable_pincodes: list[str]
     # False in staging/production: there an empty pincode list means no delivery anywhere.
     empty_pincodes_accept_all: bool
@@ -46,6 +47,7 @@ class AdminSettingsUpdate(BaseModel):
     delivery_fee_paise: FeePaise | None = None
     free_delivery_above_paise: FeePaise | None = None
     min_order_paise: FeePaise | None = None
+    delivery_eta_minutes: int | None = Field(default=None, ge=5, le=240)
     serviceable_pincodes: list[Pincode] | None = Field(default=None, max_length=500)
     cod_enabled: bool | None = None
     online_payment_enabled: bool | None = None

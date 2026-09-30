@@ -23,6 +23,7 @@ function settings(overrides: Partial<ShopSettings> = {}): ShopSettings {
     delivery_fee_paise: 2000,
     free_delivery_above_paise: 29900,
     min_order_paise: 9900,
+    delivery_eta_minutes: 30,
     serviceable_pincodes: ['248001'],
     empty_pincodes_accept_all: false,
     cod_enabled: true,
@@ -63,6 +64,15 @@ describe('settings form helpers', () => {
       'lowStockThreshold',
       'minOrder',
     ]);
+  });
+
+  it('checks the delivery time and sends it when changed', () => {
+    const base = initialState(settings());
+    expect(validate({ ...base, deliveryEta: '3' }).deliveryEta).toBeDefined();
+    expect(validate({ ...base, deliveryEta: '45' }).deliveryEta).toBeUndefined();
+    expect(changes({ ...base, deliveryEta: '45' }, settings())).toEqual({
+      delivery_eta_minutes: 45,
+    });
   });
 });
 

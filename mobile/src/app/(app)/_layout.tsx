@@ -1,15 +1,16 @@
 import { Stack } from 'expo-router';
 
+import { FlyToCartProvider } from '@/features/cart/FlyToCart';
 import { PushManager } from '@/features/notifications/PushManager';
 import { colors } from '@/theme/tokens';
 import { fonts } from '@/theme/typography';
 
 export default function AppLayout() {
   return (
-    <>
+    <FlyToCartProvider>
       <PushManager />
       <AppStack />
-    </>
+    </FlyToCartProvider>
   );
 }
 

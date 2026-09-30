@@ -862,6 +862,10 @@
             "title": "Default Low Stock Threshold",
             "type": "integer"
           },
+          "delivery_eta_minutes": {
+            "title": "Delivery Eta Minutes",
+            "type": "integer"
+          },
           "delivery_fee_paise": {
             "title": "Delivery Fee Paise",
             "type": "integer"
@@ -945,6 +949,7 @@
           "delivery_fee_paise",
           "free_delivery_above_paise",
           "min_order_paise",
+          "delivery_eta_minutes",
           "serviceable_pincodes",
           "empty_pincodes_accept_all",
           "cod_enabled",
@@ -995,6 +1000,19 @@
               }
             ],
             "title": "Default Low Stock Threshold"
+          },
+          "delivery_eta_minutes": {
+            "anyOf": [
+              {
+                "maximum": 240.0,
+                "minimum": 5.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delivery Eta Minutes"
           },
           "delivery_fee_paise": {
             "anyOf": [
@@ -3804,6 +3822,10 @@
             "title": "Cod Enabled",
             "type": "boolean"
           },
+          "delivery_eta_minutes": {
+            "title": "Delivery Eta Minutes",
+            "type": "integer"
+          },
           "delivery_fee_paise": {
             "title": "Delivery Fee Paise",
             "type": "integer"
@@ -3848,6 +3870,7 @@
           "delivery_fee_paise",
           "free_delivery_above_paise",
           "min_order_paise",
+          "delivery_eta_minutes",
           "cod_enabled",
           "online_payment_enabled"
         ],

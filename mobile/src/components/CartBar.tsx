@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { ChevronRight, ShoppingBasket } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
@@ -20,6 +20,7 @@ import Animated, {
 
 import { Gradient } from '@/components/decor';
 import { Money, PressableScale, Text } from '@/components/ui';
+import { useFlyToCart } from '@/features/cart/FlyToCart';
 import { useCart } from '@/features/cart/hooks';
 import { formatPaise } from '@/lib/money';
 import { colors, gutter, radius, shadow, spacing, springs, tintFor } from '@/theme/tokens';
@@ -38,6 +39,17 @@ export function CartBar({ safeBottom = false }: { safeBottom?: boolean }) {
   const scale = useSharedValue(1);
   const sheen = useSharedValue(0);
   const [width, setWidth] = useState(0);
+  const pillRef = useRef<View>(null);
+  const targetId = useId();
+  const { registerTarget } = useFlyToCart();
+  const visible = count > 0;
+
+  // Products added anywhere fly into this pill.
+  useEffect(() => {
+    if (!visible) return;
+    registerTarget(targetId, pillRef);
+    return () => registerTarget(targetId, null);
+  }, [visible, registerTarget, targetId]);
 
   // A bounce when the count changes confirms the tap landed.
   useEffect(() => {
@@ -71,7 +83,7 @@ export function CartBar({ safeBottom = false }: { safeBottom?: boolean }) {
       exiting={SlideOutDown.duration(180)}
       style={[styles.wrap, safeBottom && { paddingBottom: spacing.xs + insets.bottom }]}
     >
-      <Animated.View style={bounce}>
+      <Animated.View style={bounce} ref={pillRef} collapsable={false}>
         <PressableScale
           onPress={() => router.push('/cart')}
           scaleTo={0.97}

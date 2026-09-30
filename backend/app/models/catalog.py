@@ -114,7 +114,12 @@ class ShopSettings(Base):
     """Exactly one row (id = 1): the shop's delivery rules and switches."""
 
     __tablename__ = "shop_settings"
-    __table_args__ = (CheckConstraint("id = 1", name="single_row"),)
+    __table_args__ = (
+        CheckConstraint("id = 1", name="single_row"),
+        CheckConstraint(
+            "delivery_eta_minutes BETWEEN 5 AND 240", name="delivery_eta_minutes_range"
+        ),
+    )
 
     id: Mapped[int] = mapped_column(SmallInteger, primary_key=True, default=1)
     shop_name: Mapped[str] = mapped_column(Text, nullable=False, default="Bada Bazar")
@@ -129,6 +134,10 @@ class ShopSettings(Base):
         BigInteger, nullable=False, default=29900
     )
     min_order_paise: Mapped[int] = mapped_column(BigInteger, nullable=False, default=9900)
+    # The delivery promise shown in the app, e.g. "30 min".
+    delivery_eta_minutes: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=30, server_default="30"
+    )
     serviceable_pincodes: Mapped[list[str]] = mapped_column(
         ARRAY(Text), nullable=False, default=list
     )

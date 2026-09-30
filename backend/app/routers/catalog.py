@@ -43,6 +43,7 @@ def get_shop(db: Session = Depends(get_db)) -> ShopOut:
         delivery_fee_paise=s.delivery_fee_paise,
         free_delivery_above_paise=s.free_delivery_above_paise,
         min_order_paise=s.min_order_paise,
+        delivery_eta_minutes=s.delivery_eta_minutes,
         cod_enabled=s.cod_enabled,
         online_payment_enabled=s.online_payment_enabled,
     )

@@ -1,16 +1,17 @@
-import { memo, useState } from 'react';
+import { Plus } from 'lucide-react-native';
+import { memo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import Animated, { ZoomIn } from 'react-native-reanimated';
 
 import type { ProductCard as ProductCardData } from '@/api/catalog';
 import { ProductImage } from '@/components/product/ProductImage';
-import { Badge, Money, QuantityStepper, Text } from '@/components/ui';
+import { Badge, Money, PressableScale, QuantityStepper, Text } from '@/components/ui';
+import { measure, useFlyToCart } from '@/features/cart/FlyToCart';
 import { formatPaise } from '@/lib/money';
 import { colors, motion, radius, shadow, spacing, tintFor } from '@/theme/tokens';
 
 export type { ProductCardData };
 
-/** Cart controls arrive in Phase 5; until a screen passes them, the card is browse-only. */
 export type CartControls = {
   quantity: number;
   onAdd: () => void;
@@ -26,14 +27,24 @@ export type ProductCardProps = {
 
 /**
  * The "open product" button is a full-card layer *behind* the content, not a wrapper around it:
- * the ADD button and stepper must not sit inside another button (invalid <button> nesting on
+ * the + button and stepper must not sit inside another button (invalid <button> nesting on
  * web, and screen readers would merge them). The visible content ignores touches, so a tap
  * anywhere except the cart controls falls through to the open layer.
  */
 function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
   const [pressed, setPressed] = useState(false);
+  const imageRef = useRef<View>(null);
+  const { fly } = useFlyToCart();
   const outOfStock = !product.is_available;
   const discount = product.discount_percent;
+  const saving = product.mrp_paise - product.price_paise;
+
+  const add = () => {
+    void measure(imageRef).then((from) => {
+      if (from) fly(from, product.image_url);
+    });
+    cart?.onAdd();
+  };
 
   return (
     <View style={[styles.card, pressed && styles.pressed]}>
@@ -50,73 +61,77 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
         />
       ) : null}
 
-      {/* Decorative for assistive tech: the open button above already announces all of this. */}
       <View
-        style={[styles.imageWell, { backgroundColor: tintFor(product.id) }, styles.passThrough]}
-        aria-hidden
+        ref={imageRef}
+        style={[styles.imageWell, { backgroundColor: tintFor(product.id) }, styles.passChildren]}
       >
-        <ProductImage uri={product.image_url} faded={outOfStock} iconSize={40} />
+        {/* Decorative for assistive tech: the open button above already announces all of this. */}
+        <View style={[styles.imageBox, styles.passThrough]} aria-hidden>
+          <ProductImage uri={product.image_url} faded={outOfStock} iconSize={40} />
+        </View>
         {discount > 0 && !outOfStock ? (
-          <View style={styles.tag}>
+          <View style={[styles.tag, styles.passThrough]} aria-hidden>
             <Badge label={`${discount}% OFF`} tone="foil" />
           </View>
         ) : null}
-      </View>
 
-      <View style={[styles.body, styles.passChildren]}>
-        <View style={[styles.text, styles.passThrough]} aria-hidden>
-          <Text variant="label" numberOfLines={2} style={styles.name}>
-            {product.name}
-          </Text>
-          <Text variant="caption" color="textSecondary">
-            {product.unit_label}
-          </Text>
-          {product.stock_hint === 'LOW' ? (
-            <Text variant="micro" color="offerText">
-              Only a few left
-            </Text>
-          ) : null}
-        </View>
-
-        <View style={[styles.footer, styles.passChildren]}>
-          <View style={styles.passThrough} aria-hidden>
-            <Money paise={product.price_paise} variant="price" />
-            {discount > 0 ? (
-              <Money paise={product.mrp_paise} variant="caption" color="textTertiary" strike />
-            ) : null}
-          </View>
-
+        <View style={[styles.control, styles.passChildren]}>
           {outOfStock ? (
-            <Text variant="micro" color="danger">
-              Out of stock
-            </Text>
+            <View style={styles.soldOut}>
+              <Text variant="tag" color="danger">
+                Out of stock
+              </Text>
+            </View>
           ) : cart ? (
             cart.quantity > 0 ? (
-              <Animated.View key="stepper" entering={FadeIn.duration(motion.base)}>
-                <QuantityStepper
-                  value={cart.quantity}
-                  max={product.max_per_order ?? undefined}
-                  onIncrement={cart.onIncrement}
-                  onDecrement={cart.onDecrement}
-                  itemName={product.name}
-                />
-              </Animated.View>
+              <QuantityStepper
+                value={cart.quantity}
+                max={product.max_per_order ?? undefined}
+                onIncrement={cart.onIncrement}
+                onDecrement={cart.onDecrement}
+                itemName={product.name}
+              />
             ) : (
-              <Animated.View key="add" entering={FadeIn.duration(motion.base)}>
-                <Pressable
-                  onPress={cart.onAdd}
+              <Animated.View key="add" entering={ZoomIn.duration(motion.base)}>
+                <PressableScale
+                  onPress={add}
+                  scaleTo={0.88}
                   accessibilityRole="button"
                   accessibilityLabel={`Add ${product.name} to cart`}
-                  style={({ pressed }) => [styles.add, pressed && styles.addPressed]}
+                  style={({ pressed: down }) => [styles.add, down && styles.addPressed]}
                 >
-                  <Text variant="tag" color="goldBright" style={styles.addLabel}>
-                    ADD
-                  </Text>
-                </Pressable>
+                  <Plus size={18} strokeWidth={2.8} color={colors.goldBright} />
+                </PressableScale>
               </Animated.View>
             )
           ) : null}
         </View>
+      </View>
+
+      <View style={[styles.body, styles.passThrough]} aria-hidden>
+        <View style={styles.unit}>
+          <Text variant="micro" color="textSecondary" numberOfLines={1}>
+            {product.unit_label}
+          </Text>
+        </View>
+        <Text variant="label" numberOfLines={2} style={styles.name}>
+          {product.name}
+        </Text>
+        <View style={styles.priceRow}>
+          <Money paise={product.price_paise} variant="price" />
+          {discount > 0 ? (
+            <Money paise={product.mrp_paise} variant="caption" color="textTertiary" strike />
+          ) : null}
+        </View>
+        {product.stock_hint === 'LOW' && !outOfStock ? (
+          <Text variant="micro" color="goldDeep">
+            Only a few left
+          </Text>
+        ) : discount > 0 && saving > 0 ? (
+          <Text variant="micro" color="brand">
+            Save {formatPaise(saving)}
+          </Text>
+        ) : null}
       </View>
     </View>
   );
@@ -145,34 +160,35 @@ const styles = StyleSheet.create({
   passThrough: { pointerEvents: 'none' },
   // ...and containers whose children (the cart controls) still take taps.
   passChildren: { pointerEvents: 'box-none' },
-  text: { gap: 2 },
-  imageWell: {
-    aspectRatio: 1,
-    borderRadius: radius.lg - 4,
-    padding: spacing.sm,
-  },
+  imageWell: { aspectRatio: 1 / 0.92, borderRadius: radius.lg - 4 },
+  imageBox: { flex: 1, padding: spacing.md },
   tag: { position: 'absolute', top: 8, left: 8 },
-  body: { paddingTop: spacing.xs, paddingHorizontal: 4, paddingBottom: 2, gap: 2, flex: 1 },
-  name: { minHeight: 40 },
-  footer: {
-    marginTop: 'auto',
-    paddingTop: spacing.xs,
-    minHeight: 40,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-  },
+  control: { position: 'absolute', right: 6, bottom: 6 },
   add: {
     ...shadow.md,
-    shadowOpacity: 0.25,
-    height: 34,
-    minWidth: 60,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radius.md - 2,
+    shadowOpacity: 0.3,
+    width: 36,
+    height: 36,
+    borderRadius: radius.md - 3,
     backgroundColor: colors.forest,
     alignItems: 'center',
     justifyContent: 'center',
   },
   addPressed: { backgroundColor: colors.forestDeep },
-  addLabel: { fontSize: 12, letterSpacing: 0.8 },
+  soldOut: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.sm,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  body: { paddingTop: spacing.xs, paddingHorizontal: 4, paddingBottom: 4, gap: 3, flex: 1 },
+  unit: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.tintSand,
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+  },
+  name: { minHeight: 40 },
+  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 6, marginTop: 'auto' },
 });

@@ -51,6 +51,12 @@ def test_partial_update(client: TestClient, admin: dict[str, str], db_session: S
     assert shop["delivery_fee_paise"] == 3000 and shop["is_accepting_orders"] is False
 
 
+def test_delivery_promise_is_editable_and_public(client: TestClient, admin: dict[str, str]) -> None:
+    assert client.get("/api/v1/shop").json()["delivery_eta_minutes"] == 30  # the default
+    assert patch(client, admin, delivery_eta_minutes=45).json()["delivery_eta_minutes"] == 45
+    assert client.get("/api/v1/shop").json()["delivery_eta_minutes"] == 45
+
+
 def test_pincodes_are_trimmed_deduplicated_and_sorted(
     client: TestClient, admin: dict[str, str]
 ) -> None:
@@ -75,6 +81,8 @@ def test_optional_text_can_be_cleared(client: TestClient, admin: dict[str, str])
         {"shop_name": ""},
         {"shop_phone": "call me"},
         {"payment_timeout_minutes": 2},
+        {"delivery_eta_minutes": 4},
+        {"delivery_eta_minutes": 241},
     ],
 )
 def test_rejects_bad_values(

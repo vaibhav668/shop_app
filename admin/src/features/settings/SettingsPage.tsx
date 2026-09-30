@@ -166,6 +166,18 @@ function SettingsForm({
                 : `Orders below ${formatPaise(freeAbove)} pay ${formatPaise(fee)} delivery; from ${formatPaise(freeAbove)} it's free.`}
             </p>
           ) : null}
+          <div className={styles.threeCol}>
+            <TextField
+              label="Delivery time (minutes)"
+              inputMode="numeric"
+              value={form.deliveryEta}
+              onChange={(e) => set('deliveryEta', e.target.value)}
+              error={errors.deliveryEta}
+            />
+          </div>
+          <p className={styles.summary}>
+            The app promises delivery in about {form.deliveryEta.trim() || '…'} minutes.
+          </p>
         </section>
 
         <section className={styles.card}>

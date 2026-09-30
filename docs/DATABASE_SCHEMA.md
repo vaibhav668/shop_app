@@ -223,6 +223,7 @@ One row per payment attempt, so an order can have several.
 | delivery_fee_paise | bigint | 2000 (₹20) |
 | free_delivery_above_paise | bigint | 29900 (₹299) |
 | min_order_paise | bigint | 9900 (₹99) |
+| delivery_eta_minutes | int `CHECK 5–240` | 30. The delivery promise shown in the app ("30 min"). |
 | serviceable_pincodes | text[] | `{}`. An empty list accepts every pincode only when `APP_ENV` is local/test; in staging/production it means no delivery anywhere until the shop sets its area. |
 | cod_enabled, online_payment_enabled | bool | true, true |
 | payment_timeout_minutes | int | 15 |

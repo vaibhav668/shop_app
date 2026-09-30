@@ -10,6 +10,7 @@ export type FormState = {
   deliveryFee: string;
   freeDeliveryAbove: string;
   minOrder: string;
+  deliveryEta: string;
   pincodes: string[];
   codEnabled: boolean;
   onlineEnabled: boolean;
@@ -30,6 +31,7 @@ export function initialState(s: ShopSettings): FormState {
     deliveryFee: paiseToInput(s.delivery_fee_paise),
     freeDeliveryAbove: paiseToInput(s.free_delivery_above_paise),
     minOrder: paiseToInput(s.min_order_paise),
+    deliveryEta: String(s.delivery_eta_minutes),
     pincodes: s.serviceable_pincodes,
     codEnabled: s.cod_enabled,
     onlineEnabled: s.online_payment_enabled,
@@ -67,6 +69,10 @@ export function validate(form: FormState): Errors {
     errors.freeDeliveryAbove = 'Enter an amount like 299.';
   }
   if (fee(form.minOrder) === null) errors.minOrder = 'Enter an amount like 99, or 0.';
+  const eta = form.deliveryEta.trim();
+  if (!/^\d+$/.test(eta) || Number(eta) < 5 || Number(eta) > 240) {
+    errors.deliveryEta = 'Minutes between 5 and 240, e.g. 30.';
+  }
   if (!form.codEnabled && !form.onlineEnabled) {
     errors.codEnabled =
       'Keep at least one payment method on. To pause orders, use the switch above.';
@@ -89,6 +95,7 @@ export function changes(form: FormState, saved: ShopSettings): ShopSettingsUpdat
     delivery_fee_paise: parseRupees(form.deliveryFee),
     free_delivery_above_paise: parseRupees(form.freeDeliveryAbove),
     min_order_paise: parseRupees(form.minOrder),
+    delivery_eta_minutes: Number(form.deliveryEta.trim()),
     serviceable_pincodes: form.pincodes,
     cod_enabled: form.codEnabled,
     online_payment_enabled: form.onlineEnabled,

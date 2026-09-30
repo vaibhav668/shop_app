@@ -21,6 +21,7 @@ def _out(s: ShopSettings, area: DeliveryArea) -> AdminSettingsOut:
         delivery_fee_paise=s.delivery_fee_paise,
         free_delivery_above_paise=s.free_delivery_above_paise,
         min_order_paise=s.min_order_paise,
+        delivery_eta_minutes=s.delivery_eta_minutes,
         serviceable_pincodes=list(s.serviceable_pincodes or []),
         empty_pincodes_accept_all=area.open_when_unset,
         cod_enabled=s.cod_enabled,

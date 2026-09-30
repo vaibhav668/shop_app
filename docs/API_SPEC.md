@@ -56,7 +56,7 @@ PaymentSession{ provider, key_id, provider_order_id, amount_paise, currency, pre
 ### Shop, home & catalog
 | Method | Path | Notes |
 |---|---|---|
-| GET | `/shop` **public** | Name, is_accepting_orders, closed_message, delivery fee rules, payment methods enabled |
+| GET | `/shop` **public** | Name, is_accepting_orders, closed_message, delivery fee rules, `delivery_eta_minutes` (the "30 min" promise), payment methods enabled |
 | GET | `/home` **public** | `{ banners, categories, featured: ProductCard[] }`. Featured = in-stock products marked featured (falls back to the shop's own ordering if none are). Banners are active and inside their schedule; a banner whose target is hidden or removed comes back with `target_type: NONE`. `popular` and `buy_again` are added with orders (Phase 7). |
 | GET | `/categories` **public** | Active categories, sorted |
 | GET | `/products` **public** | `?q&category_id&sort=default\|price_asc\|price_desc&in_stock_only&limit&offset` → `Page<ProductCard>`. With `q`, `default` sort means relevance. Search: every word must appear in the name or local keywords (substring); only if nothing matches, a typo-tolerant trigram match is used (`word_similarity ≥ 0.5`, words of 3+ letters). |
@@ -109,7 +109,7 @@ One notification per order step the customer didn't take themselves (placed, con
 | Categories | `GET/POST /admin/categories` · `PATCH/DELETE /admin/categories/{id}` (delete only when the category is empty) · `POST /admin/categories/reorder { ids: [] }` |
 | Banners | `GET/POST /admin/banners` · `PATCH/DELETE /admin/banners/{id}` · `POST /admin/banners/reorder { ids }`. A banner opens nothing, a category or a product (`target_type` + `target_id` must agree); optional `starts_at`/`ends_at` schedule. |
 | Customers | `GET /admin/customers?q&limit&offset` → customers (not admins or deleted accounts), most recent buyers first, with `order_count`, `total_spent_paise` (paid orders only), `last_order_at`; `q` matches name, email or phone · `GET /admin/customers/{id}` adds `cancelled_count` and the 20 most recent orders |
-| Settings | `GET /admin/settings` · `PATCH /admin/settings` (only the fields sent; pincodes are trimmed, de-duplicated and sorted; fees 0–₹10,000; at least one payment method must stay on). The response's `empty_pincodes_accept_all` says whether an empty pincode list means "everywhere" (local/test) or "nowhere" (staging/production). |
+| Settings | `GET /admin/settings` · `PATCH /admin/settings` (only the fields sent; pincodes are trimmed, de-duplicated and sorted; fees 0–₹10,000; `delivery_eta_minutes` 5–240; at least one payment method must stay on). The response's `empty_pincodes_accept_all` says whether an empty pincode list means "everywhere" (local/test) or "nowhere" (staging/production). |
 | Uploads | `POST /admin/uploads/images` (multipart `file`, ≤ 5 MB, jpeg/png/webp) → `{ url, key }` |
 
 ## Operational

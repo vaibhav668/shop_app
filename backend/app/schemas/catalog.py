@@ -50,6 +50,7 @@ class ShopOut(BaseModel):
     delivery_fee_paise: int
     free_delivery_above_paise: int
     min_order_paise: int
+    delivery_eta_minutes: int
     cod_enabled: bool
     online_payment_enabled: bool
 

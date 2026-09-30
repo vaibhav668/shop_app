@@ -30,6 +30,11 @@ export function useProduct(id: string) {
   return useQuery({ queryKey: queryKeys.product(id), queryFn: () => catalogApi.product(id) });
 }
 
+/** Public shop info: open/closed, delivery rules and the delivery-time promise. */
+export function useShop() {
+  return useQuery({ queryKey: queryKeys.shop, queryFn: catalogApi.shop, staleTime: 5 * 60_000 });
+}
+
 export function useHome() {
   return useQuery({ queryKey: queryKeys.home, queryFn: catalogApi.home });
 }
