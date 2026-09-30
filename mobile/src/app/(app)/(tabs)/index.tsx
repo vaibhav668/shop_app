@@ -26,6 +26,7 @@ import { HomeSearch, MiniHeader } from '@/features/home/HomeSearch';
 import { PromiseTiles } from '@/features/home/PromiseTiles';
 import { useUnreadCount } from '@/features/notifications/hooks';
 import { colors, gutter, radius, spacing } from '@/theme/tokens';
+import { useGridCell } from '@/lib/useGridCell';
 
 // Past this point the big header is gone and the slim search bar slides in.
 const COLLAPSE_AT = 150;
@@ -39,6 +40,7 @@ function openBanner(banner: Banner) {
 }
 
 export default function HomeScreen() {
+  const cell = useGridCell(2);
   const { user } = useAuth();
   const home = useHome();
   const shop = useShop();
@@ -130,7 +132,7 @@ export default function HomeScreen() {
                 </View>
                 <View style={styles.grid}>
                   {home.data.featured.slice(0, 10).map((product) => (
-                    <View key={product.id} style={styles.cell}>
+                    <View key={product.id} style={cell}>
                       <ShopProductCard product={product} />
                     </View>
                   ))}

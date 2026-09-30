@@ -11,8 +11,10 @@ import { ProductGridSkeleton } from '@/components/product/Skeletons';
 import { QueryError } from '@/components/QueryError';
 import { EmptyState } from '@/components/ui';
 import { colors, gutter, spacing } from '@/theme/tokens';
+import { useGridCell } from '@/lib/useGridCell';
 
 export default function FavouritesScreen() {
+  const cell = useGridCell(2);
   const favourites = useInfiniteQuery({
     queryKey: queryKeys.favourites,
     queryFn: ({ pageParam }) => favouritesApi.list(pageParam),
@@ -58,7 +60,7 @@ export default function FavouritesScreen() {
             ) : null
           }
           renderItem={({ item }) => (
-            <View style={styles.cell}>
+            <View style={cell}>
               <ShopProductCard product={item} />
             </View>
           )}
@@ -74,6 +76,5 @@ const styles = StyleSheet.create({
   pad: { padding: gutter },
   list: { padding: gutter, paddingBottom: spacing.xxxl, gap: spacing.sm },
   row: { gap: spacing.sm },
-  cell: { flex: 1 / 2 },
   footer: { paddingVertical: spacing.lg },
 });

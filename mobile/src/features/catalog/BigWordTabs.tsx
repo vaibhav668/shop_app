@@ -23,6 +23,7 @@ export function BigWordTabs({
 }) {
   const scroller = useRef<ScrollView>(null);
   const offsets = useRef(new Map<string, number>());
+  const placed = useRef(false);
 
   // Keep the active word in view when it changes.
   useEffect(() => {
@@ -44,7 +45,15 @@ export function BigWordTabs({
           <Pressable
             key={c.id}
             onPress={() => onSelect(c.slug)}
-            onLayout={(e) => offsets.current.set(c.slug, e.nativeEvent.layout.x)}
+            onLayout={(e) => {
+              const x = e.nativeEvent.layout.x;
+              offsets.current.set(c.slug, x);
+              // First layout: bring the current category into view (it may be far right).
+              if (active && !placed.current) {
+                placed.current = true;
+                scroller.current?.scrollTo({ x: Math.max(0, x - gutter), animated: false });
+              }
+            }}
             accessibilityRole="tab"
             accessibilityState={{ selected: active }}
             accessibilityLabel={c.name}

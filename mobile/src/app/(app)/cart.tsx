@@ -59,7 +59,9 @@ function CartContents({ cart }: { cart: Cart }) {
             {savings > 0 ? (
               <View style={styles.savings} accessibilityRole="text">
                 <Foil borderRadius={radius.lg - 4} />
-                <Sparkles size={18} strokeWidth={2.2} color={colors.forestDeep} />
+                <View>
+                  <Sparkles size={18} strokeWidth={2.2} color={colors.forestDeep} />
+                </View>
                 <Text variant="button" color="forestDeep">
                   You&apos;re saving {formatPaise(savings)} on this order
                 </Text>

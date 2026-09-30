@@ -15,7 +15,10 @@ export function BrandMark({ size = 48 }: { size?: number }) {
       style={[styles.mark, { width: size, height: size, borderRadius: corner }]}
     >
       <Foil borderRadius={corner} />
-      <ShoppingBasket size={size * 0.52} strokeWidth={2.2} color={colors.forestDeep} />
+      {/* Wrapped in a View so it paints above the foil on web. */}
+      <View>
+        <ShoppingBasket size={size * 0.52} strokeWidth={2.2} color={colors.forestDeep} />
+      </View>
     </View>
   );
 }

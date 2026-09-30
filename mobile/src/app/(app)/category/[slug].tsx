@@ -12,6 +12,7 @@ import { Chip, EmptyState, Text } from '@/components/ui';
 import { BigWordTabs } from '@/features/catalog/BigWordTabs';
 import { useCategories, useCategory, useProducts } from '@/features/catalog/hooks';
 import { colors, gutter, spacing } from '@/theme/tokens';
+import { useGridCell } from '@/lib/useGridCell';
 
 const SORTS: { value: ProductSort; label: string }[] = [
   { value: 'default', label: 'Recommended' },
@@ -20,6 +21,7 @@ const SORTS: { value: ProductSort; label: string }[] = [
 ];
 
 export default function CategoryScreen() {
+  const cell = useGridCell(2);
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const [sort, setSort] = useState<ProductSort>('default');
   const categories = useCategories();
@@ -100,7 +102,7 @@ export default function CategoryScreen() {
             ) : null
           }
           renderItem={({ item }) => (
-            <View style={styles.cell}>
+            <View style={cell}>
               <ShopProductCard product={item} />
             </View>
           )}
@@ -119,6 +121,5 @@ const styles = StyleSheet.create({
   pad: { paddingHorizontal: gutter },
   list: { paddingHorizontal: gutter, paddingBottom: spacing.xxxl, gap: spacing.sm },
   row: { gap: spacing.sm },
-  cell: { flex: 1 / 2 },
   footer: { paddingVertical: spacing.lg },
 });

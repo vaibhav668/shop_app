@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { artForName, ProduceArt } from '@/components/art/Produce';
 import { ProductImage } from '@/components/product/ProductImage';
 import { ShopProductCard } from '@/components/product/ShopProductCard';
 import { ProductGridSkeleton } from '@/components/product/Skeletons';
@@ -28,6 +29,7 @@ import {
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
 import { colors, gutter, hitSlop, radius, shadow, spacing, tintFor } from '@/theme/tokens';
 import { textVariants } from '@/theme/typography';
+import { useGridCell } from '@/lib/useGridCell';
 
 /** The product name with the typed part marked in gold. */
 function Highlighted({ text, match }: { text: string; match: string }) {
@@ -51,6 +53,7 @@ function Highlighted({ text, match }: { text: string; match: string }) {
 }
 
 export default function SearchScreen() {
+  const cell = useGridCell(2);
   const input = useRef<TextInput>(null);
   const [text, setText] = useState('');
   // The submitted query drives the results grid; `text` drives suggestions while typing.
@@ -180,7 +183,7 @@ export default function SearchScreen() {
                 ) : null
               }
               renderItem={({ item }) => (
-                <View style={styles.cell}>
+                <View style={cell}>
                   <ShopProductCard product={item} />
                 </View>
               )}
@@ -287,7 +290,11 @@ export default function SearchScreen() {
                       pressed && styles.aislePressed,
                     ]}
                   >
-                    <LayoutGrid size={14} strokeWidth={2} color={colors.forest} />
+                    {artForName(c.name) ? (
+                      <ProduceArt kind={artForName(c.name)!} size={22} />
+                    ) : (
+                      <LayoutGrid size={14} strokeWidth={2} color={colors.forest} />
+                    )}
                     <Text variant="label">{c.name}</Text>
                   </Pressable>
                 ))}
@@ -345,12 +352,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  input: { ...textVariants.body, flex: 1, color: colors.text, paddingVertical: 0 },
+  input: {
+    ...textVariants.body,
+    flex: 1,
+    color: colors.text,
+    paddingVertical: 0,
+    outlineWidth: 0,
+    outlineColor: 'transparent',
+  },
   chips: { paddingHorizontal: gutter, paddingVertical: spacing.xs },
   pad: { paddingHorizontal: gutter },
   list: { paddingHorizontal: gutter, paddingBottom: spacing.xxxl, gap: spacing.sm },
   row: { gap: spacing.sm },
-  cell: { flex: 1 / 2 },
   footer: { paddingVertical: spacing.lg },
   suggestions: { paddingBottom: spacing.xxxl },
   row2: {

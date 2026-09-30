@@ -9,10 +9,12 @@ import { QueryError } from '@/components/QueryError';
 import { EmptyState, IconButton, Screen, Text } from '@/components/ui';
 import { useCategories } from '@/features/catalog/hooks';
 import { colors, gutter, spacing } from '@/theme/tokens';
+import { useGridCell } from '@/lib/useGridCell';
 
 const COLUMNS = 3;
 
 export default function CategoriesScreen() {
+  const cell = useGridCell(COLUMNS);
   const { data, isPending, isError, error, refetch, isRefetching } = useCategories();
 
   return (
@@ -58,7 +60,7 @@ export default function CategoriesScreen() {
           renderItem={({ item, index }) => (
             <Animated.View
               entering={FadeInUp.delay(Math.min(index, 12) * 30).duration(280)}
-              style={styles.cell}
+              style={cell}
             >
               <CategoryTile
                 category={item}
@@ -87,5 +89,4 @@ const styles = StyleSheet.create({
   pad: { paddingHorizontal: gutter },
   list: { paddingHorizontal: gutter, paddingBottom: spacing.xxxl, gap: spacing.sm },
   row: { gap: spacing.sm },
-  cell: { flex: 1 / COLUMNS },
 });

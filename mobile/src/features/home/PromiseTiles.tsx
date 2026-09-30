@@ -51,7 +51,7 @@ export function PromiseTiles({ shop }: { shop: Shop }) {
           <Text variant="micro" color="textSecondary">
             {small}
           </Text>
-          <Text variant="heading" numberOfLines={1} adjustsFontSizeToFit>
+          <Text variant="heading" numberOfLines={2} style={styles.big}>
             {big}
           </Text>
           <View style={styles.medallion}>
@@ -65,7 +65,8 @@ export function PromiseTiles({ shop }: { shop: Shop }) {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: spacing.xs, paddingHorizontal: gutter, marginTop: spacing.md },
-  tile: { flex: 1, borderRadius: radius.lg - 2, padding: spacing.sm, minHeight: 96 },
+  tile: { flex: 1, borderRadius: radius.lg - 2, padding: spacing.sm, minHeight: 104 },
+  big: { fontSize: 15, lineHeight: 19, paddingRight: 4 },
   medallion: {
     position: 'absolute',
     right: 10,

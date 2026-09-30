@@ -59,6 +59,8 @@ const styles = StyleSheet.create({
   wrapper: { gap: 6 },
   input: {
     ...textVariants.body,
+    outlineWidth: 0,
+    outlineColor: 'transparent',
     color: colors.text,
     minHeight: 48,
     backgroundColor: colors.surface,
