@@ -49,7 +49,7 @@ function AppStack() {
         }}
       />
       <Stack.Screen name="favourites" options={{ title: 'Favourites' }} />
-      <Stack.Screen name="category/[slug]" options={{ title: '' }} />
+      <Stack.Screen name="category/[slug]" options={{ headerShown: false }} />
       <Stack.Screen name="product/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="dev/ui" options={{ title: 'UI kit' }} />
     </Stack>

@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import type { Category, Shop } from '@/api/catalog';
 import { ProductCard } from '@/components/product/ProductCard';
-import { BigWordTabs } from '@/features/catalog/BigWordTabs';
+import { AisleRail } from '@/features/catalog/AisleRail';
 import { FlyToCartProvider, measure } from '@/features/cart/FlyToCart';
 import { PromiseTiles } from '@/features/home/PromiseTiles';
 
@@ -38,10 +38,10 @@ describe('<PromiseTiles />', () => {
   });
 });
 
-describe('<BigWordTabs />', () => {
+describe('<AisleRail />', () => {
   it('marks the current category and switches on tap', async () => {
     const onSelect = jest.fn();
-    await render(<BigWordTabs categories={categories} activeSlug="dairy" onSelect={onSelect} />);
+    await render(<AisleRail categories={categories} activeSlug="dairy" onSelect={onSelect} />);
     expect(screen.getByRole('tab', { name: 'Dairy' })).toBeSelected();
     await fireEvent.press(screen.getByRole('tab', { name: 'Bakery' }));
     expect(onSelect).toHaveBeenCalledWith('bakery');
