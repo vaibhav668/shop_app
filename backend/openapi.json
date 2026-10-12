@@ -5541,6 +5541,16 @@
           },
           {
             "in": "query",
+            "name": "missing_photo",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Missing Photo",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
             "name": "limit",
             "required": false,
             "schema": {
@@ -6028,6 +6038,20 @@
     "/api/v1/admin/uploads/images": {
       "post": {
         "operationId": "upload_image_api_v1_admin_uploads_images_post",
+        "parameters": [
+          {
+            "description": "Product/category photo: trimmed and centred on a white square",
+            "in": "query",
+            "name": "square",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Product/category photo: trimmed and centred on a white square",
+              "title": "Square",
+              "type": "boolean"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "multipart/form-data": {

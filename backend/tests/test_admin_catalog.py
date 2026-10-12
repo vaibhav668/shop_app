@@ -163,6 +163,7 @@ class TestProducts:
         make_product(db_session, category, name="Toned Milk", search_keywords="doodh")
         make_product(db_session, category, name="Bread", stock_quantity=2)
         make_product(db_session, category, name="Hidden Jam", is_active=False)
+        make_product(db_session, category, name="Photographed Ghee", image_key="catalog/g.webp")
 
         def names(query: str) -> list[str]:
             items = client.get(f"{ADMIN}/products?{query}", headers=admin).json()["items"]
@@ -171,7 +172,14 @@ class TestProducts:
         assert names("q=doodh") == ["Toned Milk"]
         assert names("low_stock=true") == ["Bread"]
         assert names("status=inactive") == ["Hidden Jam"]
-        assert sorted(names("status=all")) == ["Bread", "Hidden Jam", "Toned Milk"]
+        assert sorted(names("status=all")) == [
+            "Bread",
+            "Hidden Jam",
+            "Photographed Ghee",
+            "Toned Milk",
+        ]
+        assert "Photographed Ghee" not in names("missing_photo=true")
+        assert "Toned Milk" in names("missing_photo=true")
 
 
 class TestStock:
@@ -233,6 +241,32 @@ class TestUploads:
         served = client.get(body["url"].replace("http://testserver", ""))
         assert served.status_code == 200
         assert Image.open(io.BytesIO(served.content)).format == "WEBP"
+
+    def test_square_product_photo_is_centred_on_white(
+        self, client: TestClient, admin: dict[str, str]
+    ) -> None:
+        # A small red product in the top-left corner of a big grey table photo.
+        photo = Image.new("RGB", (800, 500), (200, 200, 200))
+        photo.paste((220, 38, 38), (40, 40, 200, 160))
+        out = io.BytesIO()
+        photo.save(out, format="JPEG", quality=95)
+
+        response = client.post(
+            f"{ADMIN}/uploads/images?square=true",
+            files={"file": ("photo.jpg", out.getvalue(), "image/jpeg")},
+            headers=admin,
+        )
+        assert response.status_code == 201
+        served = client.get(response.json()["url"].replace("http://testserver", ""))
+        img = Image.open(io.BytesIO(served.content)).convert("RGB")
+        assert img.size == (1000, 1000)
+        # The grey border is gone: white corners, the product filling the middle.
+        assert img.getpixel((5, 5)) == (255, 255, 255)
+        r, g, b = img.getpixel((500, 500))
+        assert r > 180 and g < 90 and b < 90
+        # An 8% margin each side: white at 60 px, the product already at 100 px.
+        assert img.getpixel((60, 500)) == (255, 255, 255)
+        assert img.getpixel((100, 500))[1] < 90
 
     def test_rejects_non_images(self, client: TestClient, admin: dict[str, str]) -> None:
         response = client.post(

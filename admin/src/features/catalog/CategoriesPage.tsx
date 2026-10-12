@@ -264,7 +264,7 @@ function CategoryDialog({
           maxLength={120}
           error={error}
         />
-        <ImageUpload value={image} onChange={setImage} />
+        <ImageUpload square value={image} onChange={setImage} />
         <Toggle
           label="Show in app"
           description="Hidden categories are kept but customers can't see them."

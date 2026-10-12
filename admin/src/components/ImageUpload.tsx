@@ -1,4 +1,4 @@
-import { ImagePlus, Trash2 } from 'lucide-react';
+import { Camera, ImagePlus, Trash2 } from 'lucide-react';
 import { useId, useRef, useState } from 'react';
 
 import { adminCatalogApi } from '@/api/catalog';
@@ -13,13 +13,17 @@ export function ImageUpload({
   value,
   onChange,
   label = 'Photo',
+  square = false,
 }: {
   value: ImageValue;
   onChange: (value: ImageValue) => void;
   label?: string;
+  /** Product and category photos: the server trims them and centres them on a white square. */
+  square?: boolean;
 }) {
   const id = useId();
   const input = useRef<HTMLInputElement>(null);
+  const camera = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,13 +32,14 @@ export function ImageUpload({
     setError(null);
     setUploading(true);
     try {
-      const uploaded = await adminCatalogApi.uploadImage(file);
+      const uploaded = await adminCatalogApi.uploadImage(file, { square });
       onChange({ key: uploaded.key, url: uploaded.url });
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Couldn't upload that photo.");
     } finally {
       setUploading(false);
       if (input.current) input.current.value = '';
+      if (camera.current) camera.current.value = '';
     }
   };
 
@@ -66,13 +71,33 @@ export function ImageUpload({
           <label htmlFor={id} className={styles.choose} aria-disabled={uploading || undefined}>
             {value ? 'Change photo' : 'Upload photo'}
           </label>
+          {/* On a phone this opens the camera straight away. */}
+          <input
+            ref={camera}
+            id={`${id}-camera`}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className={styles.file}
+            onChange={(e) => void pick(e.target.files?.[0])}
+            disabled={uploading}
+          />
+          <label
+            htmlFor={`${id}-camera`}
+            className={styles.choose}
+            aria-disabled={uploading || undefined}
+          >
+            <Camera size={14} aria-hidden /> Take photo
+          </label>
           {value ? (
             <button type="button" className={styles.remove} onClick={() => onChange(null)}>
               <Trash2 size={14} aria-hidden /> Remove
             </button>
           ) : null}
           <span className={styles.hint}>
-            JPEG, PNG or WebP, up to 5 MB. Square photos look best.
+            {square
+              ? 'JPEG, PNG or WebP, up to 5 MB. Shoot the product on a plain surface; it is trimmed and centred on white.'
+              : 'JPEG, PNG or WebP, up to 5 MB.'}
           </span>
           {error ? (
             <span className={styles.error} role="alert">

@@ -27,7 +27,12 @@ from app.services.admin_catalog import AdminCatalogService
 from app.services.catalog_views import CatalogViews
 from app.services.inventory import InventoryService
 from app.services.shop import get_shop_settings
-from app.utils.images import OUTPUT_CONTENT_TYPE, OUTPUT_EXTENSION, normalise_image
+from app.utils.images import (
+    OUTPUT_CONTENT_TYPE,
+    OUTPUT_EXTENSION,
+    normalise_image,
+    square_product_photo,
+)
 
 router = APIRouter()
 
@@ -49,9 +54,14 @@ def get_views(
 
 @router.post("/uploads/images", response_model=UploadOut, status_code=status.HTTP_201_CREATED)
 async def upload_image(
-    file: UploadFile = File(...), storage: StorageProvider = Depends(get_storage)
+    file: UploadFile = File(...),
+    square: bool = Query(
+        False, description="Product/category photo: trimmed and centred on a white square"
+    ),
+    storage: StorageProvider = Depends(get_storage),
 ) -> UploadOut:
-    data = normalise_image(await file.read())
+    raw = await file.read()
+    data = square_product_photo(raw) if square else normalise_image(raw)
     key = f"catalog/{uuid.uuid4().hex}.{OUTPUT_EXTENSION}"
     storage.save(data, key=key, content_type=OUTPUT_CONTENT_TYPE)
     return UploadOut(key=key, url=storage.url(key, width=400))
@@ -110,6 +120,7 @@ def list_products(
     category_id: uuid.UUID | None = None,
     status: ProductStatus = "all",
     low_stock: bool = False,
+    missing_photo: bool = False,
     limit: int = Query(20, ge=1, le=MAX_PAGE_SIZE),
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
@@ -121,6 +132,7 @@ def list_products(
         category_id=category_id,
         status=status,
         low_stock=low_stock,
+        missing_photo=missing_photo,
         settings=get_shop_settings(db),
         limit=limit,
         offset=offset,

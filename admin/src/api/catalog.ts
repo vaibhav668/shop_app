@@ -20,6 +20,7 @@ export type ProductFilters = {
   categoryId?: string;
   status?: ProductStatus;
   lowStock?: boolean;
+  missingPhoto?: boolean;
   offset?: number;
   limit?: number;
 };
@@ -45,6 +46,7 @@ export const adminCatalogApi = {
     if (f.q) query.set('q', f.q);
     if (f.categoryId) query.set('category_id', f.categoryId);
     if (f.lowStock) query.set('low_stock', 'true');
+    if (f.missingPhoto) query.set('missing_photo', 'true');
     return api<ProductPage>(`/admin/products?${query}`);
   },
   product: (id: string) => api<AdminProduct>(`/admin/products/${id}`),
@@ -70,10 +72,12 @@ export const adminCatalogApi = {
   reorderBanners: (ids: string[]) =>
     api<void>('/admin/banners/reorder', { method: 'POST', body: { ids } }),
 
-  uploadImage: (file: File) => {
+  /** `square`: product and category photos, trimmed and centred on a white square. */
+  uploadImage: (file: File, { square = false }: { square?: boolean } = {}) => {
     const form = new FormData();
     form.append('file', file);
-    return api<Upload>('/admin/uploads/images', { method: 'POST', body: form });
+    const path = square ? '/admin/uploads/images?square=true' : '/admin/uploads/images';
+    return api<Upload>(path, { method: 'POST', body: form });
   },
 };
 

@@ -111,6 +111,7 @@ class AdminCatalogService:
         status: ProductStatus,
         low_stock: bool,
         settings: ShopSettings,
+        missing_photo: bool = False,
         limit: int,
         offset: int,
     ) -> tuple[list[Product], int]:
@@ -135,6 +136,8 @@ class AdminCatalogService:
                 Product.low_stock_threshold, settings.default_low_stock_threshold
             )
             stmt = stmt.where(Product.stock_quantity <= threshold)
+        if missing_photo:
+            stmt = stmt.where(Product.image_key.is_(None))
 
         total = (
             self.db.scalar(select(func.count()).select_from(stmt.order_by(None).subquery())) or 0

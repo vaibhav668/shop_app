@@ -95,6 +95,27 @@ describe('products page', () => {
     expect(screen.getByText('1–2 of 2')).toBeInTheDocument();
   });
 
+  it('nudges for missing photos and filters to them', async () => {
+    const calls: string[] = [];
+    mockApi({
+      '/auth/refresh': authOk(),
+      '/admin/categories': { status: 200, body: [DAIRY] },
+      '/admin/products': (url: string) => {
+        calls.push(url);
+        return url.includes('missing_photo=true')
+          ? { status: 200, body: page([product({ id: 'p-curd', name: 'Curd' })]) }
+          : { status: 200, body: page([product()]) };
+      },
+    });
+    renderApp('/products');
+
+    expect(await screen.findByText('1 product needs a photo.')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Show them' }));
+    expect(await screen.findByRole('checkbox', { name: 'Needs a photo' })).toBeChecked();
+    expect(await screen.findByRole('link', { name: 'Curd' })).toBeInTheDocument();
+    expect(calls.some((u) => u.includes('missing_photo=true'))).toBe(true);
+  });
+
   it('shows a friendly empty state for a new shop', async () => {
     mockApi({
       '/auth/refresh': authOk(),

@@ -3223,6 +3223,7 @@ export interface operations {
         category_id?: string | null;
         status?: 'active' | 'inactive' | 'archived' | 'all';
         low_stock?: boolean;
+        missing_photo?: boolean;
         limit?: number;
         offset?: number;
       };
@@ -3538,7 +3539,10 @@ export interface operations {
   };
   upload_image_api_v1_admin_uploads_images_post: {
     parameters: {
-      query?: never;
+      query?: {
+        /** @description Product/category photo: trimmed and centred on a white square */
+        square?: boolean;
+      };
       header?: never;
       path?: never;
       cookie?: never;

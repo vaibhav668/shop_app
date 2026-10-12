@@ -308,7 +308,7 @@ function ProductForm({ product }: { product?: AdminProduct }) {
 
         <aside className={styles.side}>
           <section className={styles.card}>
-            <ImageUpload value={form.image} onChange={(v) => set('image', v)} />
+            <ImageUpload square value={form.image} onChange={(v) => set('image', v)} />
           </section>
 
           <section className={styles.card}>

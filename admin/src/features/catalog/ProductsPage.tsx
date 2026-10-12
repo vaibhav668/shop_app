@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { Package, Plus } from 'lucide-react';
+import { Camera, Package, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 
@@ -43,6 +43,7 @@ export function ProductsPage() {
   const status = (params.get('status') as ProductStatus | null) ?? 'all';
   const categoryId = params.get('category') ?? '';
   const lowStock = params.get('low') === '1';
+  const missingPhoto = params.get('photo') === 'missing';
   const page = Math.max(0, Number(params.get('page') ?? 0));
   const [search, setSearch] = useState(params.get('q') ?? '');
   const q = useDebounced(search.trim(), 300);
@@ -76,6 +77,7 @@ export function ProductsPage() {
     categoryId: categoryId || undefined,
     status,
     lowStock,
+    missingPhoto,
     offset: page * ADMIN_PAGE_SIZE,
   };
   const products = useQuery({
@@ -87,12 +89,19 @@ export function ProductsPage() {
     queryKey: catalogKeys.categories,
     queryFn: adminCatalogApi.categories,
   });
+  // How many products still show a drawing instead of a real photo.
+  const photoFilters = { status: 'all' as ProductStatus, missingPhoto: true, offset: 0 };
+  const needPhotos = useQuery({
+    queryKey: catalogKeys.products(photoFilters),
+    queryFn: () => adminCatalogApi.products(photoFilters),
+  });
+  const needPhotoCount = needPhotos.data?.total ?? 0;
 
   const total = products.data?.total ?? 0;
   const items = products.data?.items ?? [];
   const from = total === 0 ? 0 : page * ADMIN_PAGE_SIZE + 1;
   const to = Math.min(total, (page + 1) * ADMIN_PAGE_SIZE);
-  const filtered = Boolean(q || categoryId || lowStock || status !== 'all');
+  const filtered = Boolean(q || categoryId || lowStock || missingPhoto || status !== 'all');
 
   return (
     <>
@@ -105,6 +114,21 @@ export function ProductsPage() {
           </Button>
         }
       />
+
+      {needPhotoCount > 0 && !missingPhoto ? (
+        <div className={styles.photoNudge} role="status">
+          <Camera size={18} aria-hidden />
+          <span>
+            <b>
+              {needPhotoCount} {needPhotoCount === 1 ? 'product needs' : 'products need'} a photo.
+            </b>{' '}
+            Real photos make the app look its best; customers see a drawing until then.
+          </span>
+          <button type="button" onClick={() => update({ photo: 'missing' })}>
+            Show them
+          </button>
+        </div>
+      ) : null}
 
       <div className={styles.filters}>
         <TextField
@@ -144,6 +168,14 @@ export function ProductsPage() {
             onChange={(e) => update({ low: e.target.checked ? '1' : null })}
           />
           Low stock only
+        </label>
+        <label className={styles.lowStock}>
+          <input
+            type="checkbox"
+            checked={missingPhoto}
+            onChange={(e) => update({ photo: e.target.checked ? 'missing' : null })}
+          />
+          Needs a photo
         </label>
       </div>
 

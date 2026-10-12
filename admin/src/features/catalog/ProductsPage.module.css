@@ -27,3 +27,38 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* "N products need a photo": a gold reminder above the filters. */
+.photoNudge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-gold-soft);
+  color: var(--color-gold-deep);
+}
+
+.photoNudge span {
+  flex: 1;
+}
+
+.photoNudge button {
+  flex-shrink: 0;
+  height: 34px;
+  padding: 0 var(--space-3);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-forest);
+  color: var(--color-on-action);
+  font-family: var(--font-display);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .photoNudge {
+    flex-wrap: wrap;
+  }
+}
