@@ -19,6 +19,8 @@ import { QueryError } from '@/components/QueryError';
 import { Button, EmptyState, Money, QuantityStepper, Skeleton, Text } from '@/components/ui';
 import { cartSavings, maxQuantityFor } from '@/features/cart/cartMath';
 import { useCart, useCartActions } from '@/features/cart/hooks';
+import { useHome } from '@/features/catalog/hooks';
+import { ProductRail } from '@/features/home/ProductRail';
 import { formatPaise } from '@/lib/money';
 import { colors, gutter, radius, shadow, spacing, tintFor } from '@/theme/tokens';
 
@@ -71,7 +73,12 @@ function CartContents({ cart }: { cart: Cart }) {
           </View>
         }
         renderItem={({ item }) => <CartLineRow line={item} />}
-        ListFooterComponent={<BillDetails cart={cart} savings={savings} />}
+        ListFooterComponent={
+          <>
+            <MissedRail cart={cart} />
+            <BillDetails cart={cart} savings={savings} />
+          </>
+        }
       />
 
       <View style={[styles.checkout, { paddingBottom: spacing.sm + insets.bottom }]}>
@@ -240,6 +247,28 @@ function CartLineRow({ line }: { line: CartLine }) {
   );
 }
 
+/** Shop picks and deals not in the cart yet: the "forgot the bread" moment. */
+function MissedRail({ cart }: { cart: Cart }) {
+  const home = useHome();
+  if (!home.data) return null;
+  const inCart = new Set(cart.lines.map((l) => l.product.id));
+  const seen = new Set<string>();
+  const picks = [...home.data.featured, ...home.data.deals, ...home.data.under_price].filter(
+    (p) => p.is_available && !inCart.has(p.id) && !seen.has(p.id) && seen.add(p.id),
+  );
+  if (picks.length < 3) return null;
+  return (
+    <View style={styles.missed}>
+      <ProductRail
+        title="You might have missed"
+        subtitle="Popular at the shop this week"
+        icon={Sparkles}
+        products={picks.slice(0, 10)}
+      />
+    </View>
+  );
+}
+
 function BillDetails({ cart, savings }: { cart: Cart; savings: number }) {
   return (
     <View style={styles.bill}>
@@ -352,6 +381,7 @@ const styles = StyleSheet.create({
   lineInfo: { flex: 1, gap: 2 },
   lineEnd: { alignItems: 'flex-end', gap: spacing.xs },
   remove: { flexDirection: 'row', alignItems: 'center', gap: 4, height: 32 },
+  missed: { marginHorizontal: -gutter },
   bill: {
     ...shadow.sm,
     marginTop: spacing.sm,

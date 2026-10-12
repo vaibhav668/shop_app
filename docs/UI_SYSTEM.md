@@ -75,7 +75,7 @@ Text scales with the system up to 1.3×; test at 1.3×.
 
 **Button**: `primary` forest with a gold icon and a soft raised shadow · `gold` for forest surfaces · `secondary` white + border · `ghost` · `danger`. 52 dp tall (38 small).
 
-**ProductCard**: white card, `shadow.sm`, radius 20, a tinted image well (`tintFor(product.id)`), a foil discount ribbon, the price in Jakarta 800, and a forest **ADD** with gold text that becomes the forest stepper.
+**ProductCard** (compact, used everywhere): a square tile tinted with `tintFor(product.id)` holding the photo (or produce art) at about 70%, a foil discount tab hanging from the top edge, and a white **ADD** with a forest outline half over the tile's bottom edge that becomes the small forest stepper. Unit, a two-line name, the price in Jakarta 800 with struck MRP, then "Save ₹x" or "Only a few left". Rails show 3¼ cards; grids use exact column widths (`useGridCell`).
 
 **QuantityStepper**: forest squircle with gold − / +; the digit rolls in from above; `+` dims at the maximum.
 

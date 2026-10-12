@@ -53,7 +53,7 @@ function Highlighted({ text, match }: { text: string; match: string }) {
 }
 
 export default function SearchScreen() {
-  const cell = useGridCell(2);
+  const cell = useGridCell(3);
   const input = useRef<TextInput>(null);
   const [text, setText] = useState('');
   // The submitted query drives the results grid; `text` drives suggestions while typing.
@@ -162,7 +162,7 @@ export default function SearchScreen() {
             <FlatList
               data={items}
               keyExtractor={(p) => p.id}
-              numColumns={2}
+              numColumns={3}
               columnWrapperStyle={styles.row}
               contentContainerStyle={styles.list}
               keyboardShouldPersistTaps="handled"
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   },
   chips: { paddingHorizontal: gutter, paddingVertical: spacing.xs },
   pad: { paddingHorizontal: gutter },
-  list: { paddingHorizontal: gutter, paddingBottom: spacing.xxxl, gap: spacing.sm },
+  list: { paddingHorizontal: gutter, paddingBottom: spacing.xxxl, gap: spacing.lg },
   row: { gap: spacing.sm },
   footer: { paddingVertical: spacing.lg },
   suggestions: { paddingBottom: spacing.xxxl },

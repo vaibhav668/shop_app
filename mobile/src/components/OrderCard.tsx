@@ -18,6 +18,10 @@ const STEPS = ['PENDING', 'CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVER
 export function OrderCard({ order }: { order: OrderSummary }) {
   const active = !FINISHED.has(order.status);
   const reached = STEPS.indexOf(order.status as (typeof STEPS)[number]);
+  // Products without photos still get a tile each (a basket), so the card never looks empty.
+  const thumbs: (string | null)[] = order.first_item_images.length
+    ? order.first_item_images.slice(0, 3)
+    : Array.from({ length: Math.min(order.item_count, 3) }, () => null);
 
   return (
     <PressableScale
@@ -49,9 +53,9 @@ export function OrderCard({ order }: { order: OrderSummary }) {
 
       <View style={styles.bottom}>
         <View style={styles.thumbs}>
-          {order.first_item_images.slice(0, 3).map((uri, i) => (
+          {thumbs.map((uri, i) => (
             <View
-              key={uri}
+              key={uri ?? `item-${i}`}
               style={[
                 styles.thumb,
                 { backgroundColor: tints[i % tints.length], zIndex: 3 - i },

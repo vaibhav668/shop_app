@@ -113,6 +113,14 @@ Design board: https://claude.ai/artifact/HfHMC5GnY55aishijRnn54 · spec: `docs/U
 - D5 Shop owner: forest sidebar with jaali, dashboard hero and status tiles, orders as cards on phones
 - D6 Imagery and polish: produce art chosen from the product name wherever there is no photo; small green text moved to the darker forest-mid for contrast. Real product photos come from the shopkeeper before launch; haptics wait for the next dev build (`expo-haptics`).
 
+## Phase 10c — V3 quick-commerce upgrade (done)
+Plan and before/after: https://claude.ai/artifact/2eXqdYRjh7ffPjriSfgGXm
+- V1: compact product card (square tile, foil tab, Blinkit-style ADD), the app as a centred phone column on laptop browsers
+- V2: compact Home header with "The smartest grocery shop of Thalisain"; rails for Buy again (`GET /me/buy-again`), Fresh picks, Under ₹99, Biggest savings and one per aisle (`GET /home` deals / under_price / rails)
+- V3: category page with an aisle side rail and two compact columns
+- V4: square-on-white product photos (`?square=true` uploads), "Needs a photo" filter and reminder, phone-camera upload in admin
+- V5: "More from…" and "You might have missed" rails, three-column search and favourites, `npm run screenshots` for phone-size checks of every screen
+
 ## Phase 11 — Hardening
 - Security checklist: authorization sweep, rate limits (`slowapi`), CORS, headers, upload validation, log scrubbing, dependency audit (`pip-audit`, `npm audit`)
 - Audit every screen for loading/empty/error/offline states; accessibility (labels, contrast, 1.3× font scaling)

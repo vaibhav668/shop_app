@@ -12,7 +12,7 @@ import {
   TriangleAlert,
 } from 'lucide-react-native';
 import { useState } from 'react';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   FadeIn,
   interpolate,
@@ -28,7 +28,6 @@ import { ApiError } from '@/api/client';
 import { CartBar } from '@/components/CartBar';
 import { FavouriteButton } from '@/components/FavouriteButton';
 import { ProductImage } from '@/components/product/ProductImage';
-import { ShopProductCard } from '@/components/product/ShopProductCard';
 import { QueryError } from '@/components/QueryError';
 import {
   Badge,
@@ -43,6 +42,7 @@ import {
 import { maxQuantityFor } from '@/features/cart/cartMath';
 import { useCart, useCartControls } from '@/features/cart/hooks';
 import { useProduct, useShop } from '@/features/catalog/hooks';
+import { ProductRail } from '@/features/home/ProductRail';
 import { formatPaise } from '@/lib/money';
 import { colors, gutter, radius, shadow, spacing, tintFor } from '@/theme/tokens';
 
@@ -213,25 +213,19 @@ function ProductView({ product }: { product: ProductDetail }) {
           ) : null}
         </View>
 
-        {product.related.length > 0 ? (
-          <View style={styles.related}>
-            <Text variant="heading" style={styles.relatedTitle}>
-              More from {product.category.name}
-            </Text>
-            <FlatList
-              horizontal
-              data={product.related}
-              keyExtractor={(p) => p.id}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.relatedList}
-              renderItem={({ item }) => (
-                <View style={styles.relatedCard}>
-                  <ShopProductCard product={item} />
-                </View>
-              )}
-            />
-          </View>
-        ) : null}
+        <View style={styles.related}>
+          <ProductRail
+            title={`More from ${product.category.name}`}
+            subtitle="Customers often add these too"
+            products={product.related}
+            onSeeAll={() =>
+              router.push({
+                pathname: '/category/[slug]',
+                params: { slug: product.category.slug },
+              })
+            }
+          />
+        </View>
       </Animated.ScrollView>
 
       {/* Floating top controls, with a solid bar that fades in on scroll. */}
@@ -437,10 +431,7 @@ const styles = StyleSheet.create({
   },
   aboutHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   chevronOpen: { transform: [{ rotate: '90deg' }] },
-  related: { marginTop: spacing.xl },
-  relatedTitle: { paddingHorizontal: gutter + 4, marginBottom: spacing.sm },
-  relatedList: { paddingHorizontal: gutter, gap: spacing.sm, paddingBottom: spacing.sm },
-  relatedCard: { width: 160 },
+  related: { marginTop: spacing.sm, paddingBottom: spacing.md },
   topBar: {
     position: 'absolute',
     top: 0,

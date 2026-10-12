@@ -14,7 +14,7 @@ import { colors, gutter, spacing } from '@/theme/tokens';
 import { useGridCell } from '@/lib/useGridCell';
 
 export default function FavouritesScreen() {
-  const cell = useGridCell(2);
+  const cell = useGridCell(3);
   const favourites = useInfiniteQuery({
     queryKey: queryKeys.favourites,
     queryFn: ({ pageParam }) => favouritesApi.list(pageParam),
@@ -36,7 +36,7 @@ export default function FavouritesScreen() {
         <FlatList
           data={items}
           keyExtractor={(p) => p.id}
-          numColumns={2}
+          numColumns={3}
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.list}
           onEndReachedThreshold={0.5}
@@ -74,7 +74,7 @@ export default function FavouritesScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   pad: { padding: gutter },
-  list: { padding: gutter, paddingBottom: spacing.xxxl, gap: spacing.sm },
+  list: { padding: gutter, paddingBottom: spacing.xxxl, gap: spacing.lg },
   row: { gap: spacing.sm },
   footer: { paddingVertical: spacing.lg },
 });
