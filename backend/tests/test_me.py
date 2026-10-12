@@ -1,8 +1,11 @@
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.models import Cart, Favourite
 from app.repositories import users as repo
+from tests.factories import make_category, make_product
 from tests.helpers import bearer, sign_in
 
 ME = "/api/v1/me"
@@ -63,8 +66,31 @@ def test_delete_account_anonymises_and_signs_out(client: TestClient, db_session:
     body = sign_in(client)
     headers = bearer(body["access_token"])
     client.patch(ME, json={"phone": "9876543210"}, headers=headers)
+    product = make_product(db_session, make_category(db_session))
+    db_session.commit()
+    client.put(f"/api/v1/cart/items/{product.id}", json={"quantity": 2}, headers=headers)
+    client.put(f"/api/v1/favourites/{product.id}", headers=headers)
+    user_id = body["user"]["id"]
+    assert (
+        db_session.scalar(
+            select(func.count()).select_from(Favourite).where(Favourite.user_id == user_id)
+        )
+        == 1
+    )
 
     assert client.delete(ME, headers=headers).status_code == 204
+
+    # Cart and favourites go with the account (the privacy policy says so).
+    assert (
+        db_session.scalar(select(func.count()).select_from(Cart).where(Cart.user_id == user_id))
+        == 0
+    )
+    assert (
+        db_session.scalar(
+            select(func.count()).select_from(Favourite).where(Favourite.user_id == user_id)
+        )
+        == 0
+    )
 
     assert client.get(ME, headers=headers).status_code == 401
     user = repo.get_user(db_session, body["user"]["id"])

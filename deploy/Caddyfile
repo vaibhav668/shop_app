@@ -1,0 +1,49 @@
+# Caddy gets and renews HTTPS certificates for these names automatically.
+# DOMAIN comes from deploy/.env, e.g. badabazar.in → api.badabazar.in, admin.…, shop.…
+{
+	email {$ACME_EMAIL}
+}
+
+(common_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+	encode zstd gzip
+}
+
+api.{$DOMAIN} {
+	import common_headers
+	reverse_proxy api:8000
+}
+
+admin.{$DOMAIN} {
+	import common_headers
+	header {
+		X-Frame-Options "DENY"
+		Content-Security-Policy "default-src 'self'; connect-src 'self' https://api.{$DOMAIN}; img-src 'self' data: https://res.cloudinary.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+	}
+	root * /srv/admin
+	# Hashed asset files never change; the page itself always revalidates.
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+	try_files {path} /index.html
+	file_server
+}
+
+shop.{$DOMAIN} {
+	import common_headers
+	header {
+		X-Frame-Options "DENY"
+		# Google's sign-in button loads from accounts.google.com and opens its own frame.
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; frame-src https://accounts.google.com; connect-src 'self' https://api.{$DOMAIN} https://accounts.google.com; img-src 'self' data: blob: https://res.cloudinary.com https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; font-src 'self' data:; frame-ancestors 'none'; base-uri 'none'"
+	}
+	root * /srv/shop
+	@assets path /_expo/* /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+	# Static export: /cart → /cart.html, /legal/privacy → legal/privacy.html, else the app shell.
+	try_files {path} {path}.html {path}/index.html /index.html
+	file_server
+}

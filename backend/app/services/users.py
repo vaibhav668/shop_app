@@ -5,7 +5,16 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import AppError
 from app.core.security import utcnow
-from app.models import TERMINAL_STATUSES, Address, DeviceToken, Notification, Order, User
+from app.models import (
+    TERMINAL_STATUSES,
+    Address,
+    Cart,
+    DeviceToken,
+    Favourite,
+    Notification,
+    Order,
+    User,
+)
 from app.repositories import users as repo
 
 
@@ -69,4 +78,7 @@ class UserService:
         # Saved addresses are personal data; past orders keep their own copy.
         self.db.execute(delete(Address).where(Address.user_id == user.id))
         self.db.execute(delete(Notification).where(Notification.user_id == user.id))
+        # The cart (its items cascade) and favourites are personal too.
+        self.db.execute(delete(Cart).where(Cart.user_id == user.id))
+        self.db.execute(delete(Favourite).where(Favourite.user_id == user.id))
         self.db.commit()

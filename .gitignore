@@ -47,3 +47,8 @@ Thumbs.db
 
 # Local screenshot checks (npm run screenshots)
 mobile/screenshots/
+
+# Deployment secrets and data (deploy/)
+deploy/.env
+deploy/backups/
+deploy/secrets/
