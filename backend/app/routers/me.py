@@ -3,8 +3,14 @@ from sqlalchemy.orm import Session
 
 from app.dependencies.auth import get_current_user
 from app.dependencies.db import get_db
+from app.dependencies.storage import get_storage
+from app.integrations.storage import StorageProvider
 from app.models import User
+from app.repositories import catalog as catalog_repo
 from app.schemas.auth import DeviceRegistration, UpdateMeRequest, UserOut
+from app.schemas.catalog import ProductCardOut
+from app.services.catalog_views import CatalogViews
+from app.services.shop import get_shop_settings
 from app.services.users import UserService
 
 router = APIRouter(prefix="/me", tags=["me"])
@@ -43,3 +49,15 @@ def remove_device(
     token: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ) -> None:
     UserService(db).remove_device(user, token)
+
+
+@router.get("/buy-again", response_model=list[ProductCardOut])
+def buy_again(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    storage: StorageProvider = Depends(get_storage),
+) -> list[ProductCardOut]:
+    """What this customer orders most, for the home "Buy again" rail. Empty for new customers."""
+    views = CatalogViews(storage, get_shop_settings(db).default_low_stock_threshold)
+    ids = catalog_repo.buy_again_product_ids(db, user.id)
+    return [views.card(p) for p in catalog_repo.list_visible_by_ids(db, ids)]

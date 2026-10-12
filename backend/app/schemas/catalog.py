@@ -73,7 +73,21 @@ class BannerOut(BaseModel):
     target_slug: str | None
 
 
+class HomeRailOut(BaseModel):
+    """One aisle's products for a horizontal home rail."""
+
+    category: CategoryOut
+    products: list[ProductCardOut]
+
+
 class HomeOut(BaseModel):
     banners: list[BannerOut]
     categories: list[CategoryOut]
     featured: list[ProductCardOut]
+    # Biggest discounts first.
+    deals: list[ProductCardOut]
+    # At or below UNDER_PRICE_PAISE, discounted first.
+    under_price: list[ProductCardOut]
+    under_price_paise: int
+    # One rail per aisle that has products.
+    rails: list[HomeRailOut]

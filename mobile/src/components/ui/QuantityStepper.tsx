@@ -10,7 +10,7 @@ export type QuantityStepperProps = {
   onIncrement: () => void;
   onDecrement: () => void;
   max?: number;
-  size?: 'sm' | 'md';
+  size?: 'xs' | 'sm' | 'md';
   /** Used in accessibility labels, e.g. "Increase Amul Milk". */
   itemName?: string;
 };
@@ -25,8 +25,8 @@ export function QuantityStepper({
   itemName,
 }: QuantityStepperProps) {
   const atMax = max !== undefined && value >= max;
-  const height = size === 'sm' ? 34 : 44;
-  const side = size === 'sm' ? 30 : 40;
+  const height = size === 'xs' ? 32 : size === 'sm' ? 34 : 44;
+  const side = size === 'xs' ? 26 : size === 'sm' ? 30 : 40;
   const suffix = itemName ? ` ${itemName}` : ' quantity';
 
   return (

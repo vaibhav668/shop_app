@@ -35,6 +35,15 @@ export function useShop() {
   return useQuery({ queryKey: queryKeys.shop, queryFn: catalogApi.shop, staleTime: 5 * 60_000 });
 }
 
+/** What this customer orders most; refreshed when they come back to Home. */
+export function useBuyAgain() {
+  return useQuery({
+    queryKey: queryKeys.buyAgain,
+    queryFn: catalogApi.buyAgain,
+    staleTime: 60_000,
+  });
+}
+
 export function useHome() {
   return useQuery({ queryKey: queryKeys.home, queryFn: catalogApi.home });
 }

@@ -3,11 +3,15 @@ import { Bell, ChevronDown, MapPin, Zap } from 'lucide-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BrandMark } from '@/components/BrandMark';
 import { ForestFill, Jaali } from '@/components/decor';
 import { PressableScale, Text } from '@/components/ui';
 import { useAddresses } from '@/features/addresses/hooks';
+import { HomeSearch } from '@/features/home/HomeSearch';
 import { greetingFor } from '@/lib/greeting';
 import { colors, gutter, radius, spacing } from '@/theme/tokens';
+
+export const SHOP_TAGLINE = 'The smartest grocery shop of Thalisain';
 
 export type HomeHeaderProps = {
   name: string | undefined;
@@ -15,7 +19,10 @@ export type HomeHeaderProps = {
   etaMinutes: number | undefined;
 };
 
-/** Forest header with the gold jaali: greeting, bell, delivery address and the time promise. */
+/**
+ * The compact forest header: brand and tagline, the bell, the delivery address and time
+ * promise, and search, all in one block so products start high on the screen.
+ */
 export function HomeHeader({ name, unread, etaMinutes }: HomeHeaderProps) {
   const insets = useSafeAreaInsets();
   const addresses = useAddresses();
@@ -23,24 +30,20 @@ export function HomeHeader({ name, unread, etaMinutes }: HomeHeaderProps) {
   const firstName = name?.split(' ')[0];
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top + spacing.xs }]}>
+    <View style={[styles.root, { paddingTop: insets.top + spacing.sm }]}>
       <ForestFill />
       <Jaali />
       <View style={styles.glow} aria-hidden />
 
       <View style={styles.row}>
-        <View style={styles.who}>
-          <View style={styles.avatar}>
-            <Text variant="heading" color="forest">
-              {(firstName?.[0] ?? 'B').toUpperCase()}
+        <View style={styles.brand}>
+          <BrandMark size={38} />
+          <View style={styles.brandText}>
+            <Text variant="heading" color="onAction" accessibilityRole="header">
+              Bada Bazar
             </Text>
-          </View>
-          <View>
-            <Text variant="micro" color="onForestMuted">
-              {greetingFor(new Date())}
-            </Text>
-            <Text variant="heading" color="onAction" numberOfLines={1}>
-              {firstName ?? 'Welcome'}
+            <Text variant="micro" color="goldBright" numberOfLines={1}>
+              {SHOP_TAGLINE}
             </Text>
           </View>
         </View>
@@ -61,6 +64,11 @@ export function HomeHeader({ name, unread, etaMinutes }: HomeHeaderProps) {
           ) : null}
         </PressableScale>
       </View>
+
+      <Text variant="title" color="onAction" style={styles.hello}>
+        {greetingFor(new Date())}
+        {firstName ? `, ${firstName}` : ''}
+      </Text>
 
       <View style={styles.locRow}>
         <Pressable
@@ -87,13 +95,9 @@ export function HomeHeader({ name, unread, etaMinutes }: HomeHeaderProps) {
         ) : null}
       </View>
 
-      <Text variant="hero" color="onAction" style={styles.hello} accessibilityRole="header">
-        What&apos;s fresh{' '}
-        <Text variant="hero" color="goldBright">
-          today
-        </Text>
-        {firstName ? `, ${firstName}?` : '?'}
-      </Text>
+      <View style={styles.search}>
+        <HomeSearch />
+      </View>
     </View>
   );
 }
@@ -101,9 +105,9 @@ export function HomeHeader({ name, unread, etaMinutes }: HomeHeaderProps) {
 const styles = StyleSheet.create({
   root: {
     paddingHorizontal: gutter,
-    paddingBottom: 44,
-    borderBottomLeftRadius: radius.xxl + 4,
-    borderBottomRightRadius: radius.xxl + 4,
+    paddingBottom: spacing.md,
+    borderBottomLeftRadius: radius.xl,
+    borderBottomRightRadius: radius.xl,
     overflow: 'hidden',
     backgroundColor: colors.forest,
   },
@@ -118,17 +122,8 @@ const styles = StyleSheet.create({
     opacity: 0.14,
   },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  who: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flex: 1 },
-  avatar: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: colors.goldSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: colors.goldBright,
-  },
+  brand: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flex: 1 },
+  brandText: { flexShrink: 1 },
   bell: {
     width: 42,
     height: 42,
@@ -151,7 +146,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  locRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginTop: spacing.md },
+  hello: { marginTop: spacing.md },
+  locRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginTop: spacing.xs },
   where: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -175,5 +171,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     backgroundColor: colors.goldBright,
   },
-  hello: { marginTop: spacing.md },
+  search: { marginTop: spacing.md },
 });

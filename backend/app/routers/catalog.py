@@ -13,6 +13,7 @@ from app.repositories import catalog as repo
 from app.schemas.catalog import (
     CategoryOut,
     HomeOut,
+    HomeRailOut,
     ProductCardOut,
     ProductDetailOut,
     ShopOut,
@@ -24,6 +25,9 @@ from app.services.catalog_views import CARD_IMAGE_WIDTH, CatalogViews
 from app.services.shop import get_shop_settings
 
 router = APIRouter(tags=["catalog"])
+
+# The "Under ₹99" home rail.
+UNDER_PRICE_PAISE = 9900
 
 
 def get_views(
@@ -56,10 +60,22 @@ def get_home(
     views: CatalogViews = Depends(get_views),
 ) -> HomeOut:
     """Everything the home screen needs in one round trip."""
+    categories = repo.list_active_categories(db)
+    rails = []
+    for c in categories:
+        products = repo.list_category_rail(db, c.id)
+        if products:
+            rails.append(
+                HomeRailOut(category=views.category(c), products=[views.card(p) for p in products])
+            )
     return HomeOut(
         banners=BannerService(db, storage).live_banners(),
-        categories=[views.category(c) for c in repo.list_active_categories(db)],
+        categories=[views.category(c) for c in categories],
         featured=[views.card(p) for p in repo.list_featured(db)],
+        deals=[views.card(p) for p in repo.list_deals(db)],
+        under_price=[views.card(p) for p in repo.list_under_price(db, UNDER_PRICE_PAISE)],
+        under_price_paise=UNDER_PRICE_PAISE,
+        rails=rails,
     )
 
 

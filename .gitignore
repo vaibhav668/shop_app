@@ -44,3 +44,6 @@ yarn-error.log*
 Thumbs.db
 .idea/
 *.swp
+
+# Local screenshot checks (npm run screenshots)
+mobile/screenshots/

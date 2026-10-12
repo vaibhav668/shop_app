@@ -6,11 +6,11 @@ import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
   StyleSheet,
-  useWindowDimensions,
   View,
 } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 
+import { useAppWidth } from '@/lib/layout';
 import type { Banner } from '@/api/catalog';
 import { ForestFill, Gradient, Jaali } from '@/components/decor';
 import { PressableScale, Text } from '@/components/ui';
@@ -60,7 +60,7 @@ export function BannerCarousel({
   banners: Banner[];
   onOpen: (banner: Banner) => void;
 }) {
-  const { width } = useWindowDimensions();
+  const width = useAppWidth();
   const reduceMotion = useReducedMotion();
   const cardWidth = width - gutter * 2;
   const [index, setIndex] = useState(0);

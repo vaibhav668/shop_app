@@ -803,6 +803,26 @@ export interface paths {
     patch: operations['update_me_api_v1_me_patch'];
     trace?: never;
   };
+  '/api/v1/me/buy-again': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Buy Again
+     * @description What this customer orders most, for the home "Buy again" rail. Empty for new customers.
+     */
+    get: operations['buy_again_api_v1_me_buy_again_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/me/devices': {
     parameters: {
       query?: never;
@@ -1838,8 +1858,25 @@ export interface components {
       banners: components['schemas']['BannerOut'][];
       /** Categories */
       categories: components['schemas']['CategoryOut'][];
+      /** Deals */
+      deals: components['schemas']['ProductCardOut'][];
       /** Featured */
       featured: components['schemas']['ProductCardOut'][];
+      /** Rails */
+      rails: components['schemas']['HomeRailOut'][];
+      /** Under Price */
+      under_price: components['schemas']['ProductCardOut'][];
+      /** Under Price Paise */
+      under_price_paise: number;
+    };
+    /**
+     * HomeRailOut
+     * @description One aisle's products for a horizontal home rail.
+     */
+    HomeRailOut: {
+      category: components['schemas']['CategoryOut'];
+      /** Products */
+      products: components['schemas']['ProductCardOut'][];
     };
     /**
      * InventoryReason
@@ -4142,6 +4179,26 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  buy_again_api_v1_me_buy_again_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductCardOut'][];
         };
       };
     };

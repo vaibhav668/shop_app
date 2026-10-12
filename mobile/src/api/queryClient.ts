@@ -18,6 +18,7 @@ export const queryClient = new QueryClient({
 export const queryKeys = {
   shop: ['shop'] as const,
   home: ['home'] as const,
+  buyAgain: ['buy-again'] as const,
   cart: ['cart'] as const,
   addresses: ['addresses'] as const,
   notifications: ['notifications'] as const,

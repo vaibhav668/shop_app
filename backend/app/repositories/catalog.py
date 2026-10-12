@@ -160,3 +160,76 @@ def list_related(db: Session, product: Product, limit: int = 10) -> list[Product
         .limit(limit)
     )
     return list(db.scalars(stmt).unique())
+
+
+def _in_stock_visible() -> Select[tuple[Product]]:
+    return customer_visible_products().where(Product.stock_quantity > 0)
+
+
+# Share of the MRP knocked off; 0 when there is no discount.
+_discount_share = (
+    (Product.mrp_paise - Product.price_paise) * 1.0 / func.nullif(Product.mrp_paise, 0)
+)
+
+
+def list_deals(db: Session, limit: int = 12) -> list[Product]:
+    """In-stock products with the biggest discount first (home "Biggest savings" rail)."""
+    stmt = (
+        _in_stock_visible()
+        .where(Product.mrp_paise > Product.price_paise)
+        .order_by(_discount_share.desc(), Product.name)
+        .limit(limit)
+    )
+    return list(db.scalars(stmt).unique())
+
+
+def list_under_price(db: Session, max_price_paise: int, limit: int = 12) -> list[Product]:
+    """In-stock products at or below a price, discounted ones first (home "Under ₹99" rail)."""
+    stmt = (
+        _in_stock_visible()
+        .where(Product.price_paise <= max_price_paise)
+        .order_by(_discount_share.desc().nulls_last(), Product.price_paise, Product.name)
+        .limit(limit)
+    )
+    return list(db.scalars(stmt).unique())
+
+
+def list_category_rail(db: Session, category_id: uuid.UUID, limit: int = 10) -> list[Product]:
+    """A category's products for a home rail: in stock first, then featured, then shop order."""
+    stmt = (
+        customer_visible_products()
+        .where(Product.category_id == category_id)
+        .order_by(
+            (Product.stock_quantity > 0).desc(),
+            Product.is_featured.desc(),
+            Product.sort_order,
+            Product.name,
+        )
+        .limit(limit)
+    )
+    return list(db.scalars(stmt).unique())
+
+
+def list_visible_by_ids(db: Session, ids: list[uuid.UUID]) -> list[Product]:
+    """Visible products for these ids, in the same order as `ids`."""
+    if not ids:
+        return []
+    found = {
+        p.id: p for p in db.scalars(customer_visible_products().where(Product.id.in_(ids))).unique()
+    }
+    return [found[i] for i in ids if i in found]
+
+
+def buy_again_product_ids(db: Session, user_id: uuid.UUID, limit: int = 12) -> list[uuid.UUID]:
+    """What this customer orders most (then most recently), from orders that weren't cancelled."""
+    from app.models import Order, OrderItem, OrderStatus  # avoid a catalog <-> orders import cycle
+
+    stmt = (
+        select(OrderItem.product_id)
+        .join(Order, Order.id == OrderItem.order_id)
+        .where(Order.user_id == user_id, Order.status != OrderStatus.CANCELLED)
+        .group_by(OrderItem.product_id)
+        .order_by(func.count().desc(), func.max(Order.placed_at).desc())
+        .limit(limit)
+    )
+    return list(db.scalars(stmt))

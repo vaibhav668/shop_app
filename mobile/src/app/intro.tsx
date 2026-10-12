@@ -8,7 +8,6 @@ import {
   Pressable,
   type StyleProp,
   StyleSheet,
-  useWindowDimensions,
   View,
   type ViewStyle,
 } from 'react-native';
@@ -23,6 +22,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useAppWidth } from '@/lib/layout';
 import { BasketArt, ProduceArt, type ProduceKind } from '@/components/art/Produce';
 import { BrandMark } from '@/components/BrandMark';
 import { PressableScale, Text } from '@/components/ui';
@@ -126,7 +126,7 @@ function SlideView({ slide, width }: { slide: Slide; width: number }) {
 
 /** Three slides on first launch only; "Get started" (or Skip) goes to sign-in. */
 export default function IntroScreen() {
-  const { width } = useWindowDimensions();
+  const width = useAppWidth();
   const list = useRef<FlatList<Slide>>(null);
   const [index, setIndex] = useState(0);
   const last = index === SLIDES.length - 1;

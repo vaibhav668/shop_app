@@ -2489,20 +2489,70 @@
             "title": "Categories",
             "type": "array"
           },
+          "deals": {
+            "items": {
+              "$ref": "#/components/schemas/ProductCardOut"
+            },
+            "title": "Deals",
+            "type": "array"
+          },
           "featured": {
             "items": {
               "$ref": "#/components/schemas/ProductCardOut"
             },
             "title": "Featured",
             "type": "array"
+          },
+          "rails": {
+            "items": {
+              "$ref": "#/components/schemas/HomeRailOut"
+            },
+            "title": "Rails",
+            "type": "array"
+          },
+          "under_price": {
+            "items": {
+              "$ref": "#/components/schemas/ProductCardOut"
+            },
+            "title": "Under Price",
+            "type": "array"
+          },
+          "under_price_paise": {
+            "title": "Under Price Paise",
+            "type": "integer"
           }
         },
         "required": [
           "banners",
           "categories",
-          "featured"
+          "featured",
+          "deals",
+          "under_price",
+          "under_price_paise",
+          "rails"
         ],
         "title": "HomeOut",
+        "type": "object"
+      },
+      "HomeRailOut": {
+        "description": "One aisle's products for a horizontal home rail.",
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/CategoryOut"
+          },
+          "products": {
+            "items": {
+              "$ref": "#/components/schemas/ProductCardOut"
+            },
+            "title": "Products",
+            "type": "array"
+          }
+        },
+        "required": [
+          "category",
+          "products"
+        ],
+        "title": "HomeRailOut",
         "type": "object"
       },
       "InventoryReason": {
@@ -6860,6 +6910,37 @@
           }
         ],
         "summary": "Update Me",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/api/v1/me/buy-again": {
+      "get": {
+        "description": "What this customer orders most, for the home \"Buy again\" rail. Empty for new customers.",
+        "operationId": "buy_again_api_v1_me_buy_again_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProductCardOut"
+                  },
+                  "title": "Response Buy Again Api V1 Me Buy Again Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Buy Again",
         "tags": [
           "me"
         ]

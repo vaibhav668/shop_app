@@ -1,15 +1,15 @@
 import { StyleSheet, View } from 'react-native';
 
 import { Skeleton } from '@/components/ui';
-import { colors, radius, shadow, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 
 export function ProductCardSkeleton() {
   return (
     <View style={styles.card}>
-      <Skeleton height={140} radius={radius.lg - 4} />
-      <Skeleton height={14} width="85%" />
-      <Skeleton height={12} width="40%" />
-      <Skeleton height={18} width="35%" />
+      <Skeleton height={104} radius={radius.lg - 4} />
+      <Skeleton height={10} width="35%" />
+      <Skeleton height={13} width="85%" />
+      <Skeleton height={15} width="45%" />
     </View>
   );
 }
@@ -40,14 +40,8 @@ export function CategoryGridSkeleton({ count = 8 }: { count?: number }) {
 }
 
 const styles = StyleSheet.create({
-  card: {
-    gap: spacing.xs,
-    padding: spacing.xs,
-    ...shadow.sm,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-  },
+  card: { gap: spacing.xs },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  cell: { width: '48%' },
+  cell: { width: '31%' },
   categoryCell: { width: '30%', gap: spacing.xs, alignItems: 'center' },
 });

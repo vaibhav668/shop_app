@@ -8,6 +8,7 @@ export type ProductPage = components['schemas']['Page_ProductCardOut_'];
 export type Shop = components['schemas']['ShopOut'];
 export type Home = components['schemas']['HomeOut'];
 export type Banner = components['schemas']['BannerOut'];
+export type HomeRail = components['schemas']['HomeRailOut'];
 export type Suggestion = components['schemas']['SuggestionOut'];
 export type ProductSort = 'default' | 'price_asc' | 'price_desc';
 
@@ -18,6 +19,7 @@ export const catalogApi = {
   categories: () => api<Category[]>('/categories'),
   category: (slug: string) => api<Category>(`/categories/${encodeURIComponent(slug)}`),
   home: () => api<Home>('/home'),
+  buyAgain: () => api<ProductCard[]>('/me/buy-again'),
   suggest: (q: string) => api<Suggestion[]>(`/products/suggest?q=${encodeURIComponent(q)}`),
   products: (params: { q?: string; categoryId?: string; sort?: ProductSort; offset?: number }) => {
     const query = new URLSearchParams({

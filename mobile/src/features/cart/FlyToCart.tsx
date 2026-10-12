@@ -11,7 +11,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -61,7 +61,7 @@ const SIZE = 56;
 
 export function FlyToCartProvider({ children }: { children: ReactNode }) {
   const reduceMotion = useReducedMotion();
-  const { width, height } = useWindowDimensions();
+  const root = useRef<View>(null);
   const targets = useRef(new Map<string, RefObject<Measurable | null>>());
   const [flights, setFlights] = useState<Flight[]>([]);
   const nextKey = useRef(0);
@@ -76,15 +76,24 @@ export function FlyToCartProvider({ children }: { children: ReactNode }) {
       if (reduceMotion) return;
       const refs = [...targets.current.values()];
       const target = refs[refs.length - 1];
-      // No cart pill yet (the first item): land where it is about to appear.
-      const fallback: Rect = { x: width / 2 - 40, y: height - 150, width: 80, height: 40 };
-      void (target ? measure(target) : Promise.resolve(null)).then((rect) => {
-        const to = rect ? { ...rect, width: 60, x: rect.x + 8 } : fallback;
-        const key = nextKey.current++;
-        setFlights((all) => [...all.slice(-3), { key, from, to, uri }]);
-      });
+      void Promise.all([measure(root), target ? measure(target) : Promise.resolve(null)]).then(
+        ([box, rect]) => {
+          // Positions are measured against the window; the overlay may be offset from it
+          // (the centred column on the web), so convert to the overlay's own coordinates.
+          const ox = box?.x ?? 0;
+          const oy = box?.y ?? 0;
+          const local = (r: Rect): Rect => ({ ...r, x: r.x - ox, y: r.y - oy });
+          // No cart pill yet (the first item): land where it is about to appear.
+          const fallback: Rect = box
+            ? { x: box.width / 2 - 40, y: box.height - 150, width: 80, height: 40 }
+            : { x: from.x, y: from.y + 300, width: 80, height: 40 };
+          const to = rect ? local({ ...rect, width: 60, x: rect.x + 8 }) : fallback;
+          const key = nextKey.current++;
+          setFlights((all) => [...all.slice(-3), { key, from: local(from), to, uri }]);
+        },
+      );
     },
-    [reduceMotion, width, height],
+    [reduceMotion],
   );
 
   const land = useCallback((key: number) => {
@@ -95,7 +104,7 @@ export function FlyToCartProvider({ children }: { children: ReactNode }) {
 
   return (
     <FlyToCartContext.Provider value={value}>
-      <View style={styles.root}>
+      <View ref={root} style={styles.root} collapsable={false}>
         {children}
         <View style={[StyleSheet.absoluteFill, styles.passThrough]}>
           {flights.map((f) => (

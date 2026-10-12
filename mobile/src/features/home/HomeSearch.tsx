@@ -12,7 +12,7 @@ import Animated, {
 
 import { ForestFill } from '@/components/decor';
 import { PressableScale, Text } from '@/components/ui';
-import { colors, gutter, radius, shadow, spacing } from '@/theme/tokens';
+import { colors, radius, shadow, spacing } from '@/theme/tokens';
 
 const WORDS = ['milk', 'atta', 'paneer', 'dal', 'tomatoes'];
 
@@ -101,8 +101,6 @@ export function MiniHeader({ etaMinutes }: { etaMinutes: number | undefined }) {
 const styles = StyleSheet.create({
   bar: {
     ...shadow.md,
-    marginTop: -26,
-    marginHorizontal: gutter,
     height: 52,
     borderRadius: radius.lg - 2,
     backgroundColor: colors.surface,

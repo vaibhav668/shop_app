@@ -1,11 +1,11 @@
-import { Plus } from 'lucide-react-native';
 import { memo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 
 import type { ProductCard as ProductCardData } from '@/api/catalog';
+import { Foil } from '@/components/decor';
 import { ProductImage } from '@/components/product/ProductImage';
-import { Badge, Money, PressableScale, QuantityStepper, Text } from '@/components/ui';
+import { Money, PressableScale, QuantityStepper, Text } from '@/components/ui';
 import { measure, useFlyToCart } from '@/features/cart/FlyToCart';
 import { formatPaise } from '@/lib/money';
 import { colors, motion, radius, shadow, spacing, tintFor } from '@/theme/tokens';
@@ -26,10 +26,14 @@ export type ProductCardProps = {
 };
 
 /**
+ * The compact quick-commerce card: a square tinted tile with the picture, a foil discount tab
+ * hanging from its top edge, and an ADD button half over its bottom edge that becomes a
+ * stepper. Unit, name and price sit tight underneath.
+ *
  * The "open product" button is a full-card layer *behind* the content, not a wrapper around it:
- * the + button and stepper must not sit inside another button (invalid <button> nesting on
- * web, and screen readers would merge them). The visible content ignores touches, so a tap
- * anywhere except the cart controls falls through to the open layer.
+ * ADD and the stepper must not sit inside another button (invalid <button> nesting on web, and
+ * screen readers would merge them). Visible content ignores touches, so a tap anywhere except
+ * the cart controls falls through to the open layer.
  */
 function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
   const [pressed, setPressed] = useState(false);
@@ -63,7 +67,7 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
 
       <View
         ref={imageRef}
-        style={[styles.imageWell, { backgroundColor: tintFor(product.id) }, styles.passChildren]}
+        style={[styles.tile, { backgroundColor: tintFor(product.id) }, styles.passChildren]}
       >
         {/* Decorative for assistive tech: the open button above already announces all of this. */}
         <View style={[styles.imageBox, styles.passThrough]} aria-hidden>
@@ -71,12 +75,15 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
             uri={product.image_url}
             name={product.name}
             faded={outOfStock}
-            iconSize={40}
+            iconSize={36}
           />
         </View>
         {discount > 0 && !outOfStock ? (
-          <View style={[styles.tag, styles.passThrough]} aria-hidden>
-            <Badge label={`${discount}% OFF`} tone="foil" />
+          <View style={[styles.tab, styles.passThrough]} aria-hidden>
+            <Foil />
+            <Text variant="tag" color="forestDeep" style={styles.tabText}>
+              {discount}% OFF
+            </Text>
           </View>
         ) : null}
 
@@ -90,6 +97,7 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
           ) : cart ? (
             cart.quantity > 0 ? (
               <QuantityStepper
+                size="xs"
                 value={cart.quantity}
                 max={product.max_per_order ?? undefined}
                 onIncrement={cart.onIncrement}
@@ -100,12 +108,14 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
               <Animated.View key="add" entering={ZoomIn.duration(motion.base)}>
                 <PressableScale
                   onPress={add}
-                  scaleTo={0.88}
+                  scaleTo={0.9}
                   accessibilityRole="button"
                   accessibilityLabel={`Add ${product.name} to cart`}
                   style={({ pressed: down }) => [styles.add, down && styles.addPressed]}
                 >
-                  <Plus size={18} strokeWidth={2.8} color={colors.goldBright} />
+                  <Text variant="tag" color="forest" style={styles.addLabel}>
+                    ADD
+                  </Text>
                 </PressableScale>
               </Animated.View>
             )
@@ -114,18 +124,16 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
       </View>
 
       <View style={[styles.body, styles.passThrough]} aria-hidden>
-        <View style={styles.unit}>
-          <Text variant="micro" color="textSecondary" numberOfLines={1}>
-            {product.unit_label}
-          </Text>
-        </View>
+        <Text variant="micro" color="textSecondary" numberOfLines={1}>
+          {product.unit_label}
+        </Text>
         <Text variant="label" numberOfLines={2} style={styles.name}>
           {product.name}
         </Text>
         <View style={styles.priceRow}>
           <Money paise={product.price_paise} variant="price" />
           {discount > 0 ? (
-            <Money paise={product.mrp_paise} variant="caption" color="textTertiary" strike />
+            <Money paise={product.mrp_paise} variant="micro" color="textTertiary" strike />
           ) : null}
         </View>
         {product.stock_hint === 'LOW' && !outOfStock ? (
@@ -145,14 +153,8 @@ function ProductCardBase({ product, onPress, cart }: ProductCardProps) {
 export const ProductCard = memo(ProductCardBase);
 
 const styles = StyleSheet.create({
-  card: {
-    ...shadow.sm,
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: 6,
-  },
-  pressed: { transform: [{ scale: 0.98 }] },
+  card: { flex: 1 },
+  pressed: { opacity: 0.85 },
   openLayer: {
     position: 'absolute',
     top: 0,
@@ -165,35 +167,44 @@ const styles = StyleSheet.create({
   passThrough: { pointerEvents: 'none' },
   // ...and containers whose children (the cart controls) still take taps.
   passChildren: { pointerEvents: 'box-none' },
-  imageWell: { aspectRatio: 1 / 0.92, borderRadius: radius.lg - 4 },
-  imageBox: { flex: 1, padding: spacing.md },
-  tag: { position: 'absolute', top: 8, left: 8 },
-  control: { position: 'absolute', right: 6, bottom: 6 },
+  tile: { aspectRatio: 1, borderRadius: radius.lg - 4 },
+  imageBox: { flex: 1, padding: '15%' },
+  tab: {
+    position: 'absolute',
+    top: 0,
+    left: 8,
+    overflow: 'hidden',
+    borderBottomLeftRadius: 6,
+    borderBottomRightRadius: 6,
+    paddingHorizontal: 6,
+    paddingTop: 3,
+    paddingBottom: 4,
+  },
+  tabText: { fontSize: 9.5, lineHeight: 12 },
+  control: { position: 'absolute', right: 6, bottom: -14 },
   add: {
-    ...shadow.md,
-    shadowOpacity: 0.3,
-    width: 36,
-    height: 36,
-    borderRadius: radius.md - 3,
-    backgroundColor: colors.forest,
+    ...shadow.sm,
+    shadowOpacity: 0.14,
+    height: 32,
+    minWidth: 60,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.sm + 2,
+    borderWidth: 1.5,
+    borderColor: colors.forest,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  addPressed: { backgroundColor: colors.forestDeep },
+  addPressed: { backgroundColor: colors.brandTint },
+  addLabel: { fontSize: 12, letterSpacing: 0.8 },
   soldOut: {
     backgroundColor: colors.surface,
     borderRadius: radius.sm,
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 5,
+    marginBottom: 14,
   },
-  body: { paddingTop: spacing.xs, paddingHorizontal: 4, paddingBottom: 4, gap: 3, flex: 1 },
-  unit: {
-    alignSelf: 'flex-start',
-    backgroundColor: colors.tintSand,
-    borderRadius: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 1,
-  },
-  name: { minHeight: 40 },
-  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 6, marginTop: 'auto' },
+  body: { paddingTop: 20, paddingHorizontal: 2, gap: 2 },
+  name: { fontSize: 13, lineHeight: 17, minHeight: 34 },
+  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 5, marginTop: 2 },
 });

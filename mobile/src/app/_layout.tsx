@@ -10,6 +10,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { queryClient } from '@/api/queryClient';
 import { ToastProvider } from '@/components/Toast';
+import { WebFrame } from '@/components/WebFrame';
 import { ErrorState } from '@/components/ui';
 import { AdminRedirect } from '@/features/auth/AdminRedirect';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
@@ -26,14 +27,16 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <StatusBar style="dark" />
-        <QueryClientProvider client={queryClient}>
-          <ToastProvider>
-            <AuthProvider>
-              <RootNavigator />
-            </AuthProvider>
-          </ToastProvider>
-        </QueryClientProvider>
+        <WebFrame>
+          <StatusBar style="dark" />
+          <QueryClientProvider client={queryClient}>
+            <ToastProvider>
+              <AuthProvider>
+                <RootNavigator />
+              </AuthProvider>
+            </ToastProvider>
+          </QueryClientProvider>
+        </WebFrame>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

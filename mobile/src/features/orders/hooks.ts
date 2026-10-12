@@ -51,6 +51,7 @@ export function usePlaceOrder() {
       router.replace({ pathname: '/order-placed', params: { id: order.id } });
       void queryClient.invalidateQueries({ queryKey: queryKeys.cart });
       void queryClient.invalidateQueries({ queryKey: queryKeys.allOrders });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.buyAgain });
       void queryClient.invalidateQueries({ queryKey: queryKeys.addresses });
     },
     onError: async (error) => {

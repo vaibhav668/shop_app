@@ -66,6 +66,9 @@ export function DashboardPage() {
         <>
           <section className={styles.hero} aria-busy={board.isPending || undefined}>
             <div className={styles.heroText}>
+              <p className={styles.heroBrand}>
+                Bada Bazar <span>· The smartest grocery shop of Thalisain</span>
+              </p>
               <p className={styles.heroGreeting}>
                 {greeting(today)}
                 {firstName ? `, ${firstName}` : ''}
