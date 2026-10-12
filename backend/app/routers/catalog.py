@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.errors import AppError
+from app.core.rate_limit import limit
 from app.dependencies.db import get_db
 from app.dependencies.storage import get_storage
 from app.integrations.storage import StorageProvider
@@ -96,7 +97,11 @@ def get_category(
     return views.category(category)
 
 
-@router.get("/products", response_model=Page[ProductCardOut])
+@router.get(
+    "/products",
+    response_model=Page[ProductCardOut],
+    dependencies=[Depends(limit("product-search", 120, 60))],
+)
 def list_products(
     q: str | None = Query(None, max_length=60, description="Search text; ranks by relevance"),
     category_id: uuid.UUID | None = None,
@@ -120,7 +125,11 @@ def list_products(
 
 
 # Declared before /products/{product_id} so "suggest" isn't parsed as a product id.
-@router.get("/products/suggest", response_model=list[SuggestionOut])
+@router.get(
+    "/products/suggest",
+    response_model=list[SuggestionOut],
+    dependencies=[Depends(limit("product-suggest", 180, 60))],
+)
 def suggest_products(
     q: str = Query(min_length=1, max_length=60),
     db: Session = Depends(get_db),

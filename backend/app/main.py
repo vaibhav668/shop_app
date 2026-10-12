@@ -5,6 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
+from app.core.rate_limit import GlobalRateLimitMiddleware
+from app.core.security_headers import SecurityHeadersMiddleware
 from app.routers import (
     addresses,
     admin,
@@ -34,6 +36,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     # Request-time dependencies must see the same settings the app was built with.
     app.dependency_overrides[get_settings] = lambda: settings
+    # Starlette wraps later middleware around earlier ones. CORS goes last (outermost) so
+    # even a 413/429 answered by the inner layers carries CORS headers the browser can read.
+    app.add_middleware(GlobalRateLimitMiddleware, settings=settings)
+    app.add_middleware(SecurityHeadersMiddleware, settings=settings)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,

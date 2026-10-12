@@ -121,7 +121,7 @@ Plan and before/after: https://claude.ai/artifact/2eXqdYRjh7ffPjriSfgGXm
 - V4: square-on-white product photos (`?square=true` uploads), "Needs a photo" filter and reminder, phone-camera upload in admin
 - V5: "More from…" and "You might have missed" rails, three-column search and favourites, `npm run screenshots` for phone-size checks of every screen
 
-## Phase 11 — Hardening
+## Phase 11 — Hardening (done except device E2E; see SECURITY.md)
 - Security checklist: authorization sweep, rate limits (`slowapi`), CORS, headers, upload validation, log scrubbing, dependency audit (`pip-audit`, `npm audit`)
 - Audit every screen for loading/empty/error/offline states; accessibility (labels, contrast, 1.3× font scaling)
 - Performance: `EXPLAIN` on hot queries, image sizes, list rendering profile, cold-start measurement

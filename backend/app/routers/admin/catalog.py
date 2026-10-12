@@ -3,6 +3,7 @@ import uuid
 from fastapi import APIRouter, Depends, File, Query, UploadFile, status
 from sqlalchemy.orm import Session
 
+from app.core.rate_limit import limit
 from app.dependencies.auth import require_admin
 from app.dependencies.db import get_db
 from app.dependencies.storage import get_storage
@@ -52,7 +53,12 @@ def get_views(
 # --- uploads ------------------------------------------------------------------------------
 
 
-@router.post("/uploads/images", response_model=UploadOut, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/uploads/images",
+    response_model=UploadOut,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(limit("image-upload", 30, 60))],
+)
 async def upload_image(
     file: UploadFile = File(...),
     square: bool = Query(

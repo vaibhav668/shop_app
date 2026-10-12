@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.core.rate_limit import limit
 from app.dependencies.auth import get_current_user
 from app.dependencies.db import get_db
 from app.dependencies.shop import get_delivery_area
@@ -15,7 +16,11 @@ from app.services.delivery import DeliveryArea
 router = APIRouter(prefix="/checkout", tags=["checkout"])
 
 
-@router.post("/quote", response_model=CheckoutQuoteOut)
+@router.post(
+    "/quote",
+    response_model=CheckoutQuoteOut,
+    dependencies=[Depends(limit("checkout-quote", 30, 60))],
+)
 def checkout_quote(
     payload: CheckoutQuoteRequest,
     user: User = Depends(get_current_user),

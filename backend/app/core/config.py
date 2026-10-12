@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     admin_cookie_secure: bool = False
     # Comma-separated emails that become shop admins when they sign in with Google.
     admin_emails: str = ""
+    # Per-client request limits. Unset means on everywhere except the test suite.
+    rate_limits_enabled: bool | None = None
     # Local-only shortcut that signs in by email without Google. Never allowed outside local/test.
     dev_login_enabled: bool = False
 
@@ -65,6 +67,12 @@ class Settings(BaseSettings):
         if self.push_provider == "fcm" and not self.firebase_credentials_file:
             raise ValueError("PUSH_PROVIDER=fcm needs FIREBASE_CREDENTIALS_FILE.")
         return self
+
+    @property
+    def rate_limits_active(self) -> bool:
+        if self.rate_limits_enabled is not None:
+            return self.rate_limits_enabled
+        return self.app_env != "test"
 
     @property
     def cors_origin_list(self) -> list[str]:

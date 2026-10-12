@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
 from app.core.errors import AppError
+from app.core.rate_limit import limit
 from app.dependencies.auth import CurrentSession, get_current_session, get_google_verifier
 from app.dependencies.db import get_db
 from app.integrations.google_auth import GoogleIdentity, GoogleVerifier
@@ -48,7 +49,12 @@ def _respond(result: AuthResult, response: Response, settings: Settings) -> Auth
     return body
 
 
-@router.post("/google", response_model=AuthResponse, response_model_exclude_none=True)
+@router.post(
+    "/google",
+    response_model=AuthResponse,
+    response_model_exclude_none=True,
+    dependencies=[Depends(limit("auth-google", 10, 60))],
+)
 def sign_in_with_google(
     payload: GoogleSignInRequest,
     request: Request,
@@ -64,7 +70,12 @@ def sign_in_with_google(
     return _respond(result, response, settings)
 
 
-@router.post("/refresh", response_model=AuthResponse, response_model_exclude_none=True)
+@router.post(
+    "/refresh",
+    response_model=AuthResponse,
+    response_model_exclude_none=True,
+    dependencies=[Depends(limit("auth-refresh", 30, 60))],
+)
 def refresh(
     request: Request,
     response: Response,
@@ -91,7 +102,12 @@ def create_admin_handoff(
     return HandoffOut(code=code, expires_in=HANDOFF_TTL_SECONDS)
 
 
-@router.post("/admin-handoff/redeem", response_model=AuthResponse, response_model_exclude_none=True)
+@router.post(
+    "/admin-handoff/redeem",
+    response_model=AuthResponse,
+    response_model_exclude_none=True,
+    dependencies=[Depends(limit("auth-redeem", 10, 60))],
+)
 def redeem_admin_handoff(
     payload: HandoffRedeemRequest,
     request: Request,

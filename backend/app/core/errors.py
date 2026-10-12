@@ -19,6 +19,7 @@ _HTTP_STATUS_CODES = {
     403: "FORBIDDEN",
     404: "NOT_FOUND",
     405: "METHOD_NOT_ALLOWED",
+    413: "PAYLOAD_TOO_LARGE",
     429: "RATE_LIMITED",
 }
 
@@ -32,12 +33,14 @@ class AppError(Exception):
         message: str,
         status_code: int = 400,
         details: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
     ) -> None:
         super().__init__(message)
         self.code = code
         self.message = message
         self.status_code = status_code
         self.details = details or {}
+        self.headers = headers or {}
 
 
 def error_response(
@@ -50,7 +53,9 @@ def error_response(
 
 
 async def _handle_app_error(_: Request, exc: AppError) -> JSONResponse:
-    return error_response(exc.status_code, exc.code, exc.message, exc.details)
+    response = error_response(exc.status_code, exc.code, exc.message, exc.details)
+    response.headers.update(exc.headers)
+    return response
 
 
 async def _handle_validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:

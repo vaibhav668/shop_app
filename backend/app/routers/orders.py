@@ -4,6 +4,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
+from app.core.rate_limit import limit
 from app.dependencies.auth import get_current_user
 from app.dependencies.db import get_db
 from app.dependencies.notifications import get_notifier
@@ -39,7 +40,12 @@ def get_views(storage: StorageProvider = Depends(get_storage)) -> OrderViews:
     return OrderViews(storage)
 
 
-@router.post("", response_model=PlaceOrderOut, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=PlaceOrderOut,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(limit("place-order", 10, 60))],
+)
 def place_order(
     payload: PlaceOrderRequest,
     response: Response,
