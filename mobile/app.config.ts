@@ -31,7 +31,8 @@ const config: ExpoConfig = {
     ...(GOOGLE_SERVICES_FILE ? { googleServicesFile: GOOGLE_SERVICES_FILE } : {}),
 
     adaptiveIcon: {
-      backgroundColor: '#FAFAF7',
+      // Forest behind the gold basket, matching the launcher icon.
+      backgroundColor: '#14532D',
       foregroundImage: './assets/images/android-icon-foreground.png',
       monochromeImage: './assets/images/android-icon-monochrome.png',
     },
@@ -58,7 +59,7 @@ const config: ExpoConfig = {
       {
         // Small status-bar icon: must be a white-on-transparent silhouette.
         icon: './assets/images/android-icon-monochrome.png',
-        color: '#16A34A',
+        color: '#14532D',
         defaultChannel: 'orders',
       },
     ],
@@ -66,9 +67,10 @@ const config: ExpoConfig = {
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#FAFAF7',
+        // The gold basket on forest, like the welcome screen that follows.
+        backgroundColor: '#14532D',
         image: './assets/images/splash-icon.png',
-        imageWidth: 120,
+        imageWidth: 140,
       },
     ],
   ],

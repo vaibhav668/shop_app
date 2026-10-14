@@ -8,7 +8,7 @@
  *   npm run screenshots                     # every main screen → screenshots/
  *   npm run screenshots -- / /cart          # just these routes
  *
- * Env: OUT (folder), W/H (viewport), CHROME (browser path), CART=1 (put 3 items in the cart
+ * Env: OUT (folder), W/H (viewport), DPR (pixel ratio), CHROME (browser path), CART=1 (put 3 items in the cart
  * first), SCROLL=<px> (scroll the main list before the shot), WAIT=<ms> (settle time).
  */
 import { existsSync, mkdirSync } from 'node:fs';
@@ -21,6 +21,7 @@ const OUT = process.env.OUT ?? 'screenshots';
 const W = Number(process.env.W ?? 390);
 const H = Number(process.env.H ?? 844);
 const WAIT = Number(process.env.WAIT ?? 3500);
+const DPR = Number(process.env.DPR ?? 2);
 const DEFAULT_ROUTES = ['/', '/categories', '/search', '/cart', '/orders', '/account'];
 
 const BROWSERS = [
@@ -79,7 +80,7 @@ const page = await browser.newPage();
 await page.setViewport({
   width: W,
   height: H,
-  deviceScaleFactor: 2,
+  deviceScaleFactor: DPR,
   isMobile: true,
   hasTouch: true,
 });
