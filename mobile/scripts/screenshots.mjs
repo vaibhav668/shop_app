@@ -8,6 +8,7 @@
  *   npm run screenshots                     # every main screen → screenshots/
  *   npm run screenshots -- / /cart          # just these routes
  *
+ * With CHECK=1 it also reports anything that sticks out past the screen edge.
  * Env: OUT (folder), W/H (viewport), DPR (pixel ratio), CHROME (browser path), CART=1 (put 3 items in the cart
  * first), SCROLL=<px> (scroll the main list before the shot), WAIT=<ms> (settle time).
  */
@@ -110,6 +111,39 @@ for (const route of routes) {
       if (scroller) scroller.scrollTop = y;
     }, Number(process.env.SCROLL));
     await new Promise((r) => setTimeout(r, 900));
+  }
+  if (process.env.CHECK) {
+    const found = await page.evaluate((vw) => {
+      const out = [];
+      for (const el of document.querySelectorAll('body *')) {
+        const r = el.getBoundingClientRect();
+        const st = getComputedStyle(el);
+        if (r.width === 0 || r.height === 0 || st.visibility === 'hidden' || st.display === 'none')
+          continue;
+        if (r.right <= vw + 1 && r.left >= -1) continue;
+        // Content inside its own sideways scroller (rails, tab rows) may extend past the edge.
+        let p = el.parentElement;
+        let scrolled = false;
+        while (p && p !== document.body) {
+          const o = getComputedStyle(p).overflowX;
+          if (
+            (o === 'auto' || o === 'scroll' || o === 'hidden') &&
+            p.getBoundingClientRect().right <= vw + 1
+          ) {
+            scrolled = true;
+            break;
+          }
+          p = p.parentElement;
+        }
+        if (!scrolled)
+          out.push(
+            `${el.tagName.toLowerCase()} ends at ${Math.round(r.right)}px: "${(el.textContent ?? '').trim().slice(0, 40)}"`,
+          );
+      }
+      return [...new Set(out)].slice(0, 6);
+    }, W);
+    console.log(found.length ? `OVERFLOW ${route}` : `ok       ${route}`);
+    found.forEach((f) => console.log(`           ${f}`));
   }
   const name = route.replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '') || 'home';
   await page.screenshot({ path: `${OUT}/${name}${process.env.SCROLL ? '_scrolled' : ''}.png` });

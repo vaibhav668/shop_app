@@ -79,7 +79,13 @@
 @media (max-width: 767px) {
   .toolbar {
     flex-direction: column;
+    flex-wrap: nowrap; /* a wrapping column sizes itself to its widest child (the tabs) */
     align-items: stretch;
+  }
+
+  .toolbar > * {
+    min-width: 0;
+    max-width: 100%;
   }
 
   /* Status tabs scroll sideways instead of wrapping into several rows. */
